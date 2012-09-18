@@ -12,8 +12,8 @@ package
 	 */
 	public class WorldGen 
 	{
-		[Embed(source = 'grid.png')]private static var levelNums:Class;
-		[Embed(source = 'auto_tiles.png')]private static var auto_tiles:Class;
+		[Embed(source = '../resources/img/grid.png')]private static var levelNums:Class;
+		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
 		
 		private var levelWidth : Number = 100;  //level width in tiles
 		private var levelHeight : Number = 100; //level height in tiles

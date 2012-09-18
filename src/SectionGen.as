@@ -3,6 +3,7 @@ package
 	import org.flixel.FlxTilemap;
 	import org.flixel.FlxU;
 	import org.flixel.system.FlxTile;
+	import org.flixel.FlxObject;
 	
 	/**
 	 * ...
@@ -10,7 +11,7 @@ package
 	 */
 	public class SectionGen 
 	{
-		[Embed(source = 'testTileset.png')]private static var grass:Class;
+		[Embed(source = '../resources/img/mario_tileset_basic.png')]private static var grass:Class;
 
 		
 		private var levelHeight : Number;
@@ -31,8 +32,15 @@ package
 			
 			genFunctions = new Array();
 			genFunctions.push(Flat);
+			genFunctions.push(Flat);
+			genFunctions.push(FlatBridge);
 			genFunctions.push(ElevationChange);
-			genFunctions.push(Gap);
+			genFunctions.push(ElevationChange);
+			genFunctions.push(ElevationChange);
+			genFunctions.push(ElevationChange);
+			genFunctions.push(SmallGap);
+			genFunctions.push(SmallGap);
+			genFunctions.push(LargeGap);
 		}
 		
 		public function GenerateSection() : FlxTilemap {
@@ -42,8 +50,6 @@ package
 				return Flat();
 			}
 			else {
-				
-				
 				var toUse : Function = FlxU.getRandom(genFunctions) as Function;
 				
 				var newSect : FlxTilemap = toUse();
@@ -52,10 +58,6 @@ package
 				}
 				else return GenerateSection();
 			}
-		}
-		
-		private function getRandom(min:int, max:int) {
-			return Math.round(Math.random() * (max - min)) + min;
 		}
 		
 		//begin actual terrain gen
@@ -68,15 +70,42 @@ package
 			
 			for (var x : int = 0; x < width; x++) {
 				var setTile : int = 1;
-				if (x == width - 1) {
-					setTile = 2;
-				}
-				
 				returned.setTile(x, currentElevation, setTile);
-				for (var y : int = currentElevation + 1; y < levelHeight; y++) {
-					returned.setTile(x, y, 3);
-				}
+				
+				FillUnder(x, currentElevation, returned);
 			}
+			
+			//maybe put a bush or a pipe on it
+			var maybe : int = FlxU.getRandom([0, 0, 0, 1, 2]) as int;
+			if (maybe == 1) {
+				var bushX : int = getRandom(2, width - 3);
+				AddBush(bushX, currentElevation - 1, returned);
+			}
+			else if (maybe == 2) {
+				var pipeX : int = getRandom(2, width - 3);
+				AddPipe(pipeX, currentElevation - 1, returned);
+			}
+			
+			currentX += width * CommonConstants.TILEWIDTH;
+			return returned;
+		}
+		
+		private function FlatBridge() : FlxTilemap {
+			var returned : FlxTilemap = new FlxTilemap();
+			var width : int = getRandom(4, 10);
+			
+			returned.loadMap(MakeEmptySectionString(width, levelHeight), grass, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT); 
+			returned.x = currentX;
+			
+			for (var x : int = 0; x < width - 1; x++) {
+				var setTile : int = 4;
+
+				returned.setTile(x, currentElevation, setTile);
+				returned.setTile(x, currentElevation - 1, 15);
+				returned.setTileProperties(returned.getTile(x, currentElevation - 1), FlxObject.NONE);
+
+			}
+			FillUnder(width - 1, currentElevation-1, returned);
 			
 			currentX += width * CommonConstants.TILEWIDTH;
 			return returned;
@@ -128,28 +157,50 @@ package
 					returned.setTile(x, currentElevation, 1);
 				}
 				
-				for (var y : int = currentElevation + 1; y < levelHeight; y++) {
-					returned.setTile(x, y, 3);
-				}
+				FillUnder(x, currentElevation, returned);
 			}
 			
 			currentX += width * CommonConstants.TILEWIDTH;
 			return returned;
 		}
 		
-		private function Gap() : FlxTilemap {
+		private function SmallGap() : FlxTilemap {		
+			
 			var returned : FlxTilemap = new FlxTilemap();
-			var width : int = getRandom(4, 8);
+			var width : int = getRandom(5, 12);
+			var endWidth : int = getRandom(3, 4);
 			
 			returned.loadMap(MakeEmptySectionString(width, levelHeight), grass, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT); 
 			returned.x = currentX;
 			
-			returned.setTile(width-1, currentElevation, 2);
-			for (var y : int = currentElevation + 1; y < levelHeight; y++) {
-				returned.setTile(width-1, y, 3);
+			for (var x : int = width - endWidth; x < width; x++) {
+				FillUnder(x, currentElevation - 1, returned);
 			}
 			
 			currentX += width * CommonConstants.TILEWIDTH;
+
+			return returned;
+		}
+		
+		private function LargeGap() : FlxTilemap {
+			var returned : FlxTilemap = new FlxTilemap();
+			var width : int = getRandom(10, 25);
+			
+			returned.loadMap(MakeEmptySectionString(width, levelHeight), grass, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT); 
+			returned.x = currentX;
+			
+			for (var y : int = currentElevation; y < levelHeight; y++) {
+				returned.setTile(width-1, y, 1);
+			}
+			
+			//add some platforms:
+			
+			
+			
+			AddSpacedPlatforms(returned);
+			
+			currentX += width * CommonConstants.TILEWIDTH;
+
 			return returned;
 		}
 		
@@ -164,6 +215,65 @@ package
 			return FlxTilemap.arrayToCSV(data, width);
 		}
 		
+		private function getRandom(min:int, max:int) {
+			return Math.round(Math.random() * (max - min)) + min;
+		}
+		
+		private function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) {
+			for (var y : int = sy + 1; y < levelHeight; y++) {
+				tiles.setTile(sx, y, fillTile);
+			}
+		}
+		
+		private function AddPlatform(sx:int, sy:int, width:int, tiles:FlxTilemap) {
+			
+			tiles.setTile(sx, sy, 5);
+			for (var x:int = sx + 1; x < sx + width - 1; x++) {
+				tiles.setTile(x, sy, 6);
+			}
+			tiles.setTile(sx+width-1, sy, 7);
+			
+		}
+		
+		private function AddSpacedPlatforms(tiles:FlxTilemap) {
+			var width : int = tiles.widthInTiles;
+			
+			var currentX : int = 2;
+			
+			
+			while (width > 6) {
+				var platformWidth : int = getRandom(2, 4);
+				
+				if (currentX + platformWidth + 1 >= tiles.widthInTiles) {
+					break;
+				}
+				
+				AddPlatform(currentX, currentElevation, platformWidth, tiles);
+				
+				currentX += platformWidth + getRandom(2, 4);
+				
+				width -= platformWidth;
+			}
+		}
+		
+		private function AddBush(sx:int, sy:int, tiles:FlxTilemap) {
+			if (sx + 2 >= tiles.width) {
+				return;
+			}
+			tiles.setTile(sx, sy, 12);
+			tiles.setTile(sx+1, sy, 13);
+			tiles.setTile(sx+2, sy, 14);
+			tiles.setTileProperties(tiles.getTile(sx, sy), FlxObject.NONE);
+			tiles.setTileProperties(tiles.getTile(sx+1, sy), FlxObject.NONE);
+			tiles.setTileProperties(tiles.getTile(sx+2, sy), FlxObject.NONE);
+		}
+		
+		private function AddPipe(sx:int, sy:int, tiles:FlxTilemap) {
+			tiles.setTile(sx, sy, 10);
+			tiles.setTile(sx+1, sy, 11);
+			tiles.setTile(sx, sy-1, 8);
+			tiles.setTile(sx+1, sy-1, 9);
+		}
 	}
 
 }

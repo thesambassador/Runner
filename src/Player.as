@@ -1,6 +1,8 @@
 package 
 {
+	import flash.utils.Dictionary;
 	import org.flixel.*;
+	import org.flixel.system.FlxAnim;
 	/**
 	 * ...
 	 * @author Sam Tregillus
@@ -8,32 +10,54 @@ package
 	public class Player extends FlxSprite
 	{
 		
-		[Embed(source = 'mario.png')]private static var marioSprites:Class;
+		[Embed(source = '../resources/img/mario.png')]private static var marioSprites:Class;
 		
-		private static var jumpTime:Number = 7;  //variable for how long you can hold down the jump button and get lift
+		var state : String;
+		
+		
 		private var jumpEnergy:Number = jumpTime;
-		private var jumpVel:Number = 225.00;
 		
-		private var walkSpeed:Number = 160;
-		private var runSpeed:Number = 250
 		
-		private var jumpButton:String = "Z";
-		private var runButton:String = "SHIFT"
+		private var controlConfig : Dictionary;
 		
 		public var onWall : Number = 0;  //0 = not on a wall, 1=on a wall to the left, 2= on a wall to the right
 		public var stickTime : Number = 2;
 		private var timetostick: Number = 5;
 	
-		private var gravity : Number = 1000;
+		
 		
 		private var hanging : Boolean = false;
 		private var canGrab : Number = 0;  //0 = no, 1 = cangrab left, 2 = can grab right
 		
 		public var rem : Number;
 		
+		//movement constants:
+		private var groundDragFactor = 6;
+		private var airDragFactor = 3;
+		private var gravity : Number = 1000;
+		
+		private var walkSpeed:Number = 160;
+		private var runSpeed:Number = 250;
+		private var accelerationFactor:Number = 2;
+		
+		private var jumpTime:Number = 7;  //variable for how long you can hold down the jump button and get lift
+		private var jumpVel:Number = 225.00;
+		
+		
+		
+		
 		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
-		
+			
+			//controls:
+			controlConfig = new Dictionary();
+			controlConfig["LEFT"] = "LEFT";
+			controlConfig["RIGHT"] = "RIGHT";
+			controlConfig["UP"] = "UP";
+			controlConfig["DOWN"] = "DOWN";
+			controlConfig["JUMP"] = "Z";
+			controlConfig["RUN"] = "SHIFT";
+			
 			//movement
 			this.maxVelocity.x = walkSpeed;
 			this.maxVelocity.y = 700;
@@ -58,104 +82,33 @@ package
 		
 		override public function update():void 
 		{
+			//reset acceleration
 			this.acceleration.x = 0;
-			this.acceleration.y = 0;
+			this.acceleration.y = gravity;
 			
-			if(!hanging){
-				this.acceleration.y = gravity;
-				
-				if (stickTime > 0) {
-					stickTime --;
-				}
-				else {
-					onWall == 0;
-				}
-				
-				var runMod : Number = 1;
-				
-				if (FlxG.keys[runButton]) 
-				{
-					this.maxVelocity.x = runSpeed;
-				}
-				else {
-					this.maxVelocity.x = walkSpeed;
-				}
-				
-				
-				//move left or right
-				if (FlxG.keys.LEFT) {
-					//if we're not stuck to a right wall or if wall stick is 0:
-					if(onWall != 2 || stickTime == 0)
-						this.acceleration.x = -this.maxVelocity.x * 4 * runMod;
-					this.facing = FlxObject.LEFT;
-					if (this.isTouching(FlxObject.FLOOR)) {
-						if (this.velocity.x > 0) {
-							this.play("slow");
-						}
-						else{
-							this.play("run");
-						}
-					}
-				}
-				else if (FlxG.keys.RIGHT) {
-					//if we're not stuck to a left wall or if wall stick is 0:
-					if(onWall != 1 || stickTime == 0)
-						this.acceleration.x = this.maxVelocity.x * 4 * runMod;
-					this.facing = FlxObject.RIGHT;
-					if(this.isTouching(FlxObject.FLOOR)){
-						if (this.velocity.x < 0) {
-							this.play("slow");
-						}
-						else{
-							this.play("run");
-						}
-					}
-				}
-				else {
-					this.play("idle");
-					
-				}
-				
-				//touching floor
-				if(this.isTouching(FlxObject.FLOOR)){
-					jumpEnergy = jumpTime;
-					onWall = 0;
-					this.drag.x = this.maxVelocity.x * 6;
-				}
-				//not touching floor
-				else {
-					this.drag.x = this.maxVelocity.x * 3;
-					//release the key, can't jump any more
-					if (!FlxG.keys[jumpButton]) {
-						jumpEnergy = 0;
-					}
-					//play falling animation as we go down
-					if (this.velocity.y > 0) {
-						this.play("fall");
-					}
-					//play jumping animation as we go up
-					else if (this.velocity.y < 0) {
-						this.play("jump");
-					}
-					
-					//determine wall stick stuff here:
-					if (isTouching(FlxObject.LEFT)) {
-						onWall = 1;
-						stickTime = timetostick;
-						if(this.velocity.y > 0)
-							this.acceleration.y -= 500;
-					}
-					else if (isTouching(FlxObject.RIGHT)) {
-						onWall = 2;
-						stickTime = timetostick;
-						if(this.velocity.y > 0)
-							this.acceleration.y -= 500;
+			//determine player state
 
-					}
-				}
-				
-				//jumping stuff
-				if (FlxG.keys[jumpButton] && jumpEnergy > 0) {
+			//control responses:
+			//movement
+			if (FlxG.keys[controlConfig["RUN"]]) {
+				this.maxVelocity.x = runSpeed;
+			}
+			else {
+				this.maxVelocity.x = walkSpeed;
+			}
+			
+			if (FlxG.keys[controlConfig["LEFT"]]) {
+				this.facing = FlxObject.LEFT;
+				this.acceleration.x = -this.maxVelocity.x * accelerationFactor;
+			}
+			else if ((FlxG.keys[controlConfig["RIGHT"]])) {
+				this.facing = FlxObject.RIGHT;
+				this.acceleration.x = this.maxVelocity.x * accelerationFactor;
+			}
+			
+			//jumping
+			if (FlxG.keys[controlConfig["JUMP"]]) { //if jump energy is greater than 0, we're on the ground, or we have been holding down jump in the air
+				if(jumpEnergy > 0){
 					if (jumpEnergy >= jumpTime - 3) {
 						this.velocity.y = -jumpVel / 1.5;
 					}
@@ -167,30 +120,42 @@ package
 					}
 					jumpEnergy -= 1;
 				}
+			}
+			else {
+				jumpEnergy = 0;
+			}
+			
+			//change things for ground/air
+			if (this.isTouching(FlxObject.FLOOR)) {
+				state = "ground";
+				this.drag.x = this.maxVelocity.x * groundDragFactor;
 				
-				//wall jump stuff
-				else if (FlxG.keys.justPressed(jumpButton)) {
-					if (onWall == 1) {
-						this.velocity.y -= jumpVel;
-						this.velocity.x += runSpeed;
-						this.onWall = 0;
-						this.stickTime = 0;
-					}
-					else if (onWall == 2) {
-						this.velocity.y -= jumpVel * .8;
-						this.velocity.x -= runSpeed;
-						this.onWall = 0;
-						this.stickTime = 0;
-					}
+				
+				if (this.acceleration.x * this.velocity.x < 0) {
+					this.play("slow");
+					this.acceleration.x *= 2
 				}
-			} //end hanging
-				else { //if hanging
-					this.velocity.y = 0;
-					if (FlxG.keys.justPressed(jumpButton)) {
-						this.velocity.y -= jumpVel;
-						hanging = false;
-					}
+				else if (Math.abs(this.velocity.x) > 0) {
+					this.play("run");
 				}
+				else {
+					this.play("idle");
+				}
+				
+				jumpEnergy = jumpTime;
+			}
+			//air state
+			else {
+				state = "air";
+				this.drag.x = this.maxVelocity.x * airDragFactor;
+				
+				if (this.velocity.y > 0) {
+					this.play("jump");
+				}
+				else {
+					this.play("fall");
+				}
+			}
 			
 			super.update();
 		}

@@ -12,6 +12,7 @@ package
 		
 		public static var LEVELHEIGHT : Number = 64;
 		
+
 	}
 
 }

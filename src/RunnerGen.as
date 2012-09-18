@@ -13,8 +13,8 @@ package
 	 */
 	public class RunnerGen 
 	{
-		[Embed(source = 'auto_tiles.png')]private static var auto_tiles:Class;
-		[Embed(source = 'testTileset.png')]private static var grass:Class;
+		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
+		[Embed(source = '../resources/img/testTileset.png')]private static var grass:Class;
 		
 		private var firstChunk : FlxList ; //first chunk
 		private var lastChunk : FlxList ; //last chunk
@@ -22,6 +22,8 @@ package
 		public var chunkGroup : FlxGroup;
 		
 		private var sectionGen : SectionGen;
+		
+		private var chunkNum : Number = 0;
 		
 		//init
 		public function RunnerGen() 
@@ -43,9 +45,12 @@ package
 		
 		public function update(playerX:int, playerY:int) {
 			
-			if (playerX > sectionGen.currentX - (CommonConstants.TILEWIDTH * 16)) {
+			if (playerX > sectionGen.currentX - (CommonConstants.TILEWIDTH * 32)) {
 				AppendNewChunk();
 				//midChunkRight += chunkWidthPixels;
+			}
+			if (chunkNum > 20) {
+				RemoveFirstChunk();
 			}
 			
 		}
@@ -67,9 +72,16 @@ package
 				lastChunk = newList;
 			}
 			
+			chunkNum ++;
 			//remove the first item if we need to
 			
 			
+		}
+		
+		private function RemoveFirstChunk() : void {
+			chunkGroup.remove(firstChunk.object);
+			firstChunk = firstChunk.next;
+			chunkNum --;
 		}
 		
 		private function GenerateLevel() : void {
