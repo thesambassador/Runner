@@ -9,25 +9,11 @@ package
 	 */
 	public class Player extends FlxSprite
 	{
-		
 		[Embed(source = '../resources/img/mario.png')]private static var marioSprites:Class;
 		
 		var state : String;
-		
-		
-		private var jumpEnergy:Number = jumpTime;
-		
-		
-		private var controlConfig : Dictionary;
-		
-		public var onWall : Number = 0;  //0 = not on a wall, 1=on a wall to the left, 2= on a wall to the right
-		public var stickTime : Number = 2;
-		private var timetostick: Number = 5;
 	
-		
-		
-		private var hanging : Boolean = false;
-		private var canGrab : Number = 0;  //0 = no, 1 = cangrab left, 2 = can grab right
+		private var controlConfig : Dictionary;
 		
 		public var rem : Number;
 		
@@ -42,10 +28,9 @@ package
 		
 		private var jumpTime:Number = 7;  //variable for how long you can hold down the jump button and get lift
 		private var jumpVel:Number = 225.00;
+		private var jumpEnergy:Number = jumpTime;
 		
-		
-		
-		
+
 		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
 			
@@ -89,7 +74,7 @@ package
 			//determine player state
 
 			//control responses:
-			//movement
+			//movement 
 			if (FlxG.keys[controlConfig["RUN"]]) {
 				this.maxVelocity.x = runSpeed;
 			}
@@ -165,36 +150,6 @@ package
 			
 			var level : FlxTilemap = Object1 as FlxTilemap;
 			
-			var tilePosX : Number = Math.floor(this.x / 16);
-			var tilePosY : Number = Math.floor(this.y / 16);
-			
-			if (this.isTouching(FlxObject.LEFT) && this.velocity.y > 0) {
-				//tile to the left and down 1 from the current position
-				
-				var tile = level.getTile(tilePosX - 1, tilePosY + 1);
-				var tile2 = level.getTile(tilePosX - 1, tilePosY);
-				
-				if ( tile != 0 && tile2 == 0) {
-					this.rem = this.y % 16;
-					if (Math.abs(rem) > 14) {
-						hanging = true;
-					}
-				}
-				
-			}
-			else if (this.isTouching(FlxObject.RIGHT) && this.velocity.y > 0) {
-				//tile to the right and down 1 from the current position
-				
-				var tile = level.getTile(tilePosX + 1, tilePosY + 1);
-				var tile2 = level.getTile(tilePosX + 1, tilePosY);
-				
-				if ( tile != 0 && tile2 == 0) {
-					this.rem = this.y % 16;
-					if (Math.abs(rem) > 15) {
-						hanging = true;
-					}
-				}
-			}
 			
 		}
 		

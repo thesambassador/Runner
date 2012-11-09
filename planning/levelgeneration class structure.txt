@@ -1,0 +1,24 @@
+Level generation classes:
+
+Idea 1:
+
+	Chunk class
+		Adds itself to the stage, and has a removal function as well.
+		Embedded tileset
+		Public Tilemap groups:
+			Main tilemap (with collidable tiles)
+			Background tilemap (bushes, etc.)
+			Foreground tilemap (grass, etc.)
+	
+	ChunkGen class
+		Creates a new chunk
+		Can be extended?
+	
+	Level class
+		Has a LinkedList of Chunks
+		Background image w/paralax 
+		Decides when new chunks are generated and existing chunks are removed.
+	
+	Other thoughts...
+		Should Chunk class be extended to make more different "themes"?  Should ChunkGen?
+		Should ChunkGen just have a specific "theme" that can be changed out?

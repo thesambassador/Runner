@@ -1,0 +1,26 @@
+Blank Tile
+Core tiles:
+	3 different "top tiles" (ie grass on top, where player runs)
+	3 different "underground tiles" (underneath "top" tiles)
+	1 "destructable" tile
+	1 "power-up" destructable tile
+	1 "general obstacle" tile (for walls, small obstacles)
+	1 "bridge tile"
+	Background tiles (no collision except for top layer, "ledge" collision on top layer)
+		bg-left, bg-top-left, bg-top, bg-top-right, bg-right, bg-mid
+	
+Obstacles:
+	Stump
+	Rock
+	
+		
+
+Scenery objects (no collision)
+	2 foreground objects
+		grass blades
+		flower
+	2 background objects (on the level)
+		bush
+		
+	1 background image 
+	

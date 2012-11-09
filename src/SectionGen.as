@@ -205,6 +205,8 @@ package
 		}
 		
 		//helper functions
+		
+		//generates an emptry string of width*height length, to use to generatea  new chunk.
 		private function MakeEmptySectionString(width:int, height:int) : String {
 			var data : Array = new Array();
 			
@@ -215,16 +217,19 @@ package
 			return FlxTilemap.arrayToCSV(data, width);
 		}
 		
+		//just get a random integer random between min and max
 		private function getRandom(min:int, max:int) {
 			return Math.round(Math.random() * (max - min)) + min;
 		}
 		
+		//fill all tiles under the specific tile.
 		private function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) {
 			for (var y : int = sy + 1; y < levelHeight; y++) {
 				tiles.setTile(sx, y, fillTile);
 			}
 		}
 		
+		//adds a 1 height platform at sx, sy of width width
 		private function AddPlatform(sx:int, sy:int, width:int, tiles:FlxTilemap) {
 			
 			tiles.setTile(sx, sy, 5);
@@ -235,6 +240,7 @@ package
 			
 		}
 		
+		//add a set of spaced platform, to generate a bunch of platforms for a chunk
 		private function AddSpacedPlatforms(tiles:FlxTilemap) {
 			var width : int = tiles.widthInTiles;
 			
@@ -256,6 +262,7 @@ package
 			}
 		}
 		
+		//add a bush
 		private function AddBush(sx:int, sy:int, tiles:FlxTilemap) {
 			if (sx + 2 >= tiles.width) {
 				return;
@@ -268,6 +275,7 @@ package
 			tiles.setTileProperties(tiles.getTile(sx+2, sy), FlxObject.NONE);
 		}
 		
+		//add a pipe
 		private function AddPipe(sx:int, sy:int, tiles:FlxTilemap) {
 			tiles.setTile(sx, sy, 10);
 			tiles.setTile(sx+1, sy, 11);
