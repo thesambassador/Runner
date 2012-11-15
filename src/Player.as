@@ -9,7 +9,7 @@ package
 	 */
 	public class Player extends FlxSprite
 	{
-		[Embed(source = '../resources/img/mario.png')]private static var marioSprites:Class;
+		[Embed(source = '../resources/img/bigmario.png')]private static var marioSprites:Class;
 		
 		var state : String;
 	
@@ -50,17 +50,18 @@ package
 			this.drag.x = this.maxVelocity.x * 3;
 			
 			//graphics
-			this.loadGraphic(marioSprites, true, true, 16, 16);
+			this.loadGraphic(marioSprites, true, true, 16, 32);
 			this.frames = 4;
 			this.frameWidth = 16;
 			this.frameHeight = 16;
 			
 			//animation
-			this.addAnimation("run", new Array(0, 1), 10);
+			this.addAnimation("run", new Array(0, 2, 1), 10);
 			this.addAnimation("idle", new Array(0, 0));
-			this.addAnimation("jump", new Array(2, 2));
+			this.addAnimation("jump", new Array(3, 3));
 			this.addAnimation("fall", new Array(3, 3));
 			this.addAnimation("slow", new Array(4, 4));
+			this.addAnimation("slide", new Array(5, 5));
 			
 			this.width = 15; //so we can still fall between 2 tiles with a 1 space gap
 		}
@@ -149,7 +150,6 @@ package
 			FlxObject.separate(Object1, Object2);
 			
 			var level : FlxTilemap = Object1 as FlxTilemap;
-			
 			
 		}
 		

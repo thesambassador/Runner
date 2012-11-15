@@ -1,0 +1,67 @@
+Base units:
+	Flat
+		Normal flat plain
+		Bridge
+		2-levels
+	Gap
+		Simple jump-over
+		platforms in between
+		Differnet under-you-things:
+			Spikes
+			Endless Pit
+			Lava
+	Elevation gain
+		Normal jump (stairs)
+		Elevator
+		Jump-pad
+	Gap+elevation gain?
+		Moving platforms/elevators
+		floating platform-steps
+	Flat+elevation gain?
+		2-levels, need to jump on 2nd level to get up
+		
+Obstacles:
+	Flat:
+		Enemies
+			Normal jump-on (goombas)
+			Jumping dudes (like flying jumping turtles)
+			Attack-through (need to use attack)
+			Slide-through (need to slide, then can jump on)
+		Basic hurtles (2-high, just jump)
+		Advanced hurtles (first is 2-high, next need to be jumped to)
+		Pyramids
+		Projectiles 
+			From top/bottom
+			From right-to-left
+		Spinning flames (like in mario)
+		Destructable blocks
+		1-high, need to slide
+	Gap:
+		Enemies:
+			Flying dudes (like the flying turtles)
+			Projectiles (like bullet bill)
+		Spaced out platforms
+		Flying lava-fireballs
+		Moving platforms
+		Kill-lines (laser, lasts a few seconds, then goes away, need to time)
+		Moving kill-you things (like the saws in SMB)
+		Different-height platforms
+		Disappearing platforms
+		Falling platforms (donuts in Mario)
+		Spinning platforms (randomly spin and knock you off, have to time your jumps)
+		Rotating platforms (platforms "rotating" circularly around a pivot point)
+	
+	Elevation gain:
+		Moving platforms
+		Double-spring (jump on one, then need to hit another higher one)
+
+Special events?
+	Boss battles
+	Projectiles
+	Speed-requrement (running from something)
+	Stand-on-platform and avoid obstacles (like mario lava levels, where you ride the platform)
+	Falling challange?
+	Spring challenge? (keep jumping on springs to get very high)
+	
+		
+	
