@@ -3,12 +3,12 @@ Level generation classes:
 Idea 1:
 
 	Chunk class
-		Adds itself to the stage, and has a removal function as well.
-		Embedded tileset
+		Embedded tileset object?  should this be in ChunkGen?
 		Public Tilemap groups:
 			Main tilemap (with collidable tiles)
 			Background tilemap (bushes, etc.)
 			Foreground tilemap (grass, etc.)
+		Keeps track of next chunk (basic linked list node)
 	
 	ChunkGen class
 		Creates a new chunk
@@ -22,3 +22,10 @@ Idea 1:
 	Other thoughts...
 		Should Chunk class be extended to make more different "themes"?  Should ChunkGen?
 		Should ChunkGen just have a specific "theme" that can be changed out?
+		
+	Generation process:
+		Generate "main unit" (flat, gap, elevation, etc.)
+		Determine which obstacles are valid for the current difficulty/chunk size
+		Pick X obstacles to add to the chunk at random
+		
+		

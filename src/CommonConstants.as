@@ -12,7 +12,7 @@ package
 		
 		public static var LEVELHEIGHT : Number = 64;
 		
-
+		public static var JUMPHEIGHT : Number = 3; //maximum height in tiles that the player can jump
 	}
 
 }

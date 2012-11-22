@@ -797,5 +797,14 @@ package org.flixel
 
 			addChild(_focus);
 		}
+		protected function get debugger():FlxDebugger {
+			return _debugger;
+		}
+		protected function get debuggerUp():Boolean {
+			return _debuggerUp;
+		}
+		protected function set debuggerUp(b:Boolean):void {
+			_debuggerUp = b;
+		}
 	}
 }

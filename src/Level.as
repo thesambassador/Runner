@@ -16,26 +16,36 @@ package
 		private var firstChunk : Chunk ; //first chunk
 		private var lastChunk : Chunk ; //last chunk
 		private var chunkGen : ChunkGen;
-		private var chunkNum : Number = 0;
+		private var chunkNum : Number = 0; //number of chunks currently active
+		private var chunkLimit : Number = 15; //number of chunks allowed at once before we start removing them
 		
 		public var chunkGroup : FlxGroup;
+		public var entityGroup : FlxGroup;
 		
 		public var player : Player;
 		
 		//init
 		public function Level() 
 		{
-			chunkGen = new ChunkGen();
+			
+			chunkGen = new LevelOneChunkGen();
+			
 			chunkGroup = new FlxGroup();
+			entityGroup = new FlxGroup();
 			FlxG.state.add(chunkGroup);
+			FlxG.state.add(entityGroup);
 			
 			//create player and add it to the map
 			player = new Player(getStartX(), getStartY());
+			player.health = 1;
 			FlxG.state.add(player);
 			
+			//var enemy:Enemy = new Enemy(getStartX()+100, getStartY());
+			//var group:FlxGroup = new FlxGroup();
+
 			//set camera and world bounds
 			FlxG.camera.setBounds(0, 0, 100, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
-			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.TILEWIDTH * 8, CommonConstants.TILEHEIGHT * 8);
+			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.TILEWIDTH * 32, CommonConstants.TILEHEIGHT * 8);
 		}
 		
 		
@@ -50,11 +60,14 @@ package
 		
 		public function update() {
 			
-			FlxG.worldBounds.x = player.x;
+			FlxG.worldBounds.x = player.x - 64;
 			FlxG.worldBounds.y = player.y;
 			
 			//check collisions
 			FlxG.collide(chunkGroup, player, player.collideTilemap);
+			FlxG.collide(chunkGroup, entityGroup);
+			FlxG.collide(entityGroup, player, this.EnemyCollideWithPlayer);
+			
 			
 			var camera : FlxCamera = FlxG.camera;
 			var playerPoint : FlxPoint = player.getMidpoint();
@@ -63,7 +76,12 @@ package
 			
 			camera.setBounds(0, 0, player.x + 1000, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
 			
+			//player falls off the world
 			if (player.y > CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT) {
+				player.health = 0;
+			}
+			
+			if (player.health == 0) {
 				FlxG.resetState();
 			}
 			
@@ -71,7 +89,7 @@ package
 				AppendNewChunk();
 				//midChunkRight += chunkWidthPixels;
 			}
-			if (chunkNum > 20) {
+			if (chunkNum > chunkLimit) {
 				RemoveFirstChunk();
 			}
 		}
@@ -81,6 +99,8 @@ package
 			var newChunk : Chunk = chunkGen.GenerateChunk();
 
 			chunkGroup.add(newChunk.allLayers);
+			if(newChunk.entities.length > 0)
+				entityGroup.add(newChunk.entities);
 
 			//append it to the list
 			if (firstChunk == null) {
@@ -99,10 +119,26 @@ package
 		private function RemoveFirstChunk() : void {
 			var chunk1 : Chunk = firstChunk;
 			chunkGroup.remove(chunk1.allLayers);
+			entityGroup.remove(chunk1.entities);
 			firstChunk = firstChunk.nextChunk;
 			chunkNum --;
 		}
 		
+		
+		public function EnemyCollideWithPlayer(enemy:FlxObject, player:FlxObject) {
+			var playerSprite : FlxSprite = player as FlxSprite;
+			var enemySprite : FlxSprite = enemy as FlxSprite;
+			if (enemy.health > 0) {
+				if (enemy.y - playerSprite.y > 16) {
+					playerSprite.velocity.y -= 300;
+					enemy.health = 0;
+				}
+				else {
+					playerSprite.health -= 1;
+				}
+			
+			}
+		}
 
 	}
 

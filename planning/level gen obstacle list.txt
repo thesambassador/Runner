@@ -1,3 +1,13 @@
+Each chunk will be one of the "base units"
+Each chunk has between 0 and... some number of obstacles
+Each obstacle only appears between a mindifficulty and maxdifficulty
+Obstacle types?
+	Environment - solid parts that are part of the main tileset
+		Does this include moving platforms?
+	Hazard - moving or non-moving entity that kills on touch
+	Enemy - different behaviors and ways to get around them
+	
+
 Base units:
 	Flat
 		Normal flat plain
@@ -55,6 +65,8 @@ Obstacles:
 		Moving platforms
 		Double-spring (jump on one, then need to hit another higher one)
 
+	General obstacles:
+		
 Special events?
 	Boss battles
 	Projectiles
@@ -63,5 +75,99 @@ Special events?
 	Falling challange?
 	Spring challenge? (keep jumping on springs to get very high)
 	
-		
+
+Difficulty:  function of currentX (how far to the right you've gone) and difficultyFactor.  To start, it'll be linear, with Difficulty = (int)(currentX / difficultyFactor), and difficultyFactor being ~1000
+
+Difficulty changes:
+	0(start): 
+		Flat: obstacle limit = 1
+			Flat length, no obstacles
+			Simple hurtle
+			Small pyramids
+			Some 2-levels
+		Gap: obstacle limit = 0
+			Small width gaps (6 width max)
+			Small gap with platform
+		Elevation change:
+			Basic, just go up or down 1 or 2 blocks only
+	
+	1:
+		Flat: obstacle limit = 2
+			Flat length, no obstacles
+			Simple hurtle
+			Small-large pyramids
+			2-levels
+			Normal enemy
+			Destructable walls
+		Gap: obstacle limit = 1
+			Medium width gaps (8 width max)
+			Spaced platforms (3 width between each), no height difference
+		Elevation change:
+			Basic, just go up or down 1 or 2 blocks only.
+	2:
+		Flat: obstacle limit = 2
+			Flat length, no obstacles
+			Simple hurtle
+			Advanced hurtle
+			2-levels
+			Normal enemy
+			Destructable walls
+			Slide, width of 1
+		Gap obstacle limit = 1
+			Medium width gaps (8 width max)
+			Spaced platforms (4 widht between each max), small height difference
+			Flying enemies
+		Elevation change:
+			Basic, just go up or down 1 or 2 blocks
+			Springboard (6-8 height)
+	4: 
+		Flat: obstacle limit = 3
+			Flat length, no obstacles
+			Simple Hurtle
+			Advanced hurtle
+			2-levels
+			Normal enemy
+			Destructable walls
+			Slide, width of 2
+			Jumping enemy
+		Gap: obstacle limit = 2
+			Medium width gaps (8 width max)
+			Spaced platforms (4 width between each max), max height difference (as high as you can jump)
+			Flying enemies
+			Falling platforms (donuts)
+		Elevation change:
+			Basic, just go up or down 1 or 2 blocks
+			Springboard (6-8 height)
+			Elevator (1-2 moving platforms, 6-8 height)
+		Gap/Elevation change:
+			3 platforms, going up like stairs, 2 height each change
+			
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	

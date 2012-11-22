@@ -27,8 +27,9 @@ package
 		private var accelerationFactor:Number = 2;
 		
 		private var jumpTime:Number = 7;  //variable for how long you can hold down the jump button and get lift
-		private var jumpVel:Number = 225.00;
+		private var jumpVel:Number = 245.00;
 		private var jumpEnergy:Number = jumpTime;
+		private var canJump:Boolean = true; //variable to require releasing the jump key before being able to jump again
 		
 
 		public function Player(xStart:int = 0, yStart:int = 0){
@@ -64,6 +65,8 @@ package
 			this.addAnimation("slide", new Array(5, 5));
 			
 			this.width = 15; //so we can still fall between 2 tiles with a 1 space gap
+			
+			FlxG.watch(this, "y", "PlayerY");
 		}
 		
 		override public function update():void 
@@ -93,7 +96,7 @@ package
 			}
 			
 			//jumping
-			if (FlxG.keys[controlConfig["JUMP"]]) { //if jump energy is greater than 0, we're on the ground, or we have been holding down jump in the air
+			if (FlxG.keys[controlConfig["JUMP"]] && canJump) { //if jump energy is greater than 0, we're on the ground, or we have been holding down jump in the air
 				if(jumpEnergy > 0){
 					if (jumpEnergy >= jumpTime - 3) {
 						this.velocity.y = -jumpVel / 1.5;
@@ -106,10 +109,16 @@ package
 					}
 					jumpEnergy -= 1;
 				}
+
 			}
-			else {
+			else{
 				jumpEnergy = 0;
+				
 			}
+			
+			
+			
+
 			
 			//change things for ground/air
 			if (this.isTouching(FlxObject.FLOOR)) {
@@ -146,10 +155,10 @@ package
 			super.update();
 		}
 		
-		public function collideTilemap(Object1:FlxObject, Object2:FlxObject) {
-			FlxObject.separate(Object1, Object2);
-			
-			var level : FlxTilemap = Object1 as FlxTilemap;
+		
+		public function collideTilemap(tilemap:FlxObject, player:FlxObject) {
+			FlxObject.separate(tilemap, player);
+		
 			
 		}
 		
