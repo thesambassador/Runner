@@ -1,0 +1,10 @@
+Title: Runner (working title)
+Author: Sam Tregillus aka TheSambassador
+Date: 2012 (started basic planning in August 2012)
+Platform: Flash, using the Flixel engine (www.flixel.org)
+
+Runner is a procedurally generated right-to-left running platformer.  The game will attempt to emulate Mario-like platforming mechanics while procedurally generating a unique and fun level each time.
+
+Gameplay will be either never-ending or limited to about 3 or 4 major "areas".  I still haven't decided.  
+
+Gameplay is traditional run-and-jump platforming.  The game will reward traveling at top-speed for uninteruppted periods of time, as well as reward defeating enemies and collecting collectibles.
