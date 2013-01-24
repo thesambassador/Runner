@@ -1,17 +1,18 @@
 package  
 {
+	import flash.utils.ByteArray;
 	import org.flixel.system.FlxList;
 	import org.flixel.*;
+	import org.flixel.system.FlxTile;
 
 	/**
-	 * Each "chunk" will be 1-2 screen widths of a level, stored as a FlxTilemap
-	 * We will have 4-5 chunks "active" or "loaded" at a time.  As the player moves forward, it will unload the "first" chunk (farthest left) and load a new "last" chunk (farthest right).
-	 * 
+	 * test level... not randomly generated, just a quick class that I duplicated to test player movement.
 	 */
-	public class Level 
+	public class StaticLevel 
 	{
 		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
-		[Embed(source = '../resources/img/testTileset.png')]private static var grass:Class;
+		[Embed(source = '../resources/img/grasstileset.png')]private static var grass:Class;
+		[Embed(source = "../resources/lvls/testLevel.csv", mimeType = "application/octet-stream")]private static var levelText:Class;
 		
 		private var firstChunk : Chunk ; //first chunk
 		private var lastChunk : Chunk ; //last chunk
@@ -23,12 +24,11 @@ package
 		public var entityGroup : FlxGroup;
 		
 		public var player : Player;
-		public var proj : Projectile;
+		public var level : FlxTilemap;
 		
 		//init
-		public function Level() 
+		public function StaticLevel() 
 		{
-			
 			chunkGen = new LevelOneChunkGen();
 			
 			chunkGroup = new FlxGroup();
@@ -41,37 +41,48 @@ package
 			player.health = 1;
 			FlxG.state.add(player);
 			
+			//proj = new Projectile(160, 384);
+			//FlxG.state.add(proj);
+			
 			//var enemy:Enemy = new Enemy(getStartX()+100, getStartY());
 			//var group:FlxGroup = new FlxGroup();
-			
-			
-			
+
 			//set camera and world bounds
 			FlxG.camera.setBounds(0, 0, 100, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
-			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.TILEWIDTH * 32, CommonConstants.TILEHEIGHT * 8);
+			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.WINDOWWIDTH + 128, CommonConstants.WINDOWHEIGHT + 128);
 			
-			FlxG.watch(this, "chunkNum", "Chunk Num");
+			GenLevel();
+			
+			FlxG.watch(FlxG.worldBounds, "x", "WorldX");
+			FlxG.watch(FlxG.worldBounds, "y", "WorldY");
 		}
 		
 		
 		public function getStartX() : Number {
-			return CommonConstants.TILEWIDTH * 10;
+			return CommonConstants.TILEWIDTH * 3;
 		}
 		public function getStartY() : Number {
-			return  (CommonConstants.LEVELHEIGHT - 5) * CommonConstants.TILEHEIGHT;
+			return  (20 - 5) * CommonConstants.TILEHEIGHT;
 		}
 		
-		
+		public function test(a : FlxObject, b:FlxObject) {
+			
+		}
 		
 		public function update() {
 			
 			FlxG.worldBounds.x = player.x - 64;
-			FlxG.worldBounds.y = player.y;
+			FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
+			
+			if(player.attackProjectile != null)
+				if(level.overlaps(player.attackProjectile))
+					var x = 5;
 			
 			//check collisions
-			FlxG.collide(chunkGroup, player, player.collideTilemap);
+			FlxG.overlap(chunkGroup, player, player.collideTilemap);
 			FlxG.collide(chunkGroup, entityGroup);
 			FlxG.collide(entityGroup, player, this.EnemyCollideWithPlayer);
+			
 			
 			
 			var camera : FlxCamera = FlxG.camera;
@@ -89,48 +100,10 @@ package
 			if (player.health == 0) {
 				FlxG.resetState();
 			}
-			
-			//if (player.x > chunkGen.currentX - (CommonConstants.TILEWIDTH * 32)) {
-			if(chunkNum < chunkLimit) {
-				AppendNewChunk();
-				//midChunkRight += chunkWidthPixels;
-			}
-			if (chunkNum > chunkLimit) {
-				RemoveFirstChunk();
-			}
-		}
-		
-		private function AppendNewChunk() : void {
-			//create new chunk
-			var newChunk : Chunk = chunkGen.GenerateChunk();
-
-			chunkGroup.add(newChunk.allLayers);
-			if(newChunk.entities.length > 0)
-				entityGroup.add(newChunk.entities);
-
-			//append it to the list
-			if (firstChunk == null) {
-				firstChunk = newChunk;
-				lastChunk = newChunk;
-			}
-			else{
-				lastChunk.nextChunk = newChunk;
-				lastChunk = newChunk;
-			}
-			
-			chunkNum ++;
 
 		}
 		
-		private function RemoveFirstChunk() : void {
-			var chunk1 : Chunk = firstChunk;
-			chunkGroup.remove(chunk1.allLayers);
-			entityGroup.remove(chunk1.entities);
-			firstChunk = firstChunk.nextChunk;
-			chunkNum --;
-		}
-		
-		
+
 		public function EnemyCollideWithPlayer(enemy:FlxObject, player:FlxObject) {
 			var playerSprite : FlxSprite = player as FlxSprite;
 			var enemySprite : FlxSprite = enemy as FlxSprite;
@@ -144,6 +117,33 @@ package
 				}
 			
 			}
+		}
+		
+		public function GenLevel () : void {
+			
+			var b : ByteArray = new levelText();
+			var levelString : String = b.readUTFBytes(b.length);
+			
+			level = new FlxTilemap();
+			level.loadMap(levelString, grass, 16,16);
+			
+			var starBlocks : Array = level.getTileInstances(16);
+			
+
+			level.setTileProperties(16, FlxObject.ANY, starCallback, MeleeAttack);
+			level.setTileProperties(28, FlxObject.NONE);
+			level.setTileProperties(29, FlxObject.NONE);
+			level.setTileProperties(30, FlxObject.NONE);
+			level.setTileProperties(20, FlxObject.UP);
+			level.setTileProperties(21, FlxObject.UP);
+			level.setTileProperties(22, FlxObject.UP);
+
+			
+			chunkGroup.add(level);
+		}
+		
+		public function starCallback(Tile:FlxTile, obj:FlxObject) {
+			level.setTileByIndex(Tile.mapIndex, 0);
 		}
 
 	}

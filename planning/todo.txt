@@ -1,0 +1,31 @@
+TODO:
+
+Player controls:
+	Add sliding
+	Add attack (also add breakable tile)
+	Tweak running to get a faster max speed, but slower.  Need a sort of natual log velocity curve (or something similar).
+
+UI stuff:
+	Score display
+	Speed multiplier setup (1x multiplier at no speed, keeping max speed fills bar, losing max speed drains it.  Think p-wing thing from SMB3
+	Menu(?)  I think a basic tutorial might be nice, but who knows?
+	
+Level stuff:
+	Instead of 1 continuous world, going to split things into levels.
+		Can generate 1 whole level at once, reducing the load of constantly generating levels and deleting chunks
+		Gives a sense of pacing, instead of a constant onslaught of obstacles
+		Grants ability to give level bonuses (killed all enemies, destroyed all blocks, collected all coins, held multiplier the entire time, etc.) and splits the game into logical segments.
+		Level 1-1, 1-2, 1-3, 1-boss, 2-1, etc., probably only doing 3 worlds (because i don't want to make that many tilesets).
+		
+	Each level, we'll add 1-6 new obstacles...
+		Have a few different arrays:
+			CurFlatFunctions - current flat obstacles
+				I think I should roll the "multi-level" as a rare varient of flat... seems weird to have more than 3 "base" functions, but maybe not.
+					It does need special consideration for collectible/enemy generation...
+			CurGapFunctions - current gap obstacles
+			CurElevationChangeFunctions - current elevation change obstacles
+			The flat, gap, and elevation change "parent" functions will all draw their obstacles from these 3 arrays.
+		When we add a new obstacle, do we add one to each array?  
+			Probably, if we're only going to have 9 levels + boss
+		How many obstacles to add each increment?  1-2 probably?  So we have a maximum of 6 new obstacle types per level... which would be a total of 6*9 = 54 obstacles... we'll ramp it up probably.
+			If we limit ourselves to only 9 levels, 

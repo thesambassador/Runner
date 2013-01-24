@@ -7,7 +7,7 @@ package
 	{
 		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
 		
-		public var runnerGen : Level;
+		public var runnerGen : StaticLevel;
 		public var debugDiag : FlxDebugger;
 		
 		override public function create():void
@@ -18,7 +18,7 @@ package
 			FlxG.flashFramerate = 60;
 
 			
-			runnerGen = new Level();
+			runnerGen = new StaticLevel();
 			
 			
 			FlxG.watch(runnerGen.player, "x", "Player X");

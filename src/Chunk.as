@@ -66,6 +66,15 @@ package
 		
 		//this will add scenery and non-gameplay related stuff
 		public function Decorate() {
+			
+			var undergroundTiles : Array = mainTiles.getTileInstances(4);
+			
+			if(undergroundTiles != null && undergroundTiles.length > 0){
+				for each(var tile : int in undergroundTiles){
+					//mainTiles.setTileProperties(tile, FlxObject.NONE);
+				}
+			}
+			
 			RandomizeGroundTiles();
 		}
 		

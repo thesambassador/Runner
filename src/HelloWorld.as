@@ -7,7 +7,7 @@ package
 	{
 		public function HelloWorld()
 		{
-			super(320, 240, PlayState, 2); //Create a new FlxGame object and load "PlayState"
+			super(CommonConstants.WINDOWWIDTH / 2, CommonConstants.WINDOWHEIGHT / 2, PlayState, 2); //Create a new FlxGame object and load "PlayState"
 			this.forceDebugger = true;
 			
 		}

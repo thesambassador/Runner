@@ -23,8 +23,8 @@ package
 			this.addAnimation("run", new Array(0, 1), 5);
 			this.addAnimation("die", new Array(2, 2), 5);
 			
-			FlxG.watch(this, "x", "EnemyX");
-			FlxG.watch(this, "y", "EnemyY");
+			//FlxG.watch(this, "x", "EnemyX");
+			//FlxG.watch(this, "y", "EnemyY");
 		}
 		
 		override public function update() : void {

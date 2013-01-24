@@ -6,6 +6,8 @@ package
 	 */
 	public class CommonConstants 
 	{
+		public static var WINDOWWIDTH : Number = 640;
+		public static var WINDOWHEIGHT : Number = 480;
 		
 		public static var TILEWIDTH : Number = 16;
 		public static var TILEHEIGHT : Number = 16;
