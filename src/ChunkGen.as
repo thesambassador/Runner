@@ -124,11 +124,11 @@ package
 			while (numLevels > 0) {
 				var genX : int = getRandom(0, returned.width - 3);
 				while (genX < returned.width - 6) {
-					var h = numLevels * CommonConstants.JUMPHEIGHT - getRandom(0, 1);
-					var w = getRandom(2, returned.width - genX - 1);
+					var h : int = numLevels * CommonConstants.JUMPHEIGHT - getRandom(0, 1);
+					var w : int = getRandom(2, returned.width - genX - 1);
 					returned.AddOneWayPlatform(genX, currentElevation - 1, w, h);
 					
-					var spacing = getRandom(1, 4);
+					var spacing : int = getRandom(1, 4);
 					
 					genX = genX + w + spacing;
 				}
@@ -140,7 +140,7 @@ package
 		}
 		
 		//fill all tiles under the specific tile.
-		protected function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) {
+		protected function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) : void {
 			for (var y : int = sy + 1; y < CommonConstants.LEVELHEIGHT; y++) {
 				tiles.setTile(sx, y, fillTile);
 			}
@@ -150,7 +150,7 @@ package
 			return currentX / difficultyFactor;
 		}
 		
-		protected function getRandom(min:int, max:int) {
+		protected function getRandom(min:int, max:int) : int {
 			return Math.round(Math.random() * (max - min)) + min;
 		}
 	}

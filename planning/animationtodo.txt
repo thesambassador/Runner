@@ -1,0 +1,9 @@
+slowing-down animation
+sliding animation
+landing animation
+	landing with no/little speed vs landing while running?
+
+
+run-to-jump transition?
+"sprinting" animation?
+attack animatino?

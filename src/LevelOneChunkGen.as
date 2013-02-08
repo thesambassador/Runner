@@ -8,7 +8,7 @@ package
 	public class LevelOneChunkGen extends ChunkGen 
 	{
 		private var obstacleFunctions:Array ;	
-		private var lastDifficulty = 0;
+		private var lastDifficulty : int = 0;
 		
 		public function LevelOneChunkGen(startingX:int = 0, startingHeight:int = -1) 
 		{
@@ -48,8 +48,8 @@ package
 			
 			
 			//number of obstacles is at max 4, but otherwise diff/4.  So at 8 difficulty, numObstacles should be 2, but at 24 difficulty, numObstacles will only be 4
-			var maxObstacles = (diff/4 > 4 ? 4 : diff / 4)
-			var numObstacles = getRandom(0, maxObstacles);
+			var maxObstacles : int = (diff/4 > 4 ? 4 : diff / 4)
+			var numObstacles : int = getRandom(0, maxObstacles);
 			
 			//add obstacles, the obstacle functions will do nothing if there is no room for the obstacles.
 			while (numObstacles > 0 && obstacleFunctions.length > 0) {

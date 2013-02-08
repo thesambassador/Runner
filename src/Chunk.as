@@ -54,7 +54,7 @@ package
 		}
 		
 		//sets the world x coordinate of the tileset
-		public function SetX(x:int) {
+		public function SetX(x:int) : void {
 			mainTiles.x = x;
 			bgTiles.x = x;
 			fgTiles.x = x;
@@ -65,7 +65,7 @@ package
 		}
 		
 		//this will add scenery and non-gameplay related stuff
-		public function Decorate() {
+		public function Decorate() : void {
 			
 			var undergroundTiles : Array = mainTiles.getTileInstances(4);
 			
@@ -78,7 +78,7 @@ package
 			RandomizeGroundTiles();
 		}
 		
-		public function get width() {
+		public function get width() : Number {
 			return mainTiles.widthInTiles;
 		}
 		
@@ -132,7 +132,7 @@ package
 			FlxG.log("Platform at x:" + x + ", y:" + y + ", w:" + w + ", h:" + h); 
 		}
 		
-		public function FillSolid(x:int, y:int, w:int, h:int, fillBlock = 17) : void {
+		public function FillSolid(x:int, y:int, w:int, h:int, fillBlock : int = 17) : void {
 			
 			for (var setX:int = x; setX < x + w; setX++) {
 				for (var setY:int = y; setY > y - h; setY--) {
@@ -142,7 +142,7 @@ package
 			}
 		}
 		
-		public function AddEntityAtTileCoords(entity:FlxSprite, x, y) {
+		public function AddEntityAtTileCoords(entity:FlxSprite, x : int, y : int) : void{
 			this.entities.add(entity);
 			entity.x = this.mainTiles.x + x * CommonConstants.TILEWIDTH;
 			entity.y = this.mainTiles.y + y * CommonConstants.TILEHEIGHT;
@@ -152,17 +152,18 @@ package
 		//This function goes through and randomly distributes the different ground tiles, varying the look of the level
 		//Ground = 1-3
 		//Underground = 4-6
-		private function RandomizeGroundTiles() {
+		private function RandomizeGroundTiles() : void {
 			//get all tiles with index 1
 			var groundTiles : Array = mainTiles.getTileInstances(1);
+			var tileIndex : int;
 			
-			for each(var tileIndex : int in groundTiles) {
+			for each(tileIndex in groundTiles) {
 				mainTiles.setTileByIndex(tileIndex, getRandom(1, 3));
 			}
 			
 			groundTiles = mainTiles.getTileInstances(4);
 			
-			for each(var tileIndex : int in groundTiles) {
+			for each(tileIndex in groundTiles) {
 				mainTiles.setTileByIndex(tileIndex, getRandom(4, 6));
 			}
 			
@@ -171,7 +172,7 @@ package
 		
 	
 			
-		private function getRandom(min:int, max:int) {
+		private function getRandom(min:int, max:int) : int {
 			return Math.round(Math.random() * (max - min)) + min;
 		}
 	}

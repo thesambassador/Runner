@@ -11,7 +11,7 @@ package
 	{
 		[Embed(source = '../resources/img/enemies.png')]private static var enemySprites:Class;
 
-		private var moveSpeed = 50;
+		private var moveSpeed : Number = 50;
 		private var gravity : Number = 1000;
 		private var removeTime: Number = 20;
 		
@@ -23,8 +23,6 @@ package
 			this.addAnimation("run", new Array(0, 1), 5);
 			this.addAnimation("die", new Array(2, 2), 5);
 			
-			//FlxG.watch(this, "x", "EnemyX");
-			//FlxG.watch(this, "y", "EnemyY");
 		}
 		
 		override public function update() : void {

@@ -9,17 +9,16 @@ package
 	 */
 	public class Player extends FlxSprite
 	{
-		[Embed(source = '../resources/img/bigmario.png')]private static var marioSprites:Class;
-		
-		var state : String;
+		[Embed(source = '../resources/img/aliensprites.png')]private static var playerSprites:Class;
+
 	
 		private var controlConfig : Dictionary;
 		
 		public var rem : Number;
 		
 		//movement constants:
-		private var groundDragFactor = 6;
-		private var airDragFactor = 3;
+		private var groundDragFactor : Number = 6;
+		private var airDragFactor : Number = 3;
 		private var gravity : Number = 1000;
 		
 		private var walkSpeed:Number = 160;
@@ -32,6 +31,7 @@ package
 		private var canJump:Boolean = true; //variable to require releasing the jump key before being able to jump again
 		public var sliding:Boolean = false; //variable to require releasing the jump key before being able to jump again
 		public var wasSliding:Boolean = false; //hack job... too tired to figure out an elegant way, and this is quick, simple, and dirty.
+		public var initialFall:Boolean = true; //hack job... too tired to figure out an elegant way, and this is quick, simple, and dirty.
 		
 		public var attacking:Boolean = false; //is the character currently attacking?
 		public var attackCooldown : int = 25; //cooldown before you can do another attack
@@ -60,25 +60,26 @@ package
 			this.lastVel = new FlxPoint();
 			
 			//graphics
-			this.loadGraphic(marioSprites, true, true, 16, 32);
-			this.frames = 4;
-			this.frameWidth = 16;
-			this.frameHeight = 16;
+			this.loadGraphic(playerSprites, true, true, 32, 32);
+			//this.frames = 4;
+			this.frameWidth = 32;
+			this.frameHeight = 32;
+			this.offset.x += 8; //offset since sprite is 32x32 but character is 16x32
 			
 			//animation
-			this.addAnimation("run", new Array(0, 2, 1), 10);
-			this.addAnimation("idle", new Array(0, 0));
-			this.addAnimation("jump", new Array(3, 3));
-			this.addAnimation("fall", new Array(3, 3));
-			this.addAnimation("slow", new Array(4, 4));
-			this.addAnimation("slide", new Array(5, 5));
+			this.addAnimation("run", new Array(11, 12, 13, 12), 10);
+			this.addAnimation("startrun", new Array(8, 9, 10), 15, false);
+			this.addAnimation("idle", new Array(0, 1, 2, 3, 4, 5), 8);
+			this.addAnimation("jump", new Array(16, 17, 18), 20, false);
+			this.addAnimation("fallinit", new Array(19, 20, 21, 22), 10, false);
+			this.addAnimation("fall", new Array(22, 23), 5);
+			this.addAnimation("slow", new Array(14, 14));
+			this.addAnimation("startslide", new Array(24, 25, 26, 27), 30, false);
+			this.addAnimation("slide", new Array(27, 27));
 			
 			this.width = 15; //so we can still fall between 2 tiles with a 1 space gap
 			
-			FlxG.watch(this, "y", "PlayerY");
-			FlxG.watch(this, "sliding", "sliding");
-			FlxG.watch(this, "wasSliding", "wasSliding");
-			FlxG.watch(this, "attackReady", "attackReady");
+			FlxG.watch(this, "frame", "Frame");
 		}
 		
 		override public function update():void 
@@ -93,8 +94,8 @@ package
 			//determine player state
 			
 			if (this.isTouching(FlxObject.FLOOR)) {
-				state = "ground";
 				jumpEnergy = jumpTime;
+				initialFall = true;
 			}
 			
 			if(!sliding){
@@ -105,12 +106,19 @@ package
 				if (this.isTouching(FlxObject.FLOOR) && FlxG.keys.justPressed(controlConfig["DOWN"]) && !this.isTouching(FlxObject.WALL)) {
 					this.sliding = true;
 					this.setBoundHeight(15);
+					this.play("startslide");
 				}
 			}
 			else {
 				
 				this.drag.x = this.maxVelocity.x * 1; //less drag for sliding... weeee
-				this.play("slide");
+				if (this._curAnim != null) {
+					
+				}
+				else {
+					this.play("slide");
+				}
+				
 				if (!FlxG.keys[controlConfig["DOWN"]] || !this.isTouching(FlxObject.FLOOR)) {
 					this.sliding = false;
 					this.setBoundHeight(32);
@@ -128,7 +136,7 @@ package
 		}
 		
 		
-		private function updateMovement() {
+		private function updateMovement() : void{
 			//movement 
 			if (FlxG.keys[controlConfig["RUN"]]) {
 				this.maxVelocity.x = runSpeed;
@@ -147,7 +155,7 @@ package
 			}
 			
 			//change things for ground/air
-			if (this.isTouching(FlxObject.FLOOR)) {;
+			if (this.isTouching(FlxObject.FLOOR)) {
 				this.drag.x = this.maxVelocity.x * groundDragFactor;
 				
 				
@@ -156,7 +164,17 @@ package
 					this.acceleration.x *= 2
 				}
 				else if (Math.abs(this.velocity.x) > 0) {
-					this.play("run");
+					if (this._curAnim != null) {
+						if (this._curAnim.name == "idle") {
+							this.play("startrun");
+						}
+						else if (this._curAnim.name == "startrun" && !this.finished) {
+
+						}
+						else {
+							this.play("run");
+						}
+					}
 				}
 				else {
 					this.play("idle");
@@ -164,19 +182,29 @@ package
 			}
 			//air state
 			else {
-				state = "air";
 				this.drag.x = this.maxVelocity.x * airDragFactor;
 				
-				if (this.velocity.y > 0) {
-					this.play("jump");
+				if (this.velocity.y < 0) {
+					if(this.jumpEnergy > this.jumpTime - 2)
+						this.play("jump");
 				}
 				else {
-					this.play("fall");
+					
+					if(this._curAnim != null){
+						if (this._curAnim.name == "fallinit" && this.finished)
+							initialFall = false;
+						
+						if (initialFall){
+							this.play("fallinit");
+						}
+						else
+							this.play("fall");
+					}
 				}
 			}
 		}
 		
-		private function updateJumping() {
+		private function updateJumping() : void{
 			//jumping
 			if (FlxG.keys[controlConfig["JUMP"]] && canJump) { //if jump energy is greater than 0, we're on the ground, or we have been holding down jump in the air
 				if(jumpEnergy > 0){
@@ -199,7 +227,7 @@ package
 			}
 		}
 		
-		private function updateAttacking() {
+		private function updateAttacking() : void {
 			if (attackReady > 0) attackReady --;
 		
 			
@@ -214,21 +242,21 @@ package
 			}
 		}
 		
-		public function setBoundHeight(h:int) {
+		public function setBoundHeight(h:int) : void {
 			this.y += this.height - h;
 			this.height = h;
 
 			this.offset.y = 32 - this.height;
 		}
 		
-		public function collideTilemap(tilemap:FlxObject, playerObj:FlxObject) {
+		public function collideTilemap(tilemap:FlxObject, playerObj:FlxObject) : Boolean{
 			
 			var player : Player = playerObj as Player;
 			
 			var originalPosX : Number = player.x;
 			var originalPosY : Number = player.y;
 
-			FlxObject.separate(tilemap, player);
+			var returned : Boolean = FlxObject.separate(tilemap, player);
 			
 			//if the above separation function detected us touching the ceiling, but we were sliding, it's because we came up from sliding under a wall.
 			if (player.isTouching(FlxObject.CEILING) && player.wasSliding) {
@@ -244,6 +272,7 @@ package
 				
 			}
 			
+			return returned;
 		}
 		
 		public function collideMovingPlatform(Object1:FlxObject, Object2:FlxObject) : void{

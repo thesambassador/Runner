@@ -64,20 +64,15 @@ package
 		public function getStartY() : Number {
 			return  (20 - 5) * CommonConstants.TILEHEIGHT;
 		}
-		
-		public function test(a : FlxObject, b:FlxObject) {
-			
-		}
-		
-		public function update() {
+
+		public function update() : void{
 			
 			FlxG.worldBounds.x = player.x - 64;
 			FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
 			
 			if(player.attackProjectile != null)
-				if(level.overlaps(player.attackProjectile))
-					var x = 5;
-			
+				level.overlaps(player.attackProjectile)
+
 			//check collisions
 			FlxG.overlap(chunkGroup, player, player.collideTilemap);
 			FlxG.collide(chunkGroup, entityGroup);
@@ -104,19 +99,22 @@ package
 		}
 		
 
-		public function EnemyCollideWithPlayer(enemy:FlxObject, player:FlxObject) {
+		public function EnemyCollideWithPlayer(enemy:FlxObject, player:FlxObject) : Boolean {
 			var playerSprite : FlxSprite = player as FlxSprite;
 			var enemySprite : FlxSprite = enemy as FlxSprite;
 			if (enemy.health > 0) {
 				if (enemy.y - playerSprite.y > 16) {
 					playerSprite.velocity.y -= 300;
 					enemy.health = 0;
+					return true;
 				}
 				else {
 					playerSprite.health -= 1;
+					return true;
 				}
 			
 			}
+			return false;
 		}
 		
 		public function GenLevel () : void {
@@ -142,8 +140,9 @@ package
 			chunkGroup.add(level);
 		}
 		
-		public function starCallback(Tile:FlxTile, obj:FlxObject) {
+		public function starCallback(Tile:FlxTile, obj:FlxObject) : Boolean {
 			level.setTileByIndex(Tile.mapIndex, 0);
+			return true;
 		}
 
 	}
