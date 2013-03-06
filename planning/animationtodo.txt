@@ -1,5 +1,5 @@
-slowing-down animation
-sliding animation
+slowing-down animation DONE
+sliding animation DONE
 landing animation
 	landing with no/little speed vs landing while running?
 

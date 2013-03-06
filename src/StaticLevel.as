@@ -10,26 +10,23 @@ package
 	 */
 	public class StaticLevel 
 	{
-		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
-		[Embed(source = '../resources/img/grasstileset.png')]private static var grass:Class;
-		[Embed(source = "../resources/lvls/testLevel.csv", mimeType = "application/octet-stream")]private static var levelText:Class;
+		[Embed(source = '../resources/img/alientileset.png')]private static var grass:Class;
+		[Embed(source = "../resources/lvls/alienlevel.csv", mimeType = "application/octet-stream")]private static var levelText:Class;
 		
-		private var firstChunk : Chunk ; //first chunk
-		private var lastChunk : Chunk ; //last chunk
-		private var chunkGen : ChunkGen;
-		public var chunkNum : Number = 0; //number of chunks currently active
-		private var chunkLimit : Number = 60; //number of chunks allowed at once before we start removing them
+		public var levelChunk : Chunk;
 		
 		public var chunkGroup : FlxGroup;
 		public var entityGroup : FlxGroup;
 		
 		public var player : Player;
+		public var background : FlxSprite;
 		public var level : FlxTilemap;
 		
 		//init
 		public function StaticLevel() 
 		{
-			chunkGen = new LevelOneChunkGen();
+			//background image?
+			//FlxG.state.add(new ScrollingBackground());
 			
 			chunkGroup = new FlxGroup();
 			entityGroup = new FlxGroup();
@@ -37,24 +34,17 @@ package
 			FlxG.state.add(entityGroup);
 			
 			//create player and add it to the map
-			player = new Player(getStartX(), getStartY());
+			player = new Player(getStartX(), getStartY() - 64, chunkGroup);
 			player.health = 1;
 			FlxG.state.add(player);
-			
-			//proj = new Projectile(160, 384);
-			//FlxG.state.add(proj);
-			
-			//var enemy:Enemy = new Enemy(getStartX()+100, getStartY());
-			//var group:FlxGroup = new FlxGroup();
 
 			//set camera and world bounds
 			FlxG.camera.setBounds(0, 0, 100, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
 			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.WINDOWWIDTH + 128, CommonConstants.WINDOWHEIGHT + 128);
 			
 			GenLevel();
-			
-			FlxG.watch(FlxG.worldBounds, "x", "WorldX");
-			FlxG.watch(FlxG.worldBounds, "y", "WorldY");
+				
+
 		}
 		
 		
@@ -81,7 +71,7 @@ package
 			
 			
 			var camera : FlxCamera = FlxG.camera;
-			var playerPoint : FlxPoint = player.getMidpoint();
+			var playerPoint : FlxPoint = player.getFocusPoint();
 			playerPoint.x += camera.width / 2 - 64;
 			camera.focusOn(playerPoint);
 			
@@ -122,22 +112,33 @@ package
 			var b : ByteArray = new levelText();
 			var levelString : String = b.readUTFBytes(b.length);
 			
+			levelChunk = new Chunk(200, 20);
+			
 			level = new FlxTilemap();
-			level.loadMap(levelString, grass, 16,16);
+			level.loadMap(levelString, grass, 16, 16);
+			
+			levelChunk.allLayers.remove(levelChunk.mainTiles);
+			
+			levelChunk.mainTiles = level;
+			
+			levelChunk.allLayers.add(levelChunk.mainTiles);
+			
+			levelChunk.Decorate();
 			
 			var starBlocks : Array = level.getTileInstances(16);
 			
 
-			level.setTileProperties(16, FlxObject.ANY, starCallback, MeleeAttack);
-			level.setTileProperties(28, FlxObject.NONE);
-			level.setTileProperties(29, FlxObject.NONE);
-			level.setTileProperties(30, FlxObject.NONE);
-			level.setTileProperties(20, FlxObject.UP);
-			level.setTileProperties(21, FlxObject.UP);
-			level.setTileProperties(22, FlxObject.UP);
+			//level.setTileProperties(16, FlxObject.ANY, starCallback, MeleeAttack);
+			level.setTileProperties(19, FlxObject.NONE);
+			level.setTileProperties(20, FlxObject.NONE);
+			level.setTileProperties(21, FlxObject.NONE);
+			level.setTileProperties(11, FlxObject.UP);
+			level.setTileProperties(12, FlxObject.UP);
+			level.setTileProperties(13, FlxObject.UP);
 
 			
-			chunkGroup.add(level);
+			//chunkGroup.add(levelChunk.allLayers);
+			chunkGroup.add(levelChunk.allLayers);
 		}
 		
 		public function starCallback(Tile:FlxTile, obj:FlxObject) : Boolean {

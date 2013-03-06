@@ -8,6 +8,15 @@ package
 	 */
 	public class Chunk 
 	{
+		
+		//tilemap indexes
+		static var topleft : int = 20;
+		static var topmiddle : int = 21;
+		static var topright : int = 22;
+		static var left : int = 28;
+		static var middle : int = 29;
+		static var right : int = 30;
+		
 		[Embed(source = '../resources/img/grasstileset.png')]private static var tileset:Class;
 
 		public var mainTiles : FlxTilemap;  //main tiles for collision
@@ -21,17 +30,18 @@ package
 		public var obstacleX : int = 0; //for obstacle generation functions to figure out where to place themselves
 		
 		//constructor creates an empty chunk and adds itself to the stage
-		public function Chunk(width:int) 
+		public function Chunk(width:int, height:int = -1 ) 
 		{
+			if (height == -1) height = CommonConstants.LEVELHEIGHT;
 			
 			mainTiles = new FlxTilemap();
-			mainTiles.loadMap(MakeEmptySectionString(width, CommonConstants.LEVELHEIGHT), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
+			mainTiles.loadMap(MakeEmptySectionString(width, height), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
 			
 			bgTiles = new FlxTilemap();
-			bgTiles.loadMap(MakeEmptySectionString(width, CommonConstants.LEVELHEIGHT), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
+			bgTiles.loadMap(MakeEmptySectionString(width, height), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
 			
 			fgTiles = new FlxTilemap();
-			fgTiles.loadMap(MakeEmptySectionString(width, CommonConstants.LEVELHEIGHT), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
+			fgTiles.loadMap(MakeEmptySectionString(width, height), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
 			
 			allLayers = new FlxGroup();
 			allLayers.add(bgTiles);
@@ -67,11 +77,16 @@ package
 		//this will add scenery and non-gameplay related stuff
 		public function Decorate() : void {
 			
-			var undergroundTiles : Array = mainTiles.getTileInstances(4);
-			
-			if(undergroundTiles != null && undergroundTiles.length > 0){
-				for each(var tile : int in undergroundTiles){
-					//mainTiles.setTileProperties(tile, FlxObject.NONE);
+			//add the rounded corners of the grass as needed:
+			var topGrassTiles : Array = mainTiles.getTileInstances(1);
+			if (topGrassTiles != null && topGrassTiles.length > 0) {
+				for each (var tile: int in topGrassTiles) {
+					if (tile % mainTiles.width == 0 || mainTiles.getTileByIndex(tile-1) == 0) {
+						mainTiles.setTileByIndex(tile, 2);
+					}
+					else if (tile % width == width - 1 || mainTiles.getTileByIndex(tile + 1) == 0) {
+						mainTiles.setTileByIndex(tile, 3);
+					}
 				}
 			}
 			
@@ -84,13 +99,7 @@ package
 		
 		//put a 1-way platform of width w and height h at x,y.  x,y is the bottom-left corner of the 1-way platform
 		public function AddOneWayPlatform(x:int, y:int, w:int, h:int) : void {
-			//tilemap indexes
-			var topleft : int = 20;
-			var topmiddle : int = 21;
-			var topright : int = 22;
-			var left : int = 28;
-			var middle : int = 29;
-			var right : int = 30;
+
 			
 			for (var setX:int = x; setX < x + w; setX++) {
 				for (var setY:int = y; setY > y - h; setY--) {
@@ -154,19 +163,14 @@ package
 		//Underground = 4-6
 		private function RandomizeGroundTiles() : void {
 			//get all tiles with index 1
-			var groundTiles : Array = mainTiles.getTileInstances(1);
+			var groundTiles : Array = mainTiles.getTileInstances(4);
 			var tileIndex : int;
-			
-			for each(tileIndex in groundTiles) {
-				mainTiles.setTileByIndex(tileIndex, getRandom(1, 3));
-			}
-			
-			groundTiles = mainTiles.getTileInstances(4);
 			
 			for each(tileIndex in groundTiles) {
 				mainTiles.setTileByIndex(tileIndex, getRandom(4, 6));
 			}
 			
+
 			
 		}
 		

@@ -13,7 +13,8 @@ package
 		override public function create():void
 		{
 			//basic initialization
-			FlxG.bgColor = 0xff6b8cff;
+			FlxG.bgColor = 0xff000000;
+			
 			FlxG.framerate = 60;
 			FlxG.flashFramerate = 60;
 
@@ -22,7 +23,7 @@ package
 			
 			
 			FlxG.watch(runnerGen.player, "x", "Player X");
-			FlxG.visualDebug = true;
+			//FlxG.visualDebug = true;
 			
 			
 			
