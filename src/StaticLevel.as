@@ -10,7 +10,7 @@ package
 	 */
 	public class StaticLevel 
 	{
-		[Embed(source = '../resources/img/alientileset.png')]private static var grass:Class;
+		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
 		[Embed(source = "../resources/lvls/alienlevel.csv", mimeType = "application/octet-stream")]private static var levelText:Class;
 		
 		public var levelChunk : Chunk;
@@ -19,14 +19,15 @@ package
 		public var entityGroup : FlxGroup;
 		
 		public var player : Player;
-		public var background : FlxSprite;
+		public var background : ScrollingBackground;
 		public var level : FlxTilemap;
 		
 		//init
 		public function StaticLevel() 
 		{
-			//background image?
-			//FlxG.state.add(new ScrollingBackground());
+			background = new ScrollingBackground();
+			
+			FlxG.state.add(background);
 			
 			chunkGroup = new FlxGroup();
 			entityGroup = new FlxGroup();
@@ -34,7 +35,7 @@ package
 			FlxG.state.add(entityGroup);
 			
 			//create player and add it to the map
-			player = new Player(getStartX(), getStartY() - 64, chunkGroup);
+			player = new Player(getStartX(), getStartY() - 64);
 			player.health = 1;
 			FlxG.state.add(player);
 
@@ -43,7 +44,6 @@ package
 			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.WINDOWWIDTH + 128, CommonConstants.WINDOWHEIGHT + 128);
 			
 			GenLevel();
-				
 
 		}
 		
@@ -112,10 +112,10 @@ package
 			var b : ByteArray = new levelText();
 			var levelString : String = b.readUTFBytes(b.length);
 			
-			levelChunk = new Chunk(200, 20);
+			levelChunk = new Chunk(alienTileset, 200, 20);
 			
 			level = new FlxTilemap();
-			level.loadMap(levelString, grass, 16, 16);
+			level.loadMap(levelString, alienTileset, 16, 16);
 			
 			levelChunk.allLayers.remove(levelChunk.mainTiles);
 			

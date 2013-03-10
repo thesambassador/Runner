@@ -47,10 +47,9 @@ package
 		
 		public var currentAnimationPriority : int = 0; //currently playing animation's priority, if I play something with a higher priority it will override
 
-		public function Player(xStart:int = 0, yStart:int = 0, tmRef : FlxGroup = null){
+		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
 			
-			this.tilemapRef = tmRef;
 			
 			//controls:
 			controlConfig = new Dictionary();
@@ -295,7 +294,7 @@ package
 
 				else {
 					if (Math.abs(this.velocity.x) < minSlideSpeed) {
-						var dir = 1;
+						var dir : int = 1;
 						if (this.facing == FlxObject.LEFT) dir = -1;
 						
 						this.velocity.x = minSlideSpeed * dir;
@@ -351,7 +350,7 @@ package
 			//}
 		}
 		
-		public function playPriority(name:String, priority:int) {
+		public function playPriority(name:String, priority:int) : void {
 			if (priority >= currentAnimationPriority) {
 				this.play(name); 
 				currentAnimationPriority = priority

@@ -10,28 +10,35 @@ package
 	{
 		
 		//tilemap indexes
-		static var topleft : int = 20;
-		static var topmiddle : int = 21;
-		static var topright : int = 22;
-		static var left : int = 28;
-		static var middle : int = 29;
-		static var right : int = 30;
+		//main level tiles
+		private static var groundTop : int = 1; //main tile that the player runs on
+		private static var groundTopLeft: int = 2;
+		private static var groundTopRight : int = 3;
+		private static var underground : int = 4;
+		private static var barrier : int = 8;
 		
-		[Embed(source = '../resources/img/grasstileset.png')]private static var tileset:Class;
+		//background platforms
+		private static var topleft : int = 20;
+		private static var topmiddle : int = 21;
+		private static var topright : int = 22;
+		private static var left : int = 28;
+		private static var middle : int = 29;
+		private static var right : int = 30;
 
 		public var mainTiles : FlxTilemap;  //main tiles for collision
 		public var bgTiles : FlxTilemap; //background tiles with no collision
 		public var fgTiles : FlxTilemap; //foreground tiles with no collision
 		
-		public var allLayers : FlxGroup; //all layers
 		public var entities : FlxGroup; //all entities (enemies, moving objects, etc)
 		
 		public var nextChunk : Chunk;
-		public var obstacleX : int = 0; //for obstacle generation functions to figure out where to place themselves
+		
+		public var tileset : Class;
 		
 		//constructor creates an empty chunk and adds itself to the stage
-		public function Chunk(width:int, height:int = -1 ) 
+		public function Chunk(tilesetToUse : Class, width:int, height:int = -1) 
 		{
+			tileset = tilesetToUse;
 			if (height == -1) height = CommonConstants.LEVELHEIGHT;
 			
 			mainTiles = new FlxTilemap();
@@ -43,11 +50,6 @@ package
 			fgTiles = new FlxTilemap();
 			fgTiles.loadMap(MakeEmptySectionString(width, height), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
 			
-			allLayers = new FlxGroup();
-			allLayers.add(bgTiles);
-			allLayers.add(mainTiles);
-			allLayers.add(fgTiles);
-			
 			entities = new FlxGroup();
 		}
 		
@@ -58,9 +60,7 @@ package
 			for (var i:int = 0; i < width * height; i++) {
 				data.push("0");
 			}
-			
 			return FlxTilemap.arrayToCSV(data, width);
-			
 		}
 		
 		//sets the world x coordinate of the tileset
@@ -94,7 +94,21 @@ package
 		}
 		
 		public function get width() : Number {
+			return mainTiles.width;
+		}
+		
+		public function get widthInTiles() : Number {
 			return mainTiles.widthInTiles;
+		}
+		
+		public function get endElevation() : Number {
+			var x : int = mainTiles.widthInTiles - 1;
+			for (var y : int = 0; y < mainTiles.heightInTiles; y++) {
+				if (mainTiles.getTile(x, y) == groundTop) {
+					return y;
+				}
+			}
+			return -1;
 		}
 		
 		//put a 1-way platform of width w and height h at x,y.  x,y is the bottom-left corner of the 1-way platform
@@ -144,7 +158,7 @@ package
 		public function FillSolid(x:int, y:int, w:int, h:int, fillBlock : int = 17) : void {
 			
 			for (var setX:int = x; setX < x + w; setX++) {
-				for (var setY:int = y; setY > y - h; setY--) {
+				for (var setY:int = y; setY < y + h; setY++) {
 					mainTiles.setTile(setX, setY, fillBlock);
 				
 				}

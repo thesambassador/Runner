@@ -7,11 +7,13 @@ package
 	 */
 	public class LevelOneChunkGen extends ChunkGen 
 	{
+		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
 		private var obstacleFunctions:Array ;	
 		private var lastDifficulty : int = 0;
 		
 		public function LevelOneChunkGen(startingX:int = 0, startingHeight:int = -1) 
 		{
+			this.tileset = alienTileset;
 			super(startingX, startingHeight);
 			obstacleFunctions = new Array();
 		}

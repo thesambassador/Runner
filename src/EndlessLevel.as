@@ -8,25 +8,24 @@ package
 	 * We will have 4-5 chunks "active" or "loaded" at a time.  As the player moves forward, it will unload the "first" chunk (farthest left) and load a new "last" chunk (farthest right).
 	 * 
 	 */
-	public class Level 
+	public class EndlessLevel 
 	{
-		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
-		[Embed(source = '../resources/img/testTileset.png')]private static var grass:Class;
+		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
 		
 		private var firstChunk : Chunk ; //first chunk
 		private var lastChunk : Chunk ; //last chunk
 		private var chunkGen : ChunkGen;
 		public var chunkNum : Number = 0; //number of chunks currently active
-		private var chunkLimit : Number = 60; //number of chunks allowed at once before we start removing them
+		private var chunkLimit : Number = 10; //number of chunks allowed at once before we start removing them
 		
 		public var chunkGroup : FlxGroup;
 		public var entityGroup : FlxGroup;
 		
 		public var player : Player;
-		public var proj : Projectile;
+		//public var proj : Projectile;
 		
 		//init
-		public function Level() 
+		public function EndlessLevel() 
 		{
 			
 			chunkGen = new LevelOneChunkGen();
@@ -96,7 +95,7 @@ package
 				//midChunkRight += chunkWidthPixels;
 			}
 			if (chunkNum > chunkLimit) {
-				RemoveFirstChunk();
+				//RemoveFirstChunk();
 			}
 		}
 		

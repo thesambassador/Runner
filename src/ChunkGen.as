@@ -13,6 +13,7 @@ package
 		public var currentElevation : int;
 		
 		public var difficultyFactor : int = 500;
+		public var tileset : Class;
 		
 		public function ChunkGen(startingX:int = 0, startingHeight:int = -1) 
 		{
@@ -56,7 +57,7 @@ package
 			else
 				width = w;
 			
-			var returned : Chunk = new Chunk(width);
+			var returned : Chunk = new Chunk(tileset, width);
 			
 			for (var x : int = 0; x < width; x++) {
 				var setTile : int = 1;
@@ -95,7 +96,7 @@ package
 			else
 				width = w;
 			
-			var returned : Chunk = new Chunk(width);
+			var returned : Chunk = new Chunk(tileset, width);
 			
 			returned.mainTiles.setTile(0, currentElevation, 1);
 			FillUnder(0, currentElevation, returned.mainTiles, 4);

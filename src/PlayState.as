@@ -5,36 +5,36 @@ package
 
 	public class PlayState extends FlxState
 	{
-		[Embed(source = '../resources/img/auto_tiles.png')]private static var auto_tiles:Class;
 		
-		public var runnerGen : StaticLevel;
+		public var world : World;
 		public var debugDiag : FlxDebugger;
 		
 		override public function create():void
 		{
 			//basic initialization
 			FlxG.bgColor = 0xff000000;
-			
 			FlxG.framerate = 60;
 			FlxG.flashFramerate = 60;
 
-			
-			runnerGen = new StaticLevel();
-			
-			
-			FlxG.watch(runnerGen.player, "x", "Player X");
+		
+			world = new World();
+			this.add(world);
+
+			FlxG.watch(world.player, "x", "Player X");
+			FlxG.watch(world.player, "y", "Player Y");
 			//FlxG.visualDebug = true;
-			
-			
-			
 
 		}
 		
 		override public function update():void {
+
+			if (FlxG.keys.justPressed("P")) {
+				FlxG.paused = (FlxG.paused ? false : true);
+			}
+			
+
+			
 			super.update();
-			
-			runnerGen.update();
-			
 			
 
 		}
