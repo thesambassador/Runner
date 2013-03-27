@@ -11,7 +11,7 @@ package
 	 */
 	public class ScrollingBackground extends FlxGroup 
 	{
-		[Embed(source = '../resources/img/background.png')]private static var bgImage:Class;
+		[Embed(source = '../resources/img/desert.png')]private static var bgImage:Class;
 		
 		public var bg1 : FlxSprite;
 		private var bg2 : FlxSprite;
@@ -21,7 +21,7 @@ package
 		
 		public function ScrollingBackground() {
 			bg1 = new FlxSprite();
-			bg1.y = -200;
+			bg1.y = 0;
 			bg1.x = 0;
 			bg1.loadGraphic(bgImage);
 			bg1.scrollFactor.x = .25;

@@ -53,7 +53,7 @@ package
 		protected function GenFlat(w:int = -1) : Chunk {
 			var width : int ;
 			if(w == -1)
-				width = getRandom(8, 15);
+				width = CommonFunctions.getRandom(8, 15);
 			else
 				width = w;
 			
@@ -77,13 +77,13 @@ package
 		
 		protected function GenElevationChange() : Chunk {
 			if (currentElevation > CommonConstants.LEVELHEIGHT - 2) {
-				currentElevation += getRandom( -2, -1);
+				currentElevation += CommonFunctions.getRandom( -2, -1);
 			}
 			else if (currentElevation <= 2) {
-				currentElevation += getRandom(2, 1);
+				currentElevation += CommonFunctions.getRandom(2, 1);
 			}
 			else {
-				currentElevation += getRandom( -2, 2);
+				currentElevation += CommonFunctions.getRandom( -2, 2);
 			}
 			return GenFlat(2);
 		}
@@ -92,7 +92,7 @@ package
 			
 			var width : int ;
 			if(w == -1)
-				width = getRandom(2, 6);
+				width = CommonFunctions.getRandom(2, 6);
 			else
 				width = w;
 			
@@ -112,24 +112,24 @@ package
 			
 			var width : int ;
 			if(w == -1)
-				width = getRandom(10, 15);
+				width = CommonFunctions.getRandom(10, 15);
 			else
 				width = w;
 			
 			var returned : Chunk = GenFlat(width);
 			
 			//number of additional levels (not including the ground)
-			var numLevels : int = getRandom(1, 3);
+			var numLevels : int = CommonFunctions.getRandom(1, 3);
 			
 			//higher levels must be generated first, each level will be a random width and height
 			while (numLevels > 0) {
-				var genX : int = getRandom(0, returned.width - 3);
+				var genX : int = CommonFunctions.getRandom(0, returned.width - 3);
 				while (genX < returned.width - 6) {
-					var h : int = numLevels * CommonConstants.JUMPHEIGHT - getRandom(0, 1);
-					var w : int = getRandom(2, returned.width - genX - 1);
+					var h : int = numLevels * CommonConstants.JUMPHEIGHT - CommonFunctions.getRandom(0, 1);
+					var w : int = CommonFunctions.getRandom(2, returned.width - genX - 1);
 					returned.AddOneWayPlatform(genX, currentElevation - 1, w, h);
 					
-					var spacing : int = getRandom(1, 4);
+					var spacing : int = CommonFunctions.getRandom(1, 4);
 					
 					genX = genX + w + spacing;
 				}
@@ -150,10 +150,7 @@ package
 		protected function GetDifficulty() : int{
 			return currentX / difficultyFactor;
 		}
-		
-		protected function getRandom(min:int, max:int) : int {
-			return Math.round(Math.random() * (max - min)) + min;
-		}
+
 	}
 
 }

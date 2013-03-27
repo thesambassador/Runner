@@ -51,7 +51,7 @@ package
 			
 			//number of obstacles is at max 4, but otherwise diff/4.  So at 8 difficulty, numObstacles should be 2, but at 24 difficulty, numObstacles will only be 4
 			var maxObstacles : int = (diff/4 > 4 ? 4 : diff / 4)
-			var numObstacles : int = getRandom(0, maxObstacles);
+			var numObstacles : int = CommonFunctions.getRandom(0, maxObstacles);
 			
 			//add obstacles, the obstacle functions will do nothing if there is no room for the obstacles.
 			while (numObstacles > 0 && obstacleFunctions.length > 0) {

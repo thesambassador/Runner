@@ -21,7 +21,7 @@ package
 		public var player : Player;
 		public var background : ScrollingBackground;
 		
-		public var levelWidth : int = 200;
+		public var levelWidth : int = 400;
 		
 		public var firstChunk : Chunk;
 		public var lastChunk : Chunk;
@@ -33,6 +33,9 @@ package
 		public var playerStartY = CommonConstants.TILEHEIGHT * .5 * CommonConstants.LEVELHEIGHT;
 		
 		public function World () {
+			//background = new ScrollingBackground();
+			//add(background);
+			
 			bgLayer = new FlxGroup();
 			midLayer = new FlxGroup();
 			fgLayer = new FlxGroup();
@@ -46,7 +49,10 @@ package
 			add(player);
 			
 			//set camera and world bounds
-			FlxG.camera.setBounds(0, 0, 5000000000, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
+			
+			var camBoundY : int = CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT - 20;
+			
+			FlxG.camera.setBounds(0, 0, 5000000000, camBoundY);
 			FlxG.worldBounds = new FlxRect(0, 32, CommonConstants.WINDOWWIDTH + 128, CommonConstants.WINDOWHEIGHT + 128);
 			
 			CreateInitialPlatform();
@@ -66,16 +72,12 @@ package
 		}
 		
 		private function GenLevel() : void{
-			var levGen : LevelGen = new LevelGen(currentElevation, levelWidth, alienTileset);
+			var levGen : LevelGen = new LevelOneGen(currentElevation, levelWidth, 1, alienTileset);
 			
 			var newChunk : Chunk = levGen.GenerateLevel()
 			newChunk.SetX(endX);
 			
-			endX += newChunk.width;
-			currentElevation = newChunk.endElevation;
-			
 			AddChunk(newChunk);
-			var x = 5;
 		}
 		
 		private function AddChunk(chunk : Chunk) : void {
@@ -111,10 +113,7 @@ package
 			//FlxG.collide(chunkGroup, entityGroup);
 			//FlxG.collide(entityGroup, player, this.EnemyCollideWithPlayer);
 			
-			var camera : FlxCamera = FlxG.camera;
-			var playerPoint : FlxPoint = player.getFocusPoint();
-			playerPoint.x += camera.width / 2 - 64;
-			camera.focusOn(playerPoint);
+			updateCamera();
 			
 
 			//player falls off the world
@@ -127,6 +126,14 @@ package
 			}
 			
 			super.update();
+		}
+		
+		public function updateCamera() : void {
+			var camera : FlxCamera = FlxG.camera;
+			var playerPoint : FlxPoint = player.getFocusPoint();
+			playerPoint.x += camera.width / 2 - 64;
+			playerPoint.y -= 15;
+			camera.focusOn(playerPoint);
 		}
 		
 	}

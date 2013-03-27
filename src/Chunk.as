@@ -18,12 +18,12 @@ package
 		private static var barrier : int = 8;
 		
 		//background platforms
-		private static var topleft : int = 20;
-		private static var topmiddle : int = 21;
-		private static var topright : int = 22;
-		private static var left : int = 28;
-		private static var middle : int = 29;
-		private static var right : int = 30;
+		private static var topleft : int = 11;
+		private static var topmiddle : int = 12;
+		private static var topright : int = 13;
+		private static var left : int = 19;
+		private static var middle : int = 20;
+		private static var right : int = 21;
 
 		public var mainTiles : FlxTilemap;  //main tiles for collision
 		public var bgTiles : FlxTilemap; //background tiles with no collision
@@ -51,6 +51,13 @@ package
 			fgTiles.loadMap(MakeEmptySectionString(width, height), tileset, CommonConstants.TILEWIDTH, CommonConstants.TILEHEIGHT);
 			
 			entities = new FlxGroup();
+			
+			mainTiles.setTileProperties(topleft, FlxObject.UP);
+			mainTiles.setTileProperties(topmiddle, FlxObject.UP);
+			mainTiles.setTileProperties(topright, FlxObject.UP);
+			mainTiles.setTileProperties(left, FlxObject.NONE);
+			mainTiles.setTileProperties(middle, FlxObject.NONE);
+			mainTiles.setTileProperties(right, FlxObject.NONE);
 		}
 		
 		//basic function to create the string that Flixel uses to initialize a FlxTilemap
@@ -121,33 +128,33 @@ package
 					if (setX == x) {
 						if (setY == y - h + 1) {
 							mainTiles.setTile(setX, setY, topleft);
-							mainTiles.setTileProperties(mainTiles.getTile(setX, setY), FlxObject.UP); 
+
 						}
 						else {
 							mainTiles.setTile(setX, setY, left);
-							mainTiles.setTileProperties(mainTiles.getTile(setX, setY), FlxObject.NONE);
+
 						}
 					}
 					//middle tiles
 					else if (setX < x + w - 1) {
 						if (setY == y - h + 1) {
 							mainTiles.setTile(setX, setY, topmiddle);
-							mainTiles.setTileProperties(mainTiles.getTile(setX, setY), FlxObject.UP); 
+
 						}
 						else {
 							mainTiles.setTile(setX, setY, middle);
-							mainTiles.setTileProperties(mainTiles.getTile(setX, setY), FlxObject.NONE);
+
 						}
 					}
 					//right tiles
 					else{
 						if (setY == y - h + 1) {
 							mainTiles.setTile(setX, setY, topright);
-							mainTiles.setTileProperties(mainTiles.getTile(setX, setY), FlxObject.UP); 
+
 						}
 						else {
 							mainTiles.setTile(setX, setY, right);
-							mainTiles.setTileProperties(mainTiles.getTile(setX, setY), FlxObject.NONE);
+
 						}
 					}
 				}

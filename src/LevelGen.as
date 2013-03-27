@@ -1,6 +1,7 @@
 package 
 {
 	import org.flixel.*;
+
 	/**
 	 * This is the base LevelGen class
 	 * It has basic functions for creating things that all levels need
@@ -15,28 +16,79 @@ package
 		
 		public var tileset : Class //tileset to use to generate
 		
-		public var baseFunctions : Array;  //array of base functions that are valid to use.
+		public var genFunctions : Array; //array of level generation functions
+		public var consecutiveCategories : int = 0; //number of times the current category has been generated in a row
+		public var lastCategory : String = "";
 		
 		public var currentChunk : Chunk; //current chunk we're operating on, generated when we create the LevelGen object
 		
-		public function LevelGen(initialElevation : int, width : int, tileset : Class) {
+		public var difficulty : int;
+		public var difficultyIncrease : int = 2; //increase difficulty by 2 over the course of this level.
+		
+		private var midBuffer : int = 5; //buffer between sections
+		
+		public function LevelGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			currentX = 0;
 			currentY = initialElevation;
 			
-			baseFunctions = new Array();
-			baseFunctions.push(GenFlat);
-			baseFunctions.push(GenElevationChange);
-			baseFunctions.push(GenGap);
+			difficulty = startingDifficulty;
+			//diffWidth = width / difficultyIncrease;
+			
+			
+			genFunctions = new Array();
+			InitializeGenFunctions();
 			
 			currentChunk = new Chunk(tileset, width);
 			
 		}
 		
-		public function GenerateLevel() : Chunk{
+		public function InitializeGenFunctions() : void{
+			genFunctions.push(new GenFunction(GenFlat, 0, 10, "flat"));
+			genFunctions.push(new GenFunction(GenGap, 0, 10, "gap"));
+		}
+		
+		public function GetGenFunction(diff : int) : GenFunction {
+			var validFunctions : Array = new Array();
+			
+			for each(var genFunct : GenFunction in genFunctions) {
+				if (diff > genFunct.minDifficulty && diff < genFunct.maxDifficulty) {
+
+						validFunctions.push(genFunct);
+				}
+			}
+			
+			return FlxU.getRandom(validFunctions) as GenFunction;
+		}
+		
+		public function GenerateLevel() : Chunk {
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
-				var genFunction : Function = FlxU.getRandom(baseFunctions) as Function;
-				
-				genFunction();
+				var gf : GenFunction = null;
+				while(gf == null){
+					//get a random genfunction valid for our current difficulty
+					gf = GetGenFunction(difficulty);
+					
+					//if we generated this category last iteration, take note
+					if (lastCategory == gf.category) {
+						consecutiveCategories += 1;
+//
+					}
+					else {
+						consecutiveCategories = 0;
+					}
+					
+					//now stop consecutive runs of the same function:
+					if (consecutiveCategories > 0) {
+						if (gf.category == "gap") gf = null;
+						else if (gf.category == "changeY" && consecutiveCategories >= 2) gf = null;
+						else if (gf.category == "slide"  && consecutiveCategories >= 2) gf = null;
+						else if (gf.category == "hurtle"  && consecutiveCategories >= 3) gf = null;
+					}
+					if (gf == null) consecutiveCategories = 0;
+				}
+				gf.genFunction();
+				lastCategory = gf.category;
+
+				GenFlat(midBuffer); 
 			}
 			
 			//fill in the rest of the level with flatness
@@ -51,22 +103,24 @@ package
 				currentX ++;
 			}
 			
+			currentChunk.Decorate();
+			
 			return currentChunk;
 		}
 
 		protected function GenFlat(w:int = -1) {
 			var width : int ;
 			if(w == -1)
-				width = getRandom(8, 15);
+				width = CommonFunctions.getRandom(8, 15);
 			else
 				width = w;
 			
 			for (var x : int = currentX; x < width + currentX; x++) {
 				var setTile : int = 1;
 				
-				if (x == currentX + width - 1) {
-					setTile = 10;
-				}
+				//if (x == currentX + width - 1) {
+				//	setTile = 10;
+				//}
 				
 				currentChunk.mainTiles.setTile(x, currentY, setTile);
 				
@@ -78,13 +132,13 @@ package
 		
 		protected function GenElevationChange() {
 			if (currentY > CommonConstants.LEVELHEIGHT - 2) {
-				currentY += getRandom( -2, -1);
+				currentY += CommonFunctions.getRandom( -2, -1);
 			}
 			else if (currentY <= 2) {
-				currentY += getRandom(2, 1);
+				currentY += CommonFunctions.getRandom(2, 1);
 			}
 			else {
-				currentY += getRandom( -2, 2);
+				currentY += CommonFunctions.getRandom( -2, 2);
 			}
 			GenFlat(2);
 		}
@@ -93,14 +147,14 @@ package
 			
 			var width : int ;
 			if(w == -1)
-				width = getRandom(2, 8);
+				width = CommonFunctions.getRandom(4, 8);
 			else
 				width = w;
 			
-			currentChunk.mainTiles.setTile(currentX, currentY, 10);
+			currentChunk.mainTiles.setTile(currentX, currentY, 1);
 			FillUnder(currentX, currentY, currentChunk.mainTiles, 4);
 			
-			currentChunk.mainTiles.setTile(currentX + width-1, currentY, 10);
+			currentChunk.mainTiles.setTile(currentX + width-1, currentY, 1);
 			FillUnder(currentX + width - 1, currentY, currentChunk.mainTiles, 4);
 			
 			currentX += width;
@@ -108,33 +162,30 @@ package
 		
 		//this is the same as flat, but a bit wider and adds multiple "levels" that the player can jump onto for some variation
 		protected function GenMultiLevel(w:int = -1) {
-			
+			var startX = currentX;
 			var width : int ;
 			if(w == -1)
-				width = getRandom(10, 15);
+				width = CommonFunctions.getRandom(10, 15);
 			else
 				width = w;
-			
-			var returned : Chunk = GenFlat(width);
+				
+			GenFlat(width);
 			
 			//number of additional levels (not including the ground)
-			var numLevels : int = getRandom(1, 3);
+			var numLevels : int = CommonFunctions.getRandom(1, 3);
 			
 			//higher levels must be generated first, each level will be a random width and height
 			while (numLevels > 0) {
-				var genX : int = getRandom(0, currentChunk.widthInTiles - 3);
-				while (genX < currentChunk.width - 6) {
-					var h : int = numLevels * CommonConstants.JUMPHEIGHT - getRandom(0, 1);
-					var w : int = getRandom(2, currentChunk.width - genX - 1);
-					currentChunk.AddOneWayPlatform(genX, currentY - 1, w, h);
+				var genX : int = CommonFunctions.getRandom(startX, startX + 2);
+				var h : int = numLevels * CommonConstants.JUMPHEIGHT - CommonFunctions.getRandom(0, 1);
+				var w : int = CommonFunctions.getRandom(2, width-2);
+				currentChunk.AddOneWayPlatform(genX, currentY - 1, w, h);
 					
-					var spacing : int = getRandom(1, 4);
+				var spacing : int = CommonFunctions.getRandom(1, 4);
 					
-					genX = genX + w + spacing;
-				}
+				genX = genX + w + spacing;
 				numLevels --;
 			}
-			
 
 		}
 		
@@ -149,9 +200,7 @@ package
 			return 1;
 		}
 		
-		protected function getRandom(min:int, max:int) : int {
-			return Math.round(Math.random() * (max - min)) + min;
-		}
+
 	}
 	
 }

@@ -289,6 +289,7 @@ package
 					changeState("ground");
 					this.playPriority("endslide", 6);
 					this.setBoundHeight(31);
+					this.y -= 2;
 					return true;
 				}
 
