@@ -14,12 +14,11 @@ package
 	
 		private var controlConfig : Dictionary;
 		
-		public var rem : Number;
-		
-		private var tilemapRef : FlxGroup;
+		public var collectiblesCollected = 0;
+		public var invulnerable : Boolean = false;
 		
 		//movement constants:
-		private var groundDragFactor : Number = 6;
+		private var groundDragFactor : Number = 4;
 		private var airDragFactor : Number = 3;
 		private var gravity : Number = 1000;
 		
@@ -57,7 +56,7 @@ package
 			controlConfig["RIGHT"] = "RIGHT";
 			controlConfig["UP"] = "UP";
 			controlConfig["DOWN"] = "DOWN";
-			controlConfig["JUMP"] = "Z";
+			controlConfig["JUMP"] = "X";
 			controlConfig["RUN"] = "SHIFT";
 			
 			//movement
@@ -97,7 +96,7 @@ package
 		
 		override public function update():void 
 		{
-			
+			this.invulnerable = false;
 			totalFrames ++;
 			//reset acceleration and apply gravity
 			this.acceleration.x = 0;
@@ -129,7 +128,7 @@ package
 					case "slide":
 						didUpdate = updateSlideState();
 						break;
-					case "levelend":
+					case "levelEnd":
 						didUpdate = updateLevelEndState();
 						break;
 				}
@@ -206,6 +205,11 @@ package
 			}
 			
 			return true;
+			
+		}
+		
+		override public function hurt(damage : Number) : void{
+			if (!invulnerable) super.hurt(damage);
 		}
 		
 		//air state can transition to the ground state, obviously, and that's pretty much it.
@@ -311,21 +315,9 @@ package
 		}
 		
 		private function updateLevelEndState () : Boolean {
-			return true;
-		}
-		
-		public function calcCanStand(collided : FlxTilemap) : Boolean {
-			var overheadPointL : FlxPoint = new FlxPoint(this.x, this.y + this.height - 18);
-			var overheadPointR : FlxPoint = new FlxPoint(this.x + 14, this.y + this.height - 18);
-			
-			try{
-				if (collided.overlapsPoint(overheadPointL) || collided.overlapsPoint(overheadPointR)) {
-					return false;
-				}
-			}
-			catch (e:Error) {
-				
-			}
+			this.playPriority("run", 3);
+			this.facing = FlxObject.RIGHT;
+			this.acceleration.x = this.maxVelocity.x * accelerationFactor;
 			return true;
 		}
 		
@@ -378,6 +370,14 @@ package
 			return returned;
 		}
 		
+		public function EnemyBounce() {
+			if(FlxG.keys[controlConfig["JUMP"]])
+				this.velocity.y = -350;
+			else
+				this.velocity.y = -150;
+			this.invulnerable = true;
+		}
+		
 		public function collideTilemap(tilemap:FlxObject, playerObj:FlxObject) : Boolean{
 			
 			var player : Player = playerObj as Player;
@@ -393,6 +393,23 @@ package
 			
 			
 			return returned;
+		}
+		
+		public function calcCanStand(collided : FlxTilemap) : Boolean {
+			var overheadPointL : FlxPoint = new FlxPoint(this.x, this.y + this.height - 18);
+			var overheadPointR : FlxPoint = new FlxPoint(this.x + this.width - 1, this.y + this.height - 18);
+			
+			//var overheadPointVel : FlxPoint = new FlxPoint(this.x + 14 + this.velocity.x, this.y + this.height - 18);
+			
+			try{
+				if (collided.overlapsPoint(overheadPointL) || collided.overlapsPoint(overheadPointR)) {
+					return false;
+				}
+			}
+			catch (e:Error) {
+				
+			}
+			return true;
 		}
 		
 		public function collideMovingPlatform(Object1:FlxObject, Object2:FlxObject) : void{

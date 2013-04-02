@@ -59,14 +59,11 @@ package
 			
 			FlxG.worldBounds.x = player.x - 64;
 			FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
-			
-			if(player.attackProjectile != null)
-				level.overlaps(player.attackProjectile)
 
 			//check collisions
 			FlxG.overlap(chunkGroup, player, player.collideTilemap);
 			FlxG.collide(chunkGroup, entityGroup);
-			FlxG.collide(entityGroup, player, this.EnemyCollideWithPlayer);
+			//FlxG.collide(entityGroup, player, this.EnemyCollideWithPlayer);
 			
 			
 			

@@ -23,15 +23,18 @@ package
 		public var currentChunk : Chunk; //current chunk we're operating on, generated when we create the LevelGen object
 		
 		public var difficulty : int;
+		public var startDifficulty : int;
 		public var difficultyIncrease : int = 2; //increase difficulty by 2 over the course of this level.
 		
-		private var midBuffer : int = 5; //buffer between sections
+		protected var collectiblesLeft : int = 20;  //how many more collectibles can be added to the level
+		protected var midBuffer : int = 5; //buffer between sections
 		
 		public function LevelGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			currentX = 0;
 			currentY = initialElevation;
 			
 			difficulty = startingDifficulty;
+			startDifficulty = startingDifficulty;
 			//diffWidth = width / difficultyIncrease;
 			
 			
@@ -51,7 +54,7 @@ package
 			var validFunctions : Array = new Array();
 			
 			for each(var genFunct : GenFunction in genFunctions) {
-				if (diff > genFunct.minDifficulty && diff < genFunct.maxDifficulty) {
+				if (diff >= genFunct.minDifficulty && diff <= genFunct.maxDifficulty) {
 
 						validFunctions.push(genFunct);
 				}
@@ -63,6 +66,9 @@ package
 		public function GenerateLevel() : Chunk {
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
 				var gf : GenFunction = null;
+				if (currentX > (difficulty + 1 - startDifficulty) * (currentChunk.widthInTiles / (difficultyIncrease + 1))) {
+					difficulty ++;
+				}
 				while(gf == null){
 					//get a random genfunction valid for our current difficulty
 					gf = GetGenFunction(difficulty);
@@ -82,6 +88,7 @@ package
 						else if (gf.category == "changeY" && consecutiveCategories >= 2) gf = null;
 						else if (gf.category == "slide"  && consecutiveCategories >= 2) gf = null;
 						else if (gf.category == "hurtle"  && consecutiveCategories >= 3) gf = null;
+						else if (gf.category == "enemy"  && consecutiveCategories >= 2) gf = null;
 					}
 					if (gf == null) consecutiveCategories = 0;
 				}
@@ -107,6 +114,7 @@ package
 			
 			return currentChunk;
 		}
+	
 
 		protected function GenFlat(w:int = -1) {
 			var width : int ;
@@ -143,7 +151,7 @@ package
 			GenFlat(2);
 		}
 		
-		protected function GenGap(w:int = -1) {		
+		protected function GenGap(w:int = -1) : void {		
 			
 			var width : int ;
 			if(w == -1)
@@ -154,8 +162,8 @@ package
 			currentChunk.mainTiles.setTile(currentX, currentY, 1);
 			FillUnder(currentX, currentY, currentChunk.mainTiles, 4);
 			
-			currentChunk.mainTiles.setTile(currentX + width-1, currentY, 1);
-			FillUnder(currentX + width - 1, currentY, currentChunk.mainTiles, 4);
+			//currentChunk.mainTiles.setTile(currentX + width-1, currentY, 1);
+			//FillUnder(currentX + width - 1, currentY, currentChunk.mainTiles, 4);
 			
 			currentX += width;
 		}
@@ -189,6 +197,12 @@ package
 
 		}
 		
+		public function addCollectible(x:int, y:int) : void{
+			var col : Collectible = new Collectible();
+			currentChunk.AddEntityAtTileCoords(col, x, y);
+			collectiblesLeft --;
+		}
+		
 		//fill all tiles under the specific tile.
 		protected function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) : void {
 			for (var y : int = sy + 1; y < CommonConstants.LEVELHEIGHT; y++) {
@@ -200,6 +214,19 @@ package
 			return 1;
 		}
 		
+		protected function CalcMaxJumpDistance(y:int) : int {
+			
+			if (y >= 0) return 10;
+			
+			var a : Number = CommonConstants.JUMPHEIGHT / Math.pow(CommonConstants.JUMPLENGTH, 2);
+			var returned : int =  Math.sqrt((y + CommonConstants.JUMPHEIGHT) / a) as int;
+			
+			if (returned < 5) {
+				var x = 5;
+			}
+			
+			return returned;
+		}
 
 	}
 	

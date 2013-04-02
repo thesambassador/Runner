@@ -109,9 +109,10 @@ package
 		}
 		
 		public function get endElevation() : Number {
-			var x : int = mainTiles.widthInTiles - 1;
+			var x : int = mainTiles.widthInTiles - 2;
 			for (var y : int = 0; y < mainTiles.heightInTiles; y++) {
-				if (mainTiles.getTile(x, y) == groundTop) {
+				if (mainTiles.getTile(x, y) != 0) {
+					var tile : int = mainTiles.getTile(x, y);
 					return y;
 				}
 			}
@@ -199,6 +200,29 @@ package
 			
 		private function getRandom(min:int, max:int) : int {
 			return Math.round(Math.random() * (max - min)) + min;
+		}
+		
+		public static function GenFlatChunk(width : int, height : int, tileset : Class) : Chunk{
+			var returned : Chunk = new Chunk(tileset, width, CommonConstants.LEVELHEIGHT);
+			
+			for (var x : int = 0; x < width; x++) {
+				var setTile : int = 1;
+				
+				//if (x == currentX + width - 1) {
+				//	setTile = 10;
+				//}
+				
+				returned.mainTiles.setTile(x, height, setTile);
+				
+				FillUnder(x, height, returned.mainTiles, 4);
+			}
+			return returned;
+		}
+		
+		public static function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) : void {
+			for (var y : int = sy + 1; y < CommonConstants.LEVELHEIGHT; y++) {
+				tiles.setTile(sx, y, fillTile);
+			}
 		}
 	}
 
