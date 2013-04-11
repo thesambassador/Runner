@@ -15,7 +15,6 @@ package
 			FlxG.bgColor = 0xff000000;
 			FlxG.framerate = 60;
 			FlxG.flashFramerate = 60;
-
 		
 			world = new World();
 			this.add(world);

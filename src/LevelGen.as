@@ -9,7 +9,7 @@ package
 	 */
 	public class LevelGen
 	{
-		public static var endBuffer : int = 10; //stop generating level pieces once we get to total width of the level minus endBuffer.
+		public static var endBuffer : int = 15; //stop generating level pieces once we get to total width of the level minus endBuffer.
 		
 		public var currentX : int; //tile coords
 		public var currentY : int; //tile coords
@@ -19,6 +19,7 @@ package
 		public var genFunctions : Array; //array of level generation functions
 		public var consecutiveCategories : int = 0; //number of times the current category has been generated in a row
 		public var lastCategory : String = "";
+		public var bannedCategory : String = "";
 		
 		public var currentChunk : Chunk; //current chunk we're operating on, generated when we create the LevelGen object
 		
@@ -73,6 +74,11 @@ package
 					//get a random genfunction valid for our current difficulty
 					gf = GetGenFunction(difficulty);
 					
+					if (gf.category == bannedCategory) { 
+						gf = null;
+						continue;
+					}
+					
 					//if we generated this category last iteration, take note
 					if (lastCategory == gf.category) {
 						consecutiveCategories += 1;
@@ -87,20 +93,29 @@ package
 						if (gf.category == "gap") gf = null;
 						else if (gf.category == "changeY" && consecutiveCategories >= 2) gf = null;
 						else if (gf.category == "slide"  && consecutiveCategories >= 2) gf = null;
-						else if (gf.category == "hurtle"  && consecutiveCategories >= 3) gf = null;
+						else if (gf.category == "hurtle"  && consecutiveCategories >= 2) gf = null;
 						else if (gf.category == "enemy"  && consecutiveCategories >= 2) gf = null;
 					}
-					if (gf == null) consecutiveCategories = 0;
+					
+					
 				}
+				if(gf.category != lastCategory) consecutiveCategories = 0;
 				gf.genFunction();
 				lastCategory = gf.category;
-
+				bannedCategory = gf.bannedCategory;
+				
+				if (currentY <= 0) {
+					currentY = 3;
+				}
+				else if (currentY > CommonConstants.LEVELHEIGHT) {
+					currentY = CommonConstants.LEVELHEIGHT - 3;
+				}
 				GenFlat(midBuffer); 
 			}
 			
 			//fill in the rest of the level with flatness
 			while (currentX < currentChunk.widthInTiles) {
-				var setTile = 1;
+				var setTile : int = 1;
 				
 				if (currentX == currentChunk.widthInTiles - 1) setTile = 9;
 				
@@ -116,7 +131,7 @@ package
 		}
 	
 
-		protected function GenFlat(w:int = -1) {
+		protected function GenFlat(w:int = -1) : void {
 			var width : int ;
 			if(w == -1)
 				width = CommonFunctions.getRandom(8, 15);
@@ -138,7 +153,7 @@ package
 
 		}
 		
-		protected function GenElevationChange() {
+		protected function GenElevationChange() : void{
 			if (currentY > CommonConstants.LEVELHEIGHT - 2) {
 				currentY += CommonFunctions.getRandom( -2, -1);
 			}
@@ -162,15 +177,22 @@ package
 			currentChunk.mainTiles.setTile(currentX, currentY, 1);
 			FillUnder(currentX, currentY, currentChunk.mainTiles, 4);
 			
-			//currentChunk.mainTiles.setTile(currentX + width-1, currentY, 1);
+			if (currentY < CommonConstants.LEVELHEIGHT - 6) {
+				var pitDepth : int = 7;
+				for (var i : int = 0; i < width; i++) {
+					currentChunk.mainTiles.setTile(currentX + 1 + i, currentY + pitDepth, 16);
+					FillUnder(currentX + 1 + i, currentY + pitDepth, currentChunk.mainTiles, 4);
+				}
+			}
+				
 			//FillUnder(currentX + width - 1, currentY, currentChunk.mainTiles, 4);
 			
 			currentX += width;
 		}
 		
 		//this is the same as flat, but a bit wider and adds multiple "levels" that the player can jump onto for some variation
-		protected function GenMultiLevel(w:int = -1) {
-			var startX = currentX;
+		protected function GenMultiLevel(w:int = -1) : void {
+			var startX : int = currentX;
 			var width : int ;
 			if(w == -1)
 				width = CommonFunctions.getRandom(10, 15);
@@ -221,10 +243,7 @@ package
 			var a : Number = CommonConstants.JUMPHEIGHT / Math.pow(CommonConstants.JUMPLENGTH, 2);
 			var returned : int =  Math.sqrt((y + CommonConstants.JUMPHEIGHT) / a) as int;
 			
-			if (returned < 5) {
-				var x = 5;
-			}
-			
+
 			return returned;
 		}
 

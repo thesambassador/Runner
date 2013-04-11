@@ -10,31 +10,39 @@ package
 	{
 		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
 		
+		public var startElevation : int = 32;
+		
 		public var levelChunk : Chunk;
 		public var currentDifficulty : int = 1;
+		public var currentLevel : int = 1;
 
 		public var hud : HUD; //ui group
 		public var bgLayer : FlxGroup; //background tiles
 		public var midLayer: FlxGroup; //main/collision tiles
+		public var particles: FlxGroup; //main/collision tiles
 		public var fgLayer : FlxGroup; //foreground tiles
 		
 		public var entities : FlxGroup; //entities, excluding the player
 		
 		public var player : Player;
+		public var camera : SmoothCamera;
 		public var background : ScrollingBackground;
 		
-		public var levelWidth : int = 200;
+		public var levelWidth : int = 300;
 		
 		public var firstChunk : Chunk;
 		public var lastChunk : Chunk;
 		public var numChunks : int;
 		public var endX : int; //end of the level so far, this is the right side of the last generated chunk
 		public var startLevelX : int //start of the latest level chunk, the is the LEFT side of the most recent level chunk
+		public var startLevelY : int //start of the latest level chunk, the is the LEFT side of the most recent level chunk
 		public var endLevelX : int; //end of the actual level so far, this is the right side of the last LEVEL chunk
 		public var currentElevation : int; //last elevation, in tile coordinates, so that the next level/chunk will be started at the right level.
 		
-		public var playerStartX = CommonConstants.TILEWIDTH * 2;
-		public var playerStartY = CommonConstants.TILEHEIGHT * .5 * CommonConstants.LEVELHEIGHT;
+		public var startLevelCollectibles : int = 0;
+		
+		public var playerStartX : int  = CommonConstants.TILEWIDTH * 2;
+		public var playerStartY : int = CommonConstants.TILEHEIGHT * startElevation - 32;
 		
 		public function World () {
 			//background = new ScrollingBackground();
@@ -45,11 +53,13 @@ package
 			midLayer = new FlxGroup();
 			fgLayer = new FlxGroup();
 			entities = new FlxGroup();
+			particles = new FlxGroup();
 			
 			
 			add(bgLayer);
 			add(midLayer);
 			add(entities);
+			add(particles);
 			add(fgLayer);
 			
 			player = new Player(playerStartX, playerStartY);
@@ -59,12 +69,11 @@ package
 			add(hud);
 			
 			
-			//set camera and world bounds
+			//set camera
+			camera = new SmoothCamera(player);
+			FlxG.resetCameras(camera);
 			
-			var camBoundY : int = CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT - 20;
-			
-			FlxG.camera.setBounds(0, 0, 5000000000, camBoundY);
-			FlxG.worldBounds = new FlxRect(0, 32, CommonConstants.WINDOWWIDTH + 128, CommonConstants.WINDOWHEIGHT + 128);
+			FlxG.worldBounds = new FlxRect(0, 32, CommonConstants.WINDOWWIDTH + 512, CommonConstants.WINDOWHEIGHT + 128);
 			
 			CreateInitialPlatform();
 			GenLevel();
@@ -73,7 +82,7 @@ package
 		}
 		
 		private function CreateInitialPlatform() : void{
-			var startPlatform : Chunk = Chunk.GenFlatChunk(25, 34, alienTileset);
+			var startPlatform : Chunk = Chunk.GenFlatChunk(25, startElevation, alienTileset);
 
 			Chunk.FillUnder(0, 0, startPlatform.mainTiles, 8);
 			AddChunk(startPlatform);
@@ -87,6 +96,7 @@ package
 			currentDifficulty = levGen.difficulty;
 			
 			startLevelX = endX;
+			startLevelY = (currentElevation-2) * CommonConstants.TILEHEIGHT;
 			AddChunk(newChunk);
 			endLevelX = endX;
 			
@@ -128,25 +138,44 @@ package
 		
 		override public function update():void 
 		{
-			FlxG.worldBounds.x = player.x - 64;
+			FlxG.worldBounds.x = player.x - 256;
 			FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
-
+			
 			//check collisions
-			FlxG.overlap(midLayer, player, player.collideTilemap);
-			FlxG.collide(midLayer, entities, this.spriteCollisions);
+			FlxG.overlap(midLayer, player, null, player.collideTilemap);
+			FlxG.overlap(midLayer, entities, this.spriteCollisions);
 			FlxG.overlap(player, entities, this.spriteCollisions);
 			FlxG.overlap(entities, entities, this.spriteCollisions);
 			
-			updateCamera();
+			FlxG.collide(particles, midLayer);
 			
+	
+
+			updateCamera();
 
 			//player falls off the world
 			if (player.y > CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT) {
 				player.health = 0;
 			}
 			
-			if (player.health == 0) {
-				FlxG.resetState();
+			if (player.health <= 0) {
+				
+				if (player.lives <= 0) {
+					if(player.lives == 0){
+						var top : FlxText = hud.DisplayCenteredText("Game Over");
+						var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
+						top.y -= 32;
+						bottom.size = 10;
+						player.lives --;
+					}
+					if (FlxG.keys.justPressed("R")) 
+						FlxG.resetState();
+				}
+				else {
+					player.lives --;
+					player.health = 1;
+					RestartLevel();
+				}
 			}
 			
 			//end of level
@@ -158,7 +187,9 @@ package
 			}
 			
 			if (player.state == "levelEnd") {
-				if(player.x > startLevelX - 200){
+				startLevelCollectibles = player.collectiblesCollected;
+				if (player.x > startLevelX - 400) {
+					currentLevel += 1;
 					player.state = "ground";
 					hud.RemoveLevelComplete();
 					RemoveFirstChunk();
@@ -168,34 +199,59 @@ package
 			super.update();
 		}
 		
+		public function RestartLevel() : void {
+			player.reset(this.startLevelX - 128, startLevelY);
+			player.collectiblesCollected = startLevelCollectibles;
+			
+			camera.targetPoint.x = player.getFocusPoint().x;
+			camera.targetPoint.y = player.getFocusPoint().y;
+			camera.actualPoint.copyFrom(camera.targetPoint);
+			
+			entities.callAll("ResetToOriginal");
+		}
 		
 		public function updateCamera() : void {
-			var camera : FlxCamera = FlxG.camera;
-			var playerPoint : FlxPoint = player.getFocusPoint();
-			playerPoint.x += camera.width / 2 - 64;
-			playerPoint.y -= 15;
-			camera.focusOn(playerPoint);
+			for each(var tilemap : FlxTilemap in midLayer.members) {
+				if(tilemap != null){
+					var startPoint : FlxPoint = player.getFocusPoint();
+					startPoint.x += 128;
+					var endPoint : FlxPoint = new FlxPoint();
+					startPoint.copyTo(endPoint);
+					
+					endPoint.y += 400;
+					
+					var result1 : FlxPoint = new FlxPoint();
+					var result2 : FlxPoint = new FlxPoint();
+					if (!tilemap.ray(startPoint, endPoint, result1)) {
+						startPoint.x += 256;
+						endPoint.x += 128;
+						if (!tilemap.ray(startPoint, endPoint, result2)) {
+							camera.SetTargetY((result1.y + result2.y) / 2);
+						}
+					}
+				}
+			}
 		}
 		
 		public function spriteCollisions(sprite1:FlxObject, sprite2:FlxObject) : void {
 			if (sprite1 is Player) {
 				if (sprite2 is Collectible) {
 					var col : Collectible = sprite2 as Collectible;
-					col.playerCollide(sprite1 as Player);
+					col.collidePlayer(sprite1 as Player);
 				}
-				if (sprite2 is Enemy) {
-					var en : Enemy = sprite2 as Enemy;
+				if (sprite2 is Entity) {
+					var en : Entity = sprite2 as Entity;
 					en.collidePlayer(sprite1 as Player);
 				}
 			}
-			else if (sprite1 is Enemy) {
-				if (sprite2 is Enemy) {
-					(sprite1 as Enemy).collideEnemy(sprite2 as Enemy);
+			else if (sprite1 is Entity) {
+				if (sprite2 is Entity) {
+					(sprite1 as Entity).collideEnemy(sprite2 as Entity);
 				}
 			}
 			else if (sprite1 is FlxTilemap) {
-				if (sprite2 is Enemy) {
-					(sprite2 as Enemy).collideTilemap(sprite1 as FlxTilemap);
+				if (sprite2 is Entity) {
+					(sprite2 as Entity).collideTilemap(sprite1 as FlxTilemap);
 				}
 			}
 		}

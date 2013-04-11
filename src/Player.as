@@ -14,8 +14,9 @@ package
 	
 		private var controlConfig : Dictionary;
 		
-		public var collectiblesCollected = 0;
+		public var collectiblesCollected : int = 0;
 		public var invulnerable : Boolean = false;
+		public var lives : int = 2;
 		
 		//movement constants:
 		private var groundDragFactor : Number = 4;
@@ -27,6 +28,7 @@ package
 		private var minSlideSpeed:Number = 100;
 		private var accelerationFactor:Number = 2;
 		
+		private var airTime: int = 0;
 		private var jumpTime:Number = 7;  //variable for how long you can hold down the jump button and get lift
 		private var jumpVel:Number = 260.00;
 		private var jumpEnergy:Number = jumpTime;
@@ -141,9 +143,14 @@ package
 			super.update();
 		}
 		
+		override public function reset(X:Number, Y:Number) : void {
+			super.reset(X, Y);
+			this.collectiblesCollected = 0;
+		}
+		
 		//ground state can transition to air (by jumping or running off an edge) or to sliding.
 		private function updateGroundState () : Boolean {
-			
+			airTime = 0;
 			if (!this.isTouching(FlxObject.FLOOR)) {
 				changeState("air");
 				return false;
@@ -214,6 +221,16 @@ package
 		
 		//air state can transition to the ground state, obviously, and that's pretty much it.
 		private function updateAirState () : Boolean {
+			airTime ++;
+			
+			//let ourselves still jump a bit after we run off a ledge to be a bit mroe forgiving
+			if (airTime <= 4) {
+				if (FlxG.keys.justPressed(controlConfig["JUMP"]) && canStand) {
+					jumpEnergy = jumpTime; 
+					this.velocity.y = -jumpVel / 1.5;
+				}
+			}
+			
 			//if we're on the ground, and our y velocity isn't negative (up), go back to ground.
 			if (this.isTouching(FlxObject.FLOOR) && velocity.y >= 0) {
 				if (lastVel.y > 400)
@@ -287,6 +304,15 @@ package
 			if (state != lastState) {
 				this.playPriority("startslide", 6);
 			}
+			
+			if (FlxG.keys.justPressed(controlConfig["JUMP"]) && canStand) {
+				this.setBoundHeight(31);
+				this.y -= 2;
+				jumpEnergy = jumpTime; 
+				this.velocity.y = -jumpVel / 1.5;
+				changeState("air");
+				return false;
+			}
 
 			if (!FlxG.keys[controlConfig["DOWN"]] || !this.isTouching(FlxObject.FLOOR)) {
 				if (canStand) {
@@ -294,7 +320,7 @@ package
 					this.playPriority("endslide", 6);
 					this.setBoundHeight(31);
 					this.y -= 2;
-					return true;
+					return false;
 				}
 
 				else {
@@ -370,11 +396,11 @@ package
 			return returned;
 		}
 		
-		public function EnemyBounce() {
+		public function Bounce(small : int, big : int) : void {
 			if(FlxG.keys[controlConfig["JUMP"]])
-				this.velocity.y = -350;
+				this.velocity.y = big;
 			else
-				this.velocity.y = -150;
+				this.velocity.y = small;
 			this.invulnerable = true;
 		}
 		
@@ -396,13 +422,17 @@ package
 		}
 		
 		public function calcCanStand(collided : FlxTilemap) : Boolean {
+			
+			
 			var overheadPointL : FlxPoint = new FlxPoint(this.x, this.y + this.height - 18);
 			var overheadPointR : FlxPoint = new FlxPoint(this.x + this.width - 1, this.y + this.height - 18);
+			
+			var overheadPointFuture : FlxPoint = new FlxPoint(this.x + this.width + this.velocity.x * (1/60), this.y + this.height - 18);
 			
 			//var overheadPointVel : FlxPoint = new FlxPoint(this.x + 14 + this.velocity.x, this.y + this.height - 18);
 			
 			try{
-				if (collided.overlapsPoint(overheadPointL) || collided.overlapsPoint(overheadPointR)) {
+				if (collided.overlapsPoint(overheadPointL) || collided.overlapsPoint(overheadPointR) || collided.overlapsPoint(overheadPointFuture)) {
 					return false;
 				}
 			}

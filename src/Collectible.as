@@ -6,7 +6,7 @@ package
 	 * ...
 	 * @author ...
 	 */
-	public class Collectible extends FlxSprite 
+	public class Collectible extends Entity 
 	{
 		[Embed(source = '../resources/img/collectible.png')]private static var collectibleImage:Class;
 		
@@ -19,9 +19,11 @@ package
 			//this.mass = .1;
 		}
 		
-		public function playerCollide(playerObj:Player) {
-			playerObj.collectiblesCollected ++;
-			this.kill();
+		override public function collidePlayer(playerObj:Player) : void {
+			if(this.exists){
+				playerObj.collectiblesCollected ++;
+				this.kill();
+			}
 		}
 	
 			

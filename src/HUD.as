@@ -3,6 +3,7 @@ package
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxPoint;
 	import org.flixel.FlxText;
+	import org.flixel.FlxG;
 	
 	/**
 	 * ...
@@ -15,6 +16,7 @@ package
 		
 		private var score : int;
 		private var scoreText : FlxText;
+		private var levelText : FlxText;
 		private var levelCompleteText : FlxText;
 		
 		public function HUD(playerRef : Player) {
@@ -25,6 +27,13 @@ package
 			scoreText.scrollFactor.y = 0;
 			scoreText.alignment = "right";
 			add(scoreText);
+			
+			levelText = new FlxText(CommonConstants.WINDOWWIDTH / 4 - 100, 0, 200);
+			levelText.text = "0";
+			levelText.scrollFactor.x = 0;
+			levelText.scrollFactor.y = 0;
+			levelText.alignment = "center";
+			add(levelText);
 		}
 		
 		public function DisplayCenteredText(text : String) : FlxText {
@@ -44,17 +53,18 @@ package
 			return txt;
 		}
 		
-		public function DisplayLevelComplete() {
+		public function DisplayLevelComplete() : void {
 			levelCompleteText = DisplayCenteredText("Level Complete");
 		}
 		
-		public function RemoveLevelComplete() {
+		public function RemoveLevelComplete() : void {
 			levelCompleteText.kill();
 			levelCompleteText = null;
 		}
 		
 		override public function update() : void{
-			scoreText.text = player.collectiblesCollected;
+			scoreText.text = player.collectiblesCollected.toString();
+			levelText.text = (FlxG.state as PlayState).world.currentLevel.toString();
 			super.update();
 		}
 	

@@ -16,6 +16,7 @@ package
 		private static var groundTopRight : int = 3;
 		private static var underground : int = 4;
 		private static var barrier : int = 8;
+		private static var spike : int = 16;
 		
 		//background platforms
 		private static var topleft : int = 11;
@@ -58,6 +59,7 @@ package
 			mainTiles.setTileProperties(left, FlxObject.NONE);
 			mainTiles.setTileProperties(middle, FlxObject.NONE);
 			mainTiles.setTileProperties(right, FlxObject.NONE);
+			mainTiles.setTileProperties(spike, FlxObject.ANY, CommonFunctions.killPlayer);
 		}
 		
 		//basic function to create the string that Flixel uses to initialize a FlxTilemap
@@ -76,8 +78,9 @@ package
 			bgTiles.x = x;
 			fgTiles.x = x;
 			
-			for each(var entity:FlxSprite in entities.members) {
+			for each(var entity:Entity in entities.members) {
 				entity.x += x;
+				entity.origPosX += x;
 			}
 		}
 		
@@ -173,10 +176,11 @@ package
 			}
 		}
 		
-		public function AddEntityAtTileCoords(entity:FlxSprite, x : int, y : int) : void{
+		public function AddEntityAtTileCoords(entity:Entity, x : int, y : int) : void{
 			this.entities.add(entity);
-			entity.x = this.mainTiles.x + x * CommonConstants.TILEWIDTH;
-			entity.y = this.mainTiles.y + y * CommonConstants.TILEHEIGHT;
+			var targetX : Number = this.mainTiles.x + x * CommonConstants.TILEWIDTH;
+			var targetY : Number = entity.y = this.mainTiles.y + y * CommonConstants.TILEHEIGHT;
+			entity.SetInitialPosition(targetX, targetY);
 		}
 		
 		//There are 3 different "ground" tiles and 3 differnet "underground" tiles The ChunkGen will generate a 1 for ground or 4 for underground

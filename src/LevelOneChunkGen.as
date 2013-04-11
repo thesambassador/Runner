@@ -8,6 +8,7 @@ package
 	public class LevelOneChunkGen extends ChunkGen 
 	{
 		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
+		
 		private var obstacleFunctions:Array ;	
 		private var lastDifficulty : int = 0;
 		
