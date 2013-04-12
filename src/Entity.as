@@ -14,6 +14,7 @@ package
 		public var activationDistance : int = 300;
 		public var origPosX : Number;
 		public var origPosY : Number;
+		public var beenReset : Boolean = false;
 		
 		public function Entity(startX:int = 0, startY:int = 0) 
 		{
@@ -38,13 +39,22 @@ package
 				activated = true;
 		}
 		
-		public function ResetToOriginal() {
+		public function ResetToOriginal() : void {
+			beenReset = true;
+			this.activated = false;
 			this.health = 1;
 			this.facing = FlxObject.LEFT;
+			this.acceleration.x = 0;
+			this.acceleration.y = 0;
+			this.frame = 0;
+			
 			reset(origPosX, origPosY);
 		}
 		
 		override public function update() : void {
+			if (beenReset) {
+				var x = 5;
+			}
 			checkActivation();
 			//only update if in the world bounds and this has been activated
 			if(this.x >= FlxG.worldBounds.left && this.x <= FlxG.worldBounds.right && activated){

@@ -14,6 +14,9 @@ package
 		{
 			super(0, 0);
 			loadGraphic(image, true, true, sizeX, sizeY);
+			this.width = sizeX - 4;
+			this.height = sizeY - 4;
+			this.centerOffsets();
 			velX = speedX;
 			velY = speedY;
 			

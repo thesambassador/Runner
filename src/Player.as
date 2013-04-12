@@ -91,13 +91,14 @@ package
 			
 			this.width = 15; //so we can still fall between 2 tiles with a 1 space gap
 			
-			FlxG.watch(this.velocity, "x", "Vel X");
-			FlxG.watch(this.velocity, "y", "Vel Y");
-			FlxG.watch(this, "state", "State");
+			//FlxG.watch(this.velocity, "x", "Vel X");
+			//FlxG.watch(this.velocity, "y", "Vel Y");
 		}
 		
 		override public function update():void 
 		{
+			if (FlxG.keys.justPressed("K")) this.health = 0;
+			
 			this.invulnerable = false;
 			totalFrames ++;
 			//reset acceleration and apply gravity

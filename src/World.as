@@ -44,6 +44,8 @@ package
 		public var playerStartX : int  = CommonConstants.TILEWIDTH * 2;
 		public var playerStartY : int = CommonConstants.TILEHEIGHT * startElevation - 32;
 		
+		public var worldBoundsX : int = 0;
+		
 		public function World () {
 			//background = new ScrollingBackground();
 			//add(background);
@@ -73,12 +75,14 @@ package
 			camera = new SmoothCamera(player);
 			FlxG.resetCameras(camera);
 			
-			FlxG.worldBounds = new FlxRect(0, 32, CommonConstants.WINDOWWIDTH + 512, CommonConstants.WINDOWHEIGHT + 128);
+			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.WINDOWWIDTH + 512, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
 			
 			CreateInitialPlatform();
 			GenLevel();
 			
-			FlxG.watch(this, "currentDifficulty", "diff");
+			worldBoundsX = FlxG.worldBounds.x;
+			
+			FlxG.watch(this, "worldBoundsX", "World X");
 		}
 		
 		private function CreateInitialPlatform() : void{
@@ -138,8 +142,9 @@ package
 		
 		override public function update():void 
 		{
+			worldBoundsX = 816 - (FlxG.worldBounds.left + 256);
 			FlxG.worldBounds.x = player.x - 256;
-			FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
+			//FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
 			
 			//check collisions
 			FlxG.overlap(midLayer, player, null, player.collideTilemap);
@@ -202,6 +207,7 @@ package
 		public function RestartLevel() : void {
 			player.reset(this.startLevelX - 128, startLevelY);
 			player.collectiblesCollected = startLevelCollectibles;
+			FlxG.worldBounds.x = player.x - 256;
 			
 			camera.targetPoint.x = player.getFocusPoint().x;
 			camera.targetPoint.y = player.getFocusPoint().y;

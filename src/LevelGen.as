@@ -173,15 +173,13 @@ package
 				width = CommonFunctions.getRandom(4, 8);
 			else
 				width = w;
-			
-			currentChunk.mainTiles.setTile(currentX, currentY, 1);
-			FillUnder(currentX, currentY, currentChunk.mainTiles, 4);
+	
 			
 			if (currentY < CommonConstants.LEVELHEIGHT - 6) {
 				var pitDepth : int = 7;
 				for (var i : int = 0; i < width; i++) {
-					currentChunk.mainTiles.setTile(currentX + 1 + i, currentY + pitDepth, 16);
-					FillUnder(currentX + 1 + i, currentY + pitDepth, currentChunk.mainTiles, 4);
+					currentChunk.mainTiles.setTile(currentX + i, currentY + pitDepth, 16);
+					FillUnder(currentX + i, currentY + pitDepth, currentChunk.mainTiles, 4);
 				}
 			}
 				

@@ -19,6 +19,7 @@ package
 		private var currentSpeed : Number = 0;
 		private var gravity : Number = 1000;
 		private var removeTime: Number = 20;
+	
 		
 		public function EnemyWalker(startX:int = 0, startY:int = 0) 
 		{
@@ -35,6 +36,12 @@ package
 			this.addAnimation("run", new Array(0, 1, 2), 10);
 			this.addAnimation("die", new Array(5, 6, 7, 8, 9, 9, 9, 9), 20, false);
 			this.addAnimationCallback(handleAnimation);
+			
+			FlxG.watch(this, "x", "EnemyX")
+			FlxG.watch(this, "y", "EnemyY")
+			FlxG.watch(this, "activated", "EnemyActivated")
+			FlxG.watch(this, "active", "EnemyActive")
+			FlxG.watch(this, "exists", "EnemyExists")
 		}
 		
 		public function ChangeDirection() : void {
@@ -55,6 +62,7 @@ package
 					EmitParticles();
 				if (framenum > 6) {
 					this.kill();
+					this.activated = false;
 				}
 			}
 		}
@@ -110,15 +118,21 @@ package
 		}
 		
 		override public function collideEnemy(enemy : Entity) : void {
-			this.ChangeDirection();
-			if(enemy is EnemyWalker){
-				(enemy as EnemyWalker).ChangeDirection();
+			if (enemy is EnemyWalker) {
+				var walker : EnemyWalker = enemy as EnemyWalker;
 				separate(this, enemy);
-				if (enemy.x > this.x) {
-					this.x -= 2;
-				}
-				else {
-					this.x += 2;
+				if (this.isTouching(FlxObject.LEFT)) {
+					currentSpeed = moveSpeed;
+					this.facing = FlxObject.RIGHT;
+					walker.currentSpeed = -moveSpeed;
+					walker.facing = FlxObject.LEFT;
+					
+				}	
+				else if (this.isTouching(FlxObject.RIGHT)) {
+					currentSpeed = -moveSpeed;
+					this.facing = FlxObject.LEFT;
+					walker.currentSpeed = moveSpeed;
+					walker.facing = FlxObject.RIGHT;
 				}
 			}
 		}

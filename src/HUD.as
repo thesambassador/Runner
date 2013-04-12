@@ -17,6 +17,7 @@ package
 		private var score : int;
 		private var scoreText : FlxText;
 		private var levelText : FlxText;
+		private var livesText : FlxText;
 		private var levelCompleteText : FlxText;
 		
 		public function HUD(playerRef : Player) {
@@ -34,6 +35,12 @@ package
 			levelText.scrollFactor.y = 0;
 			levelText.alignment = "center";
 			add(levelText);
+			
+			livesText = new FlxText(0, 0, 200);
+			livesText.scrollFactor.x = 0;
+			livesText.scrollFactor.y = 0;
+			livesText.alignment = "left";
+			add(livesText);
 		}
 		
 		public function DisplayCenteredText(text : String) : FlxText {
@@ -63,8 +70,9 @@ package
 		}
 		
 		override public function update() : void{
-			scoreText.text = player.collectiblesCollected.toString();
-			levelText.text = (FlxG.state as PlayState).world.currentLevel.toString();
+			scoreText.text = "Coins \n   " + player.collectiblesCollected.toString();
+			livesText.text = "Lives \n" + (player.lives).toString();
+			levelText.text = "Level \n" + (FlxG.state as PlayState).world.currentLevel.toString();
 			super.update();
 		}
 	
