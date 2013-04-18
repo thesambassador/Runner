@@ -103,6 +103,25 @@ package
 			RandomizeGroundTiles();
 		}
 		
+		public function GetHeightmap() : Array {
+			var returned : Array = new Array(widthInTiles);
+			var foundHeight : Boolean;
+			
+			for (var tx:int = 0; tx < widthInTiles; tx++) {
+				foundHeight = false;
+				for (var ty :int = 0; ty < CommonConstants.LEVELHEIGHT; ty++){
+					if (mainTiles.getTile(tx, ty) == groundTop) {
+						returned[tx] = ty;
+						foundHeight = true;
+					}
+				}
+				if (!foundHeight) {
+					returned[tx] = -1;
+				}
+			}
+			return returned;
+		}
+		
 		public function get width() : Number {
 			return mainTiles.width;
 		}

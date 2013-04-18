@@ -10,6 +10,7 @@ package
 	public class SmoothCamera extends FlxCamera
 	{
 		public var playerRef : Player; 
+		public var heightmapRef : Array;
 		public var targetPoint : FlxPoint = new FlxPoint();
 		public var actualPoint : FlxPoint = new FlxPoint();
 		
@@ -23,16 +24,16 @@ package
 		
 		public var ignoreFirst : Boolean = true;
 		
-		public function SmoothCamera(player : Player) {
+		public function SmoothCamera(player : Player, heightMap : Array) {
 
 			super(0, 0, FlxG.width, FlxG.height);
 			playerRef = player;
 			
 			var camBoundY : int = CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT - 20;
 			
-			this.setBounds(0, 0, 5000000000, camBoundY);
+			this.setBounds(0, -64, 5000000000, camBoundY);
 			
-			
+			heightmapRef = heightMap;
 			
 			xOffset = this.width / 2 - 64;
 			yOffset = -48;
@@ -45,14 +46,24 @@ package
 		}
 		
 		override public function update() : void {
+			//who even knows why i have to do this.  The camera is created, but the constructor won't have run yet for whatever reason on the very first frame of the game
 			if (ignoreFirst) { 
 				ignoreFirst = false;
 				focusOn(playerRef.getFocusPoint());
 				actualPoint.y = playerRef.getFocusPoint().y;
 			}
-			else{
+			
+			else {
+				
 				targetPoint = playerRef.getFocusPoint();
+				var playerTileX : int = targetPoint.x / CommonConstants.TILEWIDTH;
+				
 				targetPoint.x += xOffset;
+
+				var heightAtTarget : int = heightmapRef[playerTileX + 25];
+				if (heightAtTarget != -1) {
+					SetTargetY(heightAtTarget * CommonConstants.TILEHEIGHT);
+				}
 				
 				if (forwardY == 0) forwardY = targetPoint.y;
 				

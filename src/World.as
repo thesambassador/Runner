@@ -12,7 +12,6 @@ package
 		
 		public var startElevation : int = 32;
 		
-		public var levelChunk : Chunk;
 		public var currentDifficulty : int = 1;
 		public var currentLevel : int = 1;
 
@@ -39,6 +38,9 @@ package
 		public var endLevelX : int; //end of the actual level so far, this is the right side of the last LEVEL chunk
 		public var currentElevation : int; //last elevation, in tile coordinates, so that the next level/chunk will be started at the right level.
 		
+		public var heightMap : Array;
+		public var heightMapEndIndex : int = 0;
+		
 		public var startLevelCollectibles : int = 0;
 		
 		public var playerStartX : int  = CommonConstants.TILEWIDTH * 2;
@@ -49,7 +51,7 @@ package
 		public function World () {
 			//background = new ScrollingBackground();
 			//add(background);
-			
+			heightMap = new Array(500);
 			
 			bgLayer = new FlxGroup();
 			midLayer = new FlxGroup();
@@ -72,7 +74,7 @@ package
 			
 			
 			//set camera
-			camera = new SmoothCamera(player);
+			camera = new SmoothCamera(player, heightMap);
 			FlxG.resetCameras(camera);
 			
 			FlxG.worldBounds = new FlxRect(0, 0, CommonConstants.WINDOWWIDTH + 512, CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT);
@@ -126,8 +128,17 @@ package
 			entities.add(chunk.entities);
 			chunk.SetX(endX);
 			
+			mergeHeightmap(chunk.GetHeightmap());
+			
 			endX += chunk.width;
 			currentElevation = chunk.endElevation;
+		}
+		
+		private function mergeHeightmap(array : Array) : void { 
+			for (var i:int = 0; i < array.length; i++) {
+				heightMap[heightMapEndIndex] = array[i];
+				heightMapEndIndex ++;
+			}
 		}
 		
 		//removes the first chunk in the list and changes the first chunk to be the next one.
@@ -156,7 +167,7 @@ package
 			
 	
 
-			updateCamera();
+			//updateCamera();
 
 			//player falls off the world
 			if (player.y > CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT) {
