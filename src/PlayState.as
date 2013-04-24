@@ -10,14 +10,17 @@ package
 		public var pauseMenu : FlxGroup;
 		public var debugDiag : FlxDebugger;
 		
+		
 		override public function create():void
 		{
+			FlxG.mouse.hide();
 			//basic initialization
-			FlxG.bgColor = 0xff000000;
+			FlxG.bgColor = 0xffff0000;
 			FlxG.framerate = 60;
 			FlxG.flashFramerate = 60;
 		
 			world = new World();
+			
 			this.add(world);
 			
 			pauseMenu = new FlxGroup();

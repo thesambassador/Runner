@@ -28,6 +28,10 @@ package
 			this.y = oy;
 		}
 		
+		public function setX(desiredX : Number) : void {
+			this.x += desiredX;
+		}
+		
 		public function behavior() : void {
 			
 		}
@@ -52,9 +56,6 @@ package
 		}
 		
 		override public function update() : void {
-			if (beenReset) {
-				var x = 5;
-			}
 			checkActivation();
 			//only update if in the world bounds and this has been activated
 			if(this.x >= FlxG.worldBounds.left && this.x <= FlxG.worldBounds.right && activated){

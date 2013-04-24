@@ -93,7 +93,7 @@ package
 						if (gf.category == "gap") gf = null;
 						else if (gf.category == "changeY" && consecutiveCategories >= 2) gf = null;
 						else if (gf.category == "slide"  && consecutiveCategories >= 2) gf = null;
-						else if (gf.category == "hurtle"  && consecutiveCategories >= 2) gf = null;
+						else if (gf.category == "hurtle"  && consecutiveCategories >= 1) gf = null;
 						else if (gf.category == "enemy"  && consecutiveCategories >= 2) gf = null;
 					}
 					

@@ -25,6 +25,8 @@ package
 				frames.push(i);
 			}
 			this.addAnimation("anim", frames, 10);
+			
+			activationDistance = 600;
 		}
 		
 		override public function collidePlayer(player : Player) : void{

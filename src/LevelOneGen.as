@@ -12,16 +12,19 @@ package
 			super(initialElevation, width, startingDifficulty, tileset)
 			//TestGenFunctions();
 			midBuffer = 4;
+			difficultyIncrease = 6;
 		}
 
 		public function TestGenFunctions() : void {
 			genFunctions = new Array();
 			genFunctions.push(new GenFunction(GenFlat, 1, 9, "flat"));
+			//genFunctions.push(new GenFunction(GenFlat, 1, 9, "flat2"));
 			//genFunctions.push(new GenFunction(GenTripleEnemy, 1, 7, "enemy"));
 			//genFunctions.push(new GenFunction(GenFireballBarrage, 1, 7, "as"));
 			//genFunctions.push(new GenFunction(GenSpringboardEasy, 1, 7, "changeY"));
 			//genFunctions.push(new GenFunction(GenSpringboardGap, 1, 7, "gap"));
-			genFunctions.push(new GenFunction(GenGapHurtle, 1, 7, "gap"));
+			genFunctions.push(new GenFunction(GenFlameStick, 1, 7, "gap"));
+
 
 
 		}
@@ -37,7 +40,7 @@ package
 
 			genFunctions.push(new GenFunction(GenSlope, 1, 100, "changeY"));
 			genFunctions.push(new GenFunction(GenSlope, 1, 2, "changeY"));
-			genFunctions.push(new GenFunction(GenHurtle, 1, 100, "hurtle"));
+			genFunctions.push(new GenFunction(GenHurtle, 1, 5, "hurtle"));
 
 			genFunctions.push(new GenFunction(GenGap, 1, 4, "gap", "enemy"));
 			genFunctions.push(new GenFunction(GenOptionalSlide, 1, 3, "slide"));
@@ -46,7 +49,7 @@ package
 
 			genFunctions.push(new GenFunction(GenAdvancedHurtle, 2, 6, "hurtle"));
 
-			genFunctions.push(new GenFunction(GenEnemyJumper, 5, 100, "enemy"));
+			
 			genFunctions.push(new GenFunction(GenSlide, 2, 9, "slide", "enemy"));
 			genFunctions.push(new GenFunction(GenDrop, 2, 100, "changeY"));
 			genFunctions.push(new GenFunction(GenSteps, 2, 100, "changeY"));
@@ -58,25 +61,25 @@ package
 			genFunctions.push(new GenFunction(GenSpringboardGap, 7, 100, "gap", "enemy"));
 
 			genFunctions.push(new GenFunction(GenSlide, 3, 10, "slide", "enemy"));
-			genFunctions.push(new GenFunction(GenOnePlatformGap , 3, 9, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenOnePlatformGap , 3, 5, "gap", "enemy"));
+			
 			genFunctions.push(new GenFunction(GenGapHurtle , 6, 100, "gap"));
 			genFunctions.push(new GenFunction(GenTripleEnemy, 6, 100, "enemy"));
 			genFunctions.push(new GenFunction(GenEnemyJumper, 6, 100, "enemy"));
 			genFunctions.push(new GenFunction(GenEnemyJumper, 6, 100, "enemy"));
 
+			genFunctions.push(new GenFunction(GenOneCrumblePlatformGap , 6, 100, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenFireball, 8, 10, "hazard"));
+			genFunctions.push(new GenFunction(GenFireball, 8, 9, "hazard"));
 
-			genFunctions.push(new GenFunction(GenFireball, 5, 8, "hazard"));
-			genFunctions.push(new GenFunction(GenFireball, 5, 8, "hazard"));
-			genFunctions.push(new GenFunction(GenOnePlatformGap , 5, 100, "gap", "enemy"));
-
-
-			genFunctions.push(new GenFunction(GenSlideJump, 5, 100, "slide", "enemy"));
-			genFunctions.push(new GenFunction(GenAdvancedHurtle, 4, 7, "hurtle"));
-			genFunctions.push(new GenFunction(GenLargeGap, 10, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenLargeGap, 8, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenLargeGap, 9, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenFireballBarrage, 8, 100, "hazard"));
-			genFunctions.push(new GenFunction(GenFireballBarrage, 9, 100, "hazard"));
+			genFunctions.push(new GenFunction(GenFlameStick, 9, 100, "hazard"));
+			genFunctions.push(new GenFunction(GenSlideJump, 7, 100, "slide", "enemy"));
+			genFunctions.push(new GenFunction(GenAdvancedHurtle, 2, 5, "hurtle"));
+			genFunctions.push(new GenFunction(GenLargeGap, 11, 100, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenLargeGap, 13, 100, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenLargeGap, 15, 100, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenFireballBarrage, 11, 100, "hazard"));
+			genFunctions.push(new GenFunction(GenFireballBarrage, 11, 100, "hazard"));
 
 
 			//genFunctions.push(new GenFunction(GenMultiLevel, 3, 10, "multiLevel"));
@@ -118,6 +121,45 @@ package
 				currentChunk.mainTiles.setTile(startX + jumpWidth + i, currentY + platformHeight, 8);
 			}
 
+		}
+		
+		public function GenOneCrumblePlatformGap() : void {
+			var startX : int = currentX;
+
+			var jumpWidth : int = CommonFunctions.getRandom(4, 6);
+			var platformWidth : int = 3;
+			var platformHeight : int = CommonFunctions.getRandom( -2, 2);
+
+			GenGap(jumpWidth * 2 + platformWidth);
+
+			for (var i:int = 0; i < platformWidth; i++) {
+				var crumble : CrumbleTile = new CrumbleTile();
+				currentChunk.AddEntityAtTileCoords(crumble, startX + jumpWidth + i, currentY + platformHeight);
+			}
+
+		}
+		
+		public function GenCrumbleGap() : void {
+			var startX : int = currentX;
+			GenGap(5);
+			for (var i:int = 0; i < 5; i++) {
+				var crumble : CrumbleTile = new CrumbleTile();
+				currentChunk.AddEntityAtTileCoords(crumble, startX + i, currentY);
+			}
+		}
+		
+		public function GenCrumblePlatform() : void {
+			var startX : int = currentX;
+			var height : int = CommonFunctions.getRandom(0, -2);
+			
+			GenGap(8);
+			
+			
+			var crumble : CrumbleTile = new CrumbleTile();
+			currentChunk.AddEntityAtTileCoords(crumble, startX + 3, currentY + height);
+			crumble = new CrumbleTile();
+			currentChunk.AddEntityAtTileCoords(crumble, startX + 4, currentY + height);
+			
 		}
 
 		//large gap with randomized platforms and height differences
@@ -283,17 +325,32 @@ package
 
 		}
 
-		public function GenFireball(h : int = 2) : void {
-			GenFlat(6);
+		public function GenFireball(h : int = 2, buffer : int =10) : void {
+			GenFlat(3);
 			var dp : DeathProjectile = new DeathProjectile(fireball, 16, 16, -150, 0, 3);
-			currentChunk.AddEntityAtTileCoords(dp, currentX + 10, currentY - h);
+			currentChunk.AddEntityAtTileCoords(dp, currentX + buffer, currentY - h);
 		}
 
 		public function GenFireballBarrage() {
 			var num : int = CommonFunctions.getRandom(2, 5);
 			for (var i : int = 0; i < num; i++) {
-				GenFireball(CommonFunctions.getRandom(1, 4));
+				GenFireball(CommonFunctions.getRandom(1, 4), i*7);
 			}
+			
+		}
+		
+		public function GenFlameStick() {
+			GenFlat(3);
+			var targetX : int = currentX - 2;
+			var targetY : int = currentY;
+			currentChunk.mainTiles.setTile(targetX, targetY, 9);
+			
+			var length : int = 4;
+			for (var i:int = 0; i < length; i++) {
+				var fireball : RotatingFlame = new RotatingFlame(targetX * CommonConstants.TILEWIDTH, targetY * CommonConstants.TILEHEIGHT, (i + 1) * 16);
+				currentChunk.AddEntityAtTileCoords(fireball, targetX + 1 + i, targetY);
+			}
+			
 		}
 
 		public function GenSpringboard() : void {

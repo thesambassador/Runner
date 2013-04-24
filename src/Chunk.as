@@ -25,6 +25,9 @@ package
 		private static var left : int = 19;
 		private static var middle : int = 20;
 		private static var right : int = 21;
+		
+		//decorative tiles
+		private static var bgGrass : int = 24;
 
 		public var mainTiles : FlxTilemap;  //main tiles for collision
 		public var bgTiles : FlxTilemap; //background tiles with no collision
@@ -79,7 +82,7 @@ package
 			fgTiles.x = x;
 			
 			for each(var entity:Entity in entities.members) {
-				entity.x += x;
+				entity.setX(x);
 				entity.origPosX += x;
 			}
 		}
@@ -97,8 +100,18 @@ package
 					else if (tile % width == width - 1 || mainTiles.getTileByIndex(tile + 1) == 0) {
 						mainTiles.setTileByIndex(tile, 3);
 					}
+					else {
+						//randomly add some grass
+						var grassTile = CommonFunctions.getRandom(-1, 2);
+						if (grassTile >= 0) {
+							fgTiles.setTileByIndex(tile-mainTiles.widthInTiles, bgGrass + grassTile + 1);
+						}
+					}
+					
 				}
 			}
+			
+			
 			
 			RandomizeGroundTiles();
 		}
@@ -201,6 +214,7 @@ package
 			var targetY : Number = entity.y = this.mainTiles.y + y * CommonConstants.TILEHEIGHT;
 			entity.SetInitialPosition(targetX, targetY);
 		}
+		
 		
 		//There are 3 different "ground" tiles and 3 differnet "underground" tiles The ChunkGen will generate a 1 for ground or 4 for underground
 		//This function goes through and randomly distributes the different ground tiles, varying the look of the level

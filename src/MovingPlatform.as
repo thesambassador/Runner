@@ -20,19 +20,17 @@ package
 			super(xStart, yStart);
 			
 			this.immovable = true;
+			
 			this.makeGraphic(w, h);
 			
 			this.path = new FlxPath();
-			
-			this.path.add(xStart, yStart);
-			this.path.add(xStart + 100, yStart);
-			this.path.add(xStart + 100, yStart - 100);
-
 			
 			currentIndex = 0;
 			speed = 100;
 			direction = 1;
 		}
+		
+		
 		
 		override public function update():void {
 			var currPoint : Point = new Point(this.x, this.y);

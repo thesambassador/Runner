@@ -9,10 +9,12 @@ package
 	public class World extends FlxGroup
 	{
 		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
+		public static var startingDifficulty : int = 1;
+		public static var difficultyGain : int = 1;
 		
 		public var startElevation : int = 32;
-		
 		public var currentDifficulty : int = 1;
+		
 		public var currentLevel : int = 1;
 
 		public var hud : HUD; //ui group
@@ -27,7 +29,7 @@ package
 		public var camera : SmoothCamera;
 		public var background : ScrollingBackground;
 		
-		public var levelWidth : int = 300;
+		public var levelWidth : int = 200;
 		
 		public var firstChunk : Chunk;
 		public var lastChunk : Chunk;
@@ -49,8 +51,10 @@ package
 		public var worldBoundsX : int = 0;
 		
 		public function World () {
-			//background = new ScrollingBackground();
-			//add(background);
+			
+			currentDifficulty = startingDifficulty;
+			background = new ScrollingBackground();
+			add(background);
 			heightMap = new Array(500);
 			
 			bgLayer = new FlxGroup();
@@ -62,15 +66,24 @@ package
 			
 			add(bgLayer);
 			add(midLayer);
+			player = new Player(playerStartX, playerStartY);
+			add(player);
 			add(entities);
 			add(particles);
 			add(fgLayer);
 			
-			player = new Player(playerStartX, playerStartY);
-			add(player);
+			
 			
 			hud = new HUD(player);
 			add(hud);
+			
+			var length : int = 4;
+			
+				
+			//for (var i:int = 0; i < length; i++) {
+			//	var fireball : RotatingFlame = new RotatingFlame(5 * CommonConstants.TILEWIDTH, currentElevation * CommonConstants.TILEHEIGHT, (i + 1) * 16);
+			//	entities.add(fireball);
+			//}
 			
 			
 			//set camera
@@ -96,6 +109,7 @@ package
 		
 		private function GenLevel() : void{
 			var levGen : LevelGen = new LevelOneGen(currentElevation, levelWidth, currentDifficulty, alienTileset);
+			levGen.difficultyIncrease = difficultyGain;
 			
 			var newChunk : Chunk = levGen.GenerateLevel();
 			
@@ -165,6 +179,9 @@ package
 			
 			FlxG.collide(particles, midLayer);
 			
+			//second pass over entities so that we can separate the ones that matter, since we don't do any separation in the playerCollide method of each entity.  
+			//This lets us collide the player with multiple entities at once... mostly just the "crumbleTile"
+			FlxG.overlap(player, entities, secondCollide);
 	
 
 			//updateCamera();
@@ -227,39 +244,17 @@ package
 			entities.callAll("ResetToOriginal");
 		}
 		
-		public function updateCamera() : void {
-			for each(var tilemap : FlxTilemap in midLayer.members) {
-				if(tilemap != null){
-					var startPoint : FlxPoint = player.getFocusPoint();
-					startPoint.x += 128;
-					var endPoint : FlxPoint = new FlxPoint();
-					startPoint.copyTo(endPoint);
-					
-					endPoint.y += 400;
-					
-					var result1 : FlxPoint = new FlxPoint();
-					var result2 : FlxPoint = new FlxPoint();
-					if (!tilemap.ray(startPoint, endPoint, result1)) {
-						startPoint.x += 256;
-						endPoint.x += 128;
-						if (!tilemap.ray(startPoint, endPoint, result2)) {
-							camera.SetTargetY((result1.y + result2.y) / 2);
-						}
-					}
+		public function secondCollide(sprite1:FlxObject, sprite2:FlxObject) {
+			if (sprite1 is Player) {
+				if (sprite2 is CrumbleTile) {
+					FlxObject.separate(sprite1, sprite2);
 				}
 			}
 		}
 		
 		public function spriteCollisions(sprite1:FlxObject, sprite2:FlxObject) : void {
 			if (sprite1 is Player) {
-				if (sprite2 is Collectible) {
-					var col : Collectible = sprite2 as Collectible;
-					col.collidePlayer(sprite1 as Player);
-				}
-				if (sprite2 is Entity) {
-					var en : Entity = sprite2 as Entity;
-					en.collidePlayer(sprite1 as Player);
-				}
+				(sprite2 as Entity).collidePlayer(sprite1 as Player);
 			}
 			else if (sprite1 is Entity) {
 				if (sprite2 is Entity) {

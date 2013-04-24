@@ -41,7 +41,15 @@ package
 		
 		public function SetTargetY(targetY : int) {
 			if (Math.abs(targetY - lastY) > 4 * 16) {
-				forwardY = targetY;
+				var halfHeight : int = CommonConstants.WINDOWHEIGHT / 2;
+				if (forwardY  > playerRef.y + halfHeight) {
+					forwardY = playerRef.y - 48
+				}
+				else if (forwardY < playerRef.y - halfHeight) {
+					forwardY = playerRef.y + 48;
+				}
+				else
+					forwardY = targetY;
 			}
 		}
 		
