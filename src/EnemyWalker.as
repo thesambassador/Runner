@@ -37,11 +37,6 @@ package
 			this.addAnimation("die", new Array(5, 6, 7, 8, 9, 9, 9, 9), 20, false);
 			this.addAnimationCallback(handleAnimation);
 			
-			FlxG.watch(this, "x", "EnemyX")
-			FlxG.watch(this, "y", "EnemyY")
-			FlxG.watch(this, "activated", "EnemyActivated")
-			FlxG.watch(this, "active", "EnemyActive")
-			FlxG.watch(this, "exists", "EnemyExists")
 		}
 		
 		public function ChangeDirection() : void {

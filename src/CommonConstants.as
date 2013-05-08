@@ -8,6 +8,10 @@ package
 	{
 		public static var WINDOWWIDTH : Number = 800;
 		public static var WINDOWHEIGHT : Number = 600;
+		public static var SCALEFACTOR : Number = 2;
+		
+		public static var VISIBLEHEIGHT : Number = WINDOWHEIGHT / SCALEFACTOR;
+		public static var VISIBLEWIDTH : Number = WINDOWWIDTH / SCALEFACTOR;
 		
 		public static var TILEWIDTH : Number = 16;
 		public static var TILEHEIGHT : Number = 16;

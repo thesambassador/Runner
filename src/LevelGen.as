@@ -110,6 +110,7 @@ package
 				else if (currentY > CommonConstants.LEVELHEIGHT) {
 					currentY = CommonConstants.LEVELHEIGHT - 3;
 				}
+				currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
 				GenFlat(midBuffer); 
 			}
 			

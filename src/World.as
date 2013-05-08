@@ -50,6 +50,12 @@ package
 		
 		public var worldBoundsX : int = 0;
 		
+		public var monsterX : Number;
+		public var monsterAcceleration : Number = 15; //acceleration per level
+		public var monsterVel : Number = 125;
+		
+		public var levelEndTimer : FlxTimer;
+		
 		public function World () {
 			
 			currentDifficulty = startingDifficulty;
@@ -63,7 +69,6 @@ package
 			entities = new FlxGroup();
 			particles = new FlxGroup();
 			
-			
 			add(bgLayer);
 			add(midLayer);
 			player = new Player(playerStartX, playerStartY);
@@ -72,19 +77,11 @@ package
 			add(particles);
 			add(fgLayer);
 			
+			//monsterX = -levelWidth * CommonConstants.TILEWIDTH;
+			monsterX = -1000;
 			
-			
-			hud = new HUD(player);
+			hud = new HUD(this);
 			add(hud);
-			
-			var length : int = 4;
-			
-				
-			//for (var i:int = 0; i < length; i++) {
-			//	var fireball : RotatingFlame = new RotatingFlame(5 * CommonConstants.TILEWIDTH, currentElevation * CommonConstants.TILEHEIGHT, (i + 1) * 16);
-			//	entities.add(fireball);
-			//}
-			
 			
 			//set camera
 			camera = new SmoothCamera(player, heightMap);
@@ -98,6 +95,10 @@ package
 			worldBoundsX = FlxG.worldBounds.x;
 			
 			FlxG.watch(this, "worldBoundsX", "World X");
+			FlxG.watch(this, "monsterX", "Monster X");
+			FlxG.watch(this, "monsterVel", "Monster Vel");
+			
+			levelEndTimer = new FlxTimer();
 		}
 		
 		private function CreateInitialPlatform() : void{
@@ -167,6 +168,14 @@ package
 		
 		override public function update():void 
 		{
+			
+			monsterX += monsterVel * FlxG.elapsed;
+			if (monsterX > player.x  && player.alive) {
+				player.lives = 0;
+				player.health = 0;
+				//player.kill();
+			}
+			
 			worldBoundsX = 816 - (FlxG.worldBounds.left + 256);
 			FlxG.worldBounds.x = player.x - 256;
 			//FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
@@ -184,7 +193,6 @@ package
 			FlxG.overlap(player, entities, secondCollide);
 	
 
-			//updateCamera();
 
 			//player falls off the world
 			if (player.y > CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT) {
@@ -192,7 +200,7 @@ package
 			}
 			
 			if (player.health <= 0) {
-				
+				player.kill();
 				if (player.lives <= 0) {
 					if(player.lives == 0){
 						var top : FlxText = hud.DisplayCenteredText("Game Over");
@@ -205,9 +213,18 @@ package
 						FlxG.resetState();
 				}
 				else {
-					player.lives --;
-					player.health = 1;
-					RestartLevel();
+					//player.lives --;
+					if (levelEndTimer.finished || levelEndTimer.progress == 0) {
+						var respawn:FlxPoint = findClosestRespawn();
+						camera.SetTargetY(respawn.y);
+						camera.SetTargetX(respawn.x);
+						camera.xDelay = .01;
+						//camera.targetPoint.x += camera.xOffset;
+						//camera.forwardY = camera.targetPoint.y;
+						levelEndTimer = new FlxTimer();
+						levelEndTimer.start(3, 1, RestartLevel);
+					}
+					//RestartLevel(levelEndTimer);
 				}
 			}
 			
@@ -223,6 +240,7 @@ package
 				startLevelCollectibles = player.collectiblesCollected;
 				if (player.x > startLevelX - 400) {
 					currentLevel += 1;
+					monsterVel += monsterAcceleration;
 					player.state = "ground";
 					hud.RemoveLevelComplete();
 					RemoveFirstChunk();
@@ -232,16 +250,57 @@ package
 			super.update();
 		}
 		
-		public function RestartLevel() : void {
-			player.reset(this.startLevelX - 128, startLevelY);
+		public function findClosestRespawn() : FlxPoint {
+			var chunk : Chunk = firstChunk;
+			var validPoint : FlxPoint;
+			while (validPoint == null) {
+				if (player.x > chunk.x + chunk.width || player.x < chunk.x) {
+					chunk = chunk.nextChunk;
+				}
+				else {
+					for (var i : int = 0; i < chunk.safeZones.length; i++) {
+						var check : FlxPoint = chunk.safeZones[i] as FlxPoint;
+						var checkX = chunk.tileXToRealX(check.x);
+						if (player.x < checkX) {
+							if (i == 0) i++;
+							validPoint = chunk.safeZones[i - 1];  //tilemap coords
+							break;
+						}
+					}
+					if (validPoint == null) {
+						validPoint = chunk.safeZones[0];
+					}
+				}
+			}
+			
+		
+			
+			return new FlxPoint(chunk.tileXToRealX(validPoint.x), validPoint.y * CommonConstants.TILEHEIGHT - 32);
+		}
+		
+		public function RestartLevel(timer:FlxTimer) : void {
+			timer.stop();
+			var respawnPoint : FlxPoint = findClosestRespawn();
+			
+			player.health = 1;
+			player.reset(respawnPoint.x, respawnPoint.y);
+			//player.reset(this.startLevelX - 128, startLevelY);
 			player.collectiblesCollected = startLevelCollectibles;
 			FlxG.worldBounds.x = player.x - 256;
 			
-			camera.targetPoint.x = player.getFocusPoint().x;
-			camera.targetPoint.y = player.getFocusPoint().y;
-			camera.actualPoint.copyFrom(camera.targetPoint);
+			//camera.targetPoint.x = player.getFocusPoint().x;
+			//camera.targetPoint.y = player.getFocusPoint().y;
+			//camera.actualPoint.copyFrom(camera.targetPoint);
 			
 			entities.callAll("ResetToOriginal");
+			
+			FlxG.overlap(player, entities, clearCollided);
+				
+			
+		}
+		
+		public function clearCollided(player:FlxObject, entity:FlxObject) {
+			entity.kill();
 		}
 		
 		public function secondCollide(sprite1:FlxObject, sprite2:FlxObject) {

@@ -12,18 +12,21 @@ package
 			super(initialElevation, width, startingDifficulty, tileset)
 			//TestGenFunctions();
 			midBuffer = 4;
-			difficultyIncrease = 6;
+			//difficultyIncrease = 6;
 		}
 
 		public function TestGenFunctions() : void {
 			genFunctions = new Array();
-			genFunctions.push(new GenFunction(GenFlat, 1, 9, "flat"));
-			//genFunctions.push(new GenFunction(GenFlat, 1, 9, "flat2"));
+			
+			
+			
+			//genFunctions.push(new GenFunction(GenDrop, 1, 9, "flat"));
+			genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat2"));
 			//genFunctions.push(new GenFunction(GenTripleEnemy, 1, 7, "enemy"));
 			//genFunctions.push(new GenFunction(GenFireballBarrage, 1, 7, "as"));
 			//genFunctions.push(new GenFunction(GenSpringboardEasy, 1, 7, "changeY"));
 			//genFunctions.push(new GenFunction(GenSpringboardGap, 1, 7, "gap"));
-			genFunctions.push(new GenFunction(GenFlameStick, 1, 7, "gap"));
+			genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
 
 
 
@@ -42,7 +45,8 @@ package
 			genFunctions.push(new GenFunction(GenSlope, 1, 2, "changeY"));
 			genFunctions.push(new GenFunction(GenHurtle, 1, 5, "hurtle"));
 
-			genFunctions.push(new GenFunction(GenGap, 1, 4, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenSmallGap, 1, 4, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenSmallGap, 2, 4, "gap", "enemy"));
 			genFunctions.push(new GenFunction(GenOptionalSlide, 1, 3, "slide"));
 			genFunctions.push(new GenFunction(GenDrop, 1, 100, "changeY"));
 			genFunctions.push(new GenFunction(GenEnemyWalker, 1, 100, "enemy"));
@@ -54,8 +58,8 @@ package
 			genFunctions.push(new GenFunction(GenDrop, 2, 100, "changeY"));
 			genFunctions.push(new GenFunction(GenSteps, 2, 100, "changeY"));
 			genFunctions.push(new GenFunction(GenEnemyWalker, 2, 4, "enemy"));
-			genFunctions.push(new GenFunction(GenGap, 2, 5, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenGap, 2, 6, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenGap, 6, 7, "gap", "enemy"));
+			genFunctions.push(new GenFunction(GenGap, 6, 8, "gap", "enemy"));
 
 			genFunctions.push(new GenFunction(GenSpringboardEasy, 3, 8, "gap", "enemy"));
 			genFunctions.push(new GenFunction(GenSpringboardGap, 7, 100, "gap", "enemy"));
@@ -93,17 +97,12 @@ package
 			currentChunk.AddEntityAtTileCoords(jumper, startX + 2, currentY - 1); 
 		}
 
-		override protected function GenGap(w : int = -1) : void {
-			var startX : int = currentX;
-			var width : int ;
-			if(w == -1)
-				width = CommonFunctions.getRandom(4, 8);
-			else
-				width = w;
+		public function GenSmallGap() : void {
+
+			var width : int = CommonFunctions.getRandom(3, 5);
 
 			super.GenGap(width);
 
-			//AddCoinArch(startX + 1, currentY - 4, width - 2);
 
 		}
 
@@ -360,7 +359,7 @@ package
 		}
 
 		public function GenSpringboardEasy() : void {
-			var cliffHeight : int = CommonFunctions.getRandom(6, 9);
+			var cliffHeight : int = CommonFunctions.getRandom(5, 7);
 			if (currentY - cliffHeight < 10) return;
 
 			GenSpringboard();

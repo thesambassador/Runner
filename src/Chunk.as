@@ -28,12 +28,23 @@ package
 		
 		//decorative tiles
 		private static var bgGrass : int = 24;
+		private static var bushLeft : int = 28;
+		
+		private static var treeBotLeft : int = 40;
+		private static var treeBotMid : int = 41;
+		private static var treeBotRight : int = 42;
+		
+		private static var treeLeft : int = 32;
+		private static var treeMid : int = 33;
+		private static var treeRight : int = 34;
 
 		public var mainTiles : FlxTilemap;  //main tiles for collision
 		public var bgTiles : FlxTilemap; //background tiles with no collision
 		public var fgTiles : FlxTilemap; //foreground tiles with no collision
 		
 		public var entities : FlxGroup; //all entities (enemies, moving objects, etc)
+		
+		public var safeZones : Array; //array of safe places to replace the character if he dies
 		
 		public var nextChunk : Chunk;
 		
@@ -63,6 +74,8 @@ package
 			mainTiles.setTileProperties(middle, FlxObject.NONE);
 			mainTiles.setTileProperties(right, FlxObject.NONE);
 			mainTiles.setTileProperties(spike, FlxObject.ANY, CommonFunctions.killPlayer);
+			
+			safeZones = new Array();
 		}
 		
 		//basic function to create the string that Flixel uses to initialize a FlxTilemap
@@ -90,6 +103,7 @@ package
 		//this will add scenery and non-gameplay related stuff
 		public function Decorate() : void {
 			
+			//PlaceTrees();
 			//add the rounded corners of the grass as needed:
 			var topGrassTiles : Array = mainTiles.getTileInstances(1);
 			if (topGrassTiles != null && topGrassTiles.length > 0) {
@@ -106,6 +120,19 @@ package
 						if (grassTile >= 0) {
 							fgTiles.setTileByIndex(tile-mainTiles.widthInTiles, bgGrass + grassTile + 1);
 						}
+						//randomly add some bushes
+						var shouldPlace = Math.random();
+						if (shouldPlace < .1) {
+							var indexLeft : int = tile-mainTiles.widthInTiles;
+							var indexRight : int = tile-mainTiles.widthInTiles + 1;
+							
+							if (bgTiles.getTileByIndex(indexLeft - 1) == 0 && bgTiles.getTileByIndex(indexLeft) == 0) {
+								if(mainTiles.getTileByIndex(indexLeft - 1) == 0 && mainTiles.getTileByIndex(indexLeft) == 0){
+									bgTiles.setTileByIndex(indexLeft, bushLeft);
+									bgTiles.setTileByIndex(indexRight, bushLeft + 1);
+								}
+							}
+						}
 					}
 					
 				}
@@ -116,14 +143,55 @@ package
 			RandomizeGroundTiles();
 		}
 		
+		public function PlaceTrees() : void {
+			var topGrassTiles : Array = mainTiles.getTileInstances(1);
+			if (topGrassTiles != null && topGrassTiles.length > 0) {
+				for each (var tile: int in topGrassTiles) {
+					var treeWidth : int = CommonFunctions.getRandom(3, 7);
+					if (IsClear(bgTiles, tile - widthInTiles, treeWidth) && Math.random() < .05) {
+						var start:int = tile-widthInTiles;
+						//place tree
+						var yStart : int = start / widthInTiles;
+						var xStart : int = start % widthInTiles - 1;
+						for (var y : int = yStart; y > 0; y--) {
+							for (var x:int = xStart; x < xStart + treeWidth; x++ ) {
+								var setTile : int = 32;
+								if (x != xStart) {
+									setTile += 1;
+								}
+								if (x == xStart + treeWidth - 1) {
+									setTile += 1;
+								}
+								if (y == yStart) {
+									setTile += 8;
+								}
+								bgTiles.setTile(x, y, setTile);
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		
+		public function IsClear(tilemap : FlxTilemap, startIndex : int, width:int) : Boolean{
+			var tile : int;
+			for (var i:int = startIndex; i < startIndex + width; i++) {
+				if (i % widthInTiles == 0) return false;
+				if (tilemap.getTileByIndex(i) != 0) return false;
+			}
+			return true;
+		}
+		
 		public function GetHeightmap() : Array {
 			var returned : Array = new Array(widthInTiles);
 			var foundHeight : Boolean;
 			
 			for (var tx:int = 0; tx < widthInTiles; tx++) {
 				foundHeight = false;
-				for (var ty :int = 0; ty < CommonConstants.LEVELHEIGHT; ty++){
-					if (mainTiles.getTile(tx, ty) == groundTop) {
+				for (var ty :int = 0; ty < CommonConstants.LEVELHEIGHT; ty++) {
+					var tileat : uint = mainTiles.getTile(tx, ty);
+					if (tileat == groundTop || tileat == groundTopLeft || tileat == groundTopRight) {
 						returned[tx] = ty;
 						foundHeight = true;
 					}
@@ -139,8 +207,18 @@ package
 			return mainTiles.width;
 		}
 		
+		public function get x() : Number {
+			return mainTiles.x;
+		}
+		
 		public function get widthInTiles() : Number {
 			return mainTiles.widthInTiles;
+		}
+		
+		public function tileXToRealX(tx:int) : Number {
+
+			return tx * CommonConstants.TILEWIDTH + this.x;
+			
 		}
 		
 		public function get endElevation() : Number {
@@ -253,6 +331,7 @@ package
 				
 				FillUnder(x, height, returned.mainTiles, 4);
 			}
+			returned.safeZones.push(new FlxPoint(returned.widthInTiles - 2, height));
 			return returned;
 		}
 		

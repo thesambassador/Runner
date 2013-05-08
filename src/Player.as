@@ -24,8 +24,8 @@ package
 		private var gravity : Number = 1000;
 		
 		private var walkSpeed:Number = 160;
-		private var runSpeed:Number = 250;
-		private var minSlideSpeed:Number = 100;
+		public var runSpeed:Number = 250;
+		public var minSlideSpeed:Number = 100;
 		private var accelerationFactor:Number = 2;
 		
 		private var airTime: int = 0;

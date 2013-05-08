@@ -47,6 +47,11 @@ package
 			this.x += desiredX;
 		}
 		
+		override public function ResetToOriginal() : void {
+			super.ResetToOriginal();
+			currentAngle = 0;
+		}
+		
 		override public function behavior() : void {
 			currentAngle += speed * (1/60);
 			if (currentAngle > 360) {

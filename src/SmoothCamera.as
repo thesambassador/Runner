@@ -17,7 +17,8 @@ package
 		public var xOffset : int;
 		public var yOffset : int;
 		
-		public var delay : Number = .01;
+		public var yDelay : Number = .01;
+		public var xDelay : Number = 1;
 		
 		public var lastY : int = 0;
 		public var forwardY : int = 0;
@@ -39,18 +40,22 @@ package
 			yOffset = -48;
 		}
 		
-		public function SetTargetY(targetY : int) {
-			if (Math.abs(targetY - lastY) > 4 * 16) {
-				var halfHeight : int = CommonConstants.WINDOWHEIGHT / 2;
-				if (forwardY  > playerRef.y + halfHeight) {
-					forwardY = playerRef.y - 48
-				}
-				else if (forwardY < playerRef.y - halfHeight) {
-					forwardY = playerRef.y + 48;
-				}
-				else
-					forwardY = targetY;
+		public function SetTargetY(targetY : int, force:Boolean = false) {
+ 			if (Math.abs(targetY - lastY) > 4 * 16 || force) {
+				forwardY = targetY + yOffset;
 			}
+			//don't let our player get off the screen
+           	var halfHeight : int = CommonConstants.WINDOWHEIGHT / 4;
+			if (playerRef.alive && forwardY + yOffset + halfHeight < playerRef.y + 32) {
+				forwardY = playerRef.y + 48
+			}
+			//else if (forwardY - halfHeight > playerRef.y - halfHeight) {
+			//	forwardY = playerRef.y + 48;
+			//}
+		}
+		
+		public function SetTargetX(targetX : int) {
+			targetPoint.x = targetX + xOffset;
 		}
 		
 		override public function update() : void {
@@ -63,30 +68,36 @@ package
 			
 			else {
 				
-				targetPoint = playerRef.getFocusPoint();
-				var playerTileX : int = targetPoint.x / CommonConstants.TILEWIDTH;
+				var playerPoint : FlxPoint = playerRef.getFocusPoint();
+				//X stuff
+				if(playerRef.alive)
+					SetTargetX(playerPoint.x);
+				if (xDelay < 1) {
+					xDelay += .001;
+				}
+	
+				var diffX : Number = targetPoint.x - actualPoint.x;
+				diffX *= xDelay;
+				actualPoint.x += diffX;
 				
-				targetPoint.x += xOffset;
+				var playerTileX : int = targetPoint.x / CommonConstants.TILEWIDTH;
 
 				var heightAtTarget : int = heightmapRef[playerTileX + 25];
 				if (heightAtTarget != -1) {
 					SetTargetY(heightAtTarget * CommonConstants.TILEHEIGHT);
 				}
+				else {
+					//SetTargetY(forwardY, true);
+				}
 				
-				if (forwardY == 0) forwardY = targetPoint.y;
+				if (forwardY == 0) SetTargetY(targetPoint.y, true);
 				
-				
-				targetPoint.y = forwardY + yOffset;
+				targetPoint.y = forwardY;
 				
 				var diffy : Number = targetPoint.y - actualPoint.y;
-				diffy *= delay;
+				diffy *= yDelay;
 				
-				var potentialY : Number = targetPoint.y + diffy;
-				var scrollY : Number = this.scroll.y;
-				
-				actualPoint.x = targetPoint.x;
 				actualPoint.y += diffy;
-				//actualPoint.y = forwardY;
 
 				this.focusOn(actualPoint);
 				
