@@ -70,25 +70,34 @@ package
 		public function startGame() {
 			var startDiff : int = 1;
 			var diffGain : int = 2;
-
+			var monsterAcc : int = 15;
+			var monsterVel : int = 150;
 			
 			switch(difficulty) {
 				case "easy":
 					startDiff = 1;
 					diffGain = 2;
+					monsterAcc = 15;
+					monsterVel = 125;
 					break;
 				case "medium":
 					startDiff = 2;
 					diffGain = 3;
+					monsterAcc = 17;
+					monsterVel = 140;
 					break;
 				case "hard":
 					startDiff = 5; 
 					diffGain = 4;
+					monsterAcc = 20;
+					monsterVel = 150;
 					break;
 			}
 			
 			World.startingDifficulty = startDiff;
 			World.difficultyGain = diffGain;
+			World.monsterAcceleration = monsterAcc;
+			World.startingMinMonsterVel = monsterVel;
 			
 			var playState = new PlayState();
 			FlxG.switchState(playState);

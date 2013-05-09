@@ -28,8 +28,8 @@ package
 		private var timerText : FlxText;
 		private var levelCompleteText : FlxText;
 		
-		private static var leftMargin : int = 10;
-		private static var rightMargin : int = 10;
+		private static var leftMargin : int = 100;
+		private static var rightMargin : int = 100;
 		private static var bottomMargin : int = 5;
 		
 		private var playerIndicator : FlxSprite;
@@ -111,7 +111,7 @@ package
 			levelText.text = "Level \n" + (FlxG.state as PlayState).world.currentLevel.toString();
 			
 			var playerGain : Number = player.x - worldRef.monsterX;
-			var barScale : Number = worldRef.levelWidth * CommonConstants.TILEWIDTH * 3
+			var barScale : Number = World.levelWidth * CommonConstants.TILEWIDTH
 			
 			if (playerGain > barScale) {
 				playerIndicator.x = CommonConstants.VISIBLEWIDTH - rightMargin - playerIndicator.width;

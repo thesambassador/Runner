@@ -116,7 +116,7 @@ package
 					}
 					else {
 						//randomly add some grass
-						var grassTile = CommonFunctions.getRandom(-1, 2);
+						var grassTile : uint = CommonFunctions.getRandom(-1, 2);
 						if (grassTile >= 0) {
 							fgTiles.setTileByIndex(tile-mainTiles.widthInTiles, bgGrass + grassTile + 1);
 						}

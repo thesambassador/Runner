@@ -47,10 +47,11 @@ package
 		public var lastVel : FlxPoint;
 		
 		public var currentAnimationPriority : int = 0; //currently playing animation's priority, if I play something with a higher priority it will override
+		
+		public var playerEffect : PlayerEffects;
 
 		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
-			
 			
 			//controls:
 			controlConfig = new Dictionary();
@@ -79,6 +80,7 @@ package
 			this.addAnimation("run", new Array(11, 12, 13, 12), 10);
 			this.addAnimation("startrun", new Array(8, 9, 10), 15, false);
 			this.addAnimation("idle", new Array(0, 1, 2, 3, 4, 5), 8);
+			this.addAnimation("frozen", new Array(0, 0), 8);
 			this.addAnimation("jump", new Array(16, 17, 18), 20, false);
 			this.addAnimation("fallinit", new Array(19, 20, 21, 22), 10, false);
 			this.addAnimation("fall", new Array(22, 23), 5);
@@ -88,11 +90,13 @@ package
 			this.addAnimation("startslide", new Array(24, 25, 26, 27), 30, false);
 			this.addAnimation("endslide", new Array(27, 26, 25, 24), 30, false);
 			this.addAnimation("slide", new Array(27, 27));
+			this.addAnimation("invis", new Array(63, 63));
 			
 			this.width = 15; //so we can still fall between 2 tiles with a 1 space gap
 			
 			//FlxG.watch(this.velocity, "x", "Vel X");
 			//FlxG.watch(this.velocity, "y", "Vel Y");
+			
 		}
 		
 		override public function update():void 
@@ -134,6 +138,9 @@ package
 					case "levelEnd":
 						didUpdate = updateLevelEndState();
 						break;
+					case "respawn":
+						didUpdate = updateRespawn();
+						break;
 				}
 			}
 			
@@ -141,12 +148,53 @@ package
 			
 			canStand = true;
 			
+			if (playerEffect != null) {
+				playerEffect.update();
+			}
+			
 			super.update();
+		}
+		
+		override public function draw() : void {
+			super.draw();
+			if (playerEffect != null) {
+				playerEffect.draw();
+			}
+		}
+		
+		override public function preUpdate() : void {
+			super.preUpdate();
+			if (playerEffect != null) {
+				playerEffect.preUpdate();
+			}
+		}
+		
+		override public function postUpdate() : void {
+			super.postUpdate();
+			if (playerEffect != null) {
+				playerEffect.postUpdate();
+			}
+		}
+		
+		override public function kill() : void {
+			super.kill();
+			FlxG.state.add(PlayerEffects.deathByFire(this.x, this.y, playerSprites));
 		}
 		
 		override public function reset(X:Number, Y:Number) : void {
 			super.reset(X, Y);
-			this.collectiblesCollected = 0;
+			FlxG.state.add(PlayerEffects.respawn(this.x, this.y, playerSprites));
+			this.playPriority("invis", 10);
+			
+			var visibleTimer : FlxTimer = new FlxTimer();
+			visibleTimer.start(1, 1, makeVisible);
+			
+			var respawnTimer : FlxTimer = new FlxTimer();
+			respawnTimer.start(1, 1.5, finishRespawn);
+			
+			//this.visible = false;
+			changeState("respawn");
+			//this.collectiblesCollected = 0;
 		}
 		
 		//ground state can transition to air (by jumping or running off an edge) or to sliding.
@@ -219,6 +267,7 @@ package
 		override public function hurt(damage : Number) : void{
 			if (!invulnerable) super.hurt(damage);
 		}
+
 		
 		//air state can transition to the ground state, obviously, and that's pretty much it.
 		private function updateAirState () : Boolean {
@@ -348,6 +397,21 @@ package
 			return true;
 		}
 		
+		private function updateRespawn() : Boolean {
+			this.invulnerable = true;
+			
+		
+			return true;
+		}
+		
+		public function makeVisible(poop:FlxTimer) : void {
+			this.playPriority("frozen", 11);
+		}
+		
+		public function finishRespawn(poop:FlxTimer) : void {
+			changeState("ground");
+		}
+		
 		private function changeState(newState:String) : void {
 			if (newState != state) {
 				state = newState;
@@ -396,6 +460,9 @@ package
 			
 			return returned;
 		}
+		
+		
+		
 		
 		public function Bounce(small : int, big : int) : void {
 			if(FlxG.keys[controlConfig["JUMP"]])

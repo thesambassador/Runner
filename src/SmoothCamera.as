@@ -15,6 +15,8 @@ package
 		public var actualPoint : FlxPoint = new FlxPoint();
 		
 		public var xOffset : int;
+		//public var normalXOffset : int;
+		//public var monsterXOffset : int;
 		public var yOffset : int;
 		
 		public var yDelay : Number = .01;

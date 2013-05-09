@@ -15,6 +15,7 @@ package
 		public var origPosX : Number;
 		public var origPosY : Number;
 		public var beenReset : Boolean = false;
+		public var needToReset : Boolean = false;
 		
 		public function Entity(startX:int = 0, startY:int = 0) 
 		{
@@ -44,15 +45,17 @@ package
 		}
 		
 		public function ResetToOriginal() : void {
-			beenReset = true;
-			this.activated = false;
-			this.health = 1;
-			this.facing = FlxObject.LEFT;
-			this.acceleration.x = 0;
-			this.acceleration.y = 0;
-			this.frame = 0;
-			
-			reset(origPosX, origPosY);
+			if(needToReset){
+				beenReset = true;
+				this.activated = false;
+				this.health = 1;
+				this.facing = FlxObject.LEFT;
+				this.acceleration.x = 0;
+				this.acceleration.y = 0;
+				this.frame = 0;
+				
+				reset(origPosX, origPosY);
+			}
 		}
 		
 		override public function update() : void {

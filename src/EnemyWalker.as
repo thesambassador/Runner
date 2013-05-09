@@ -103,12 +103,17 @@ package
 		}
 		
 		override public function collidePlayer(player : Player) : void {
-			if (player.y + player.height < this.y + 13 && this.health > 0) {
-				this.health = 0;
-				player.Bounce(-150, -350);
+			if(player.state != "respawn"){
+				if (player.y + player.height < this.y + 13 && this.health > 0) {
+					this.health = 0;
+					player.Bounce(-150, -350);
+				}
+				else if(health > 0){
+					player.hurt(1);
+				}
 			}
-			else if(health > 0){
-				player.hurt(1);
+			else {
+				this.health = 0;
 			}
 		}
 		

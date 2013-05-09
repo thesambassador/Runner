@@ -9,8 +9,16 @@ package
 	public class World extends FlxGroup
 	{
 		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
-		public static var startingDifficulty : int = 1;
-		public static var difficultyGain : int = 1;
+		
+		//difficulty parameters, set by the main menu
+		public static var levelWidth : int = 200;
+		public static var startingDifficulty : int = 1; //what level of difficulty the first level will contain
+		public static var difficultyGain : int = 1; //how much the difficulty increases throughout each level
+		
+		public static var monsterAcceleration : Number = 10; //acceleration per level
+		public static var maxMonsterDistance : Number = levelWidth * CommonConstants.TILEWIDTH; //maximum distance that the monster can fall behind
+		public static var startingMinMonsterVel : Number = 150;
+		public static var maxMinMonsterVelocity : Number = 225; //this is the fastest that the monster will go when he's closer than maxMonsterDistance
 		
 		public var startElevation : int = 32;
 		public var currentDifficulty : int = 1;
@@ -29,7 +37,7 @@ package
 		public var camera : SmoothCamera;
 		public var background : ScrollingBackground;
 		
-		public var levelWidth : int = 200;
+		
 		
 		public var firstChunk : Chunk;
 		public var lastChunk : Chunk;
@@ -50,15 +58,21 @@ package
 		
 		public var worldBoundsX : int = 0;
 		
+		public var monsterSprite : FlxSprite;
 		public var monsterX : Number;
-		public var monsterAcceleration : Number = 15; //acceleration per level
 		public var monsterVel : Number = 125;
+		public var minMonsterVelocity : Number = 150;
+		
+		public var shakeBoundary : Number = -750;
+		public var shakeDelay : int = 90;
+		public var shakeTimer : int = 0;
 		
 		public var levelEndTimer : FlxTimer;
 		
 		public function World () {
 			
 			currentDifficulty = startingDifficulty;
+			minMonsterVelocity = startingMinMonsterVel;
 			background = new ScrollingBackground();
 			add(background);
 			heightMap = new Array(500);
@@ -72,6 +86,9 @@ package
 			add(bgLayer);
 			add(midLayer);
 			player = new Player(playerStartX, playerStartY);
+			monsterSprite = new FlxSprite();
+			monsterSprite.makeGraphic(1000, 1000, 0x8800bb00);
+			add(monsterSprite);
 			add(player);
 			add(entities);
 			add(particles);
@@ -79,6 +96,7 @@ package
 			
 			//monsterX = -levelWidth * CommonConstants.TILEWIDTH;
 			monsterX = -1000;
+			monsterSprite.x = monsterX - 1000;
 			
 			hud = new HUD(this);
 			add(hud);
@@ -103,7 +121,8 @@ package
 		
 		private function CreateInitialPlatform() : void{
 			var startPlatform : Chunk = Chunk.GenFlatChunk(25, startElevation, alienTileset);
-
+			startPlatform.Decorate();
+			
 			Chunk.FillUnder(0, 0, startPlatform.mainTiles, 8);
 			AddChunk(startPlatform);
 		}
@@ -123,6 +142,7 @@ package
 			
 			//Generate end of level chunk
 			var endChunk : Chunk = Chunk.GenFlatChunk(50, currentElevation, alienTileset);
+			endChunk.Decorate();
 			
 			AddChunk(endChunk);
 		}
@@ -168,13 +188,29 @@ package
 		
 		override public function update():void 
 		{
-			
+			monsterVel = 250 * ((player.x - monsterX) / maxMonsterDistance);
+			if (monsterVel < minMonsterVelocity) {
+				monsterVel = minMonsterVelocity;
+			}
 			monsterX += monsterVel * FlxG.elapsed;
 			if (monsterX > player.x  && player.alive) {
 				player.lives = 0;
 				player.health = 0;
 				//player.kill();
 			}
+			else if (monsterX > player.x + shakeBoundary) {
+				
+				shakeTimer++;
+				if (shakeTimer >= shakeDelay) {
+					shakeTimer = 0;
+					camera.shake(.005);
+				}
+			}
+			else {
+				shakeTimer = 0;
+			}
+			
+			monsterSprite.x = monsterX - 1000;
 			
 			worldBoundsX = 816 - (FlxG.worldBounds.left + 256);
 			FlxG.worldBounds.x = player.x - 256;
@@ -191,16 +227,15 @@ package
 			//second pass over entities so that we can separate the ones that matter, since we don't do any separation in the playerCollide method of each entity.  
 			//This lets us collide the player with multiple entities at once... mostly just the "crumbleTile"
 			FlxG.overlap(player, entities, secondCollide);
-	
-
-
+			
 			//player falls off the world
 			if (player.y > CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT) {
 				player.health = 0;
 			}
 			
 			if (player.health <= 0) {
-				player.kill();
+				if(player.alive)
+					player.kill();
 				if (player.lives <= 0) {
 					if(player.lives == 0){
 						var top : FlxText = hud.DisplayCenteredText("Game Over");
@@ -222,7 +257,7 @@ package
 						//camera.targetPoint.x += camera.xOffset;
 						//camera.forwardY = camera.targetPoint.y;
 						levelEndTimer = new FlxTimer();
-						levelEndTimer.start(3, 1, RestartLevel);
+						levelEndTimer.start(1, 1, RestartLevel);
 					}
 					//RestartLevel(levelEndTimer);
 				}
@@ -240,7 +275,10 @@ package
 				startLevelCollectibles = player.collectiblesCollected;
 				if (player.x > startLevelX - 400) {
 					currentLevel += 1;
-					monsterVel += monsterAcceleration;
+					minMonsterVelocity += monsterAcceleration;
+					if (minMonsterVelocity > maxMinMonsterVelocity) {
+						minMonsterVelocity = maxMinMonsterVelocity;
+					}
 					player.state = "ground";
 					hud.RemoveLevelComplete();
 					RemoveFirstChunk();
@@ -285,12 +323,8 @@ package
 			player.health = 1;
 			player.reset(respawnPoint.x, respawnPoint.y);
 			//player.reset(this.startLevelX - 128, startLevelY);
-			player.collectiblesCollected = startLevelCollectibles;
+			//player.collectiblesCollected = startLevelCollectibles;
 			FlxG.worldBounds.x = player.x - 256;
-			
-			//camera.targetPoint.x = player.getFocusPoint().x;
-			//camera.targetPoint.y = player.getFocusPoint().y;
-			//camera.actualPoint.copyFrom(camera.targetPoint);
 			
 			entities.callAll("ResetToOriginal");
 			
