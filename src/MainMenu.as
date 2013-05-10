@@ -77,20 +77,20 @@ package
 				case "easy":
 					startDiff = 1;
 					diffGain = 2;
-					monsterAcc = 15;
-					monsterVel = 125;
+					monsterAcc = 10;
+					monsterVel = 100;
 					break;
 				case "medium":
 					startDiff = 2;
 					diffGain = 3;
-					monsterAcc = 17;
-					monsterVel = 140;
+					monsterAcc = 10;
+					monsterVel = 120;
 					break;
 				case "hard":
 					startDiff = 5; 
 					diffGain = 4;
-					monsterAcc = 20;
-					monsterVel = 150;
+					monsterAcc = 10;
+					monsterVel = 120;
 					break;
 			}
 			

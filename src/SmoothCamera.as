@@ -48,12 +48,13 @@ package
 			}
 			//don't let our player get off the screen
            	var halfHeight : int = CommonConstants.WINDOWHEIGHT / 4;
-			if (playerRef.alive && forwardY + yOffset + halfHeight < playerRef.y + 32) {
+			if (playerRef.alive && forwardY + halfHeight < playerRef.y + 32) {
 				forwardY = playerRef.y + 48
 			}
-			//else if (forwardY - halfHeight > playerRef.y - halfHeight) {
-			//	forwardY = playerRef.y + 48;
-			//}
+			else if (playerRef.alive && forwardY - halfHeight > playerRef.y) {
+				forwardY = playerRef.y - 16;
+			}
+			
 		}
 		
 		public function SetTargetX(targetX : int) {
@@ -84,7 +85,7 @@ package
 				
 				var playerTileX : int = targetPoint.x / CommonConstants.TILEWIDTH;
 
-				var heightAtTarget : int = heightmapRef[playerTileX + 25];
+				var heightAtTarget : int = heightmapRef[playerTileX + 20];
 				if (heightAtTarget != -1) {
 					SetTargetY(heightAtTarget * CommonConstants.TILEHEIGHT);
 				}
