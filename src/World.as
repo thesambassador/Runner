@@ -9,6 +9,7 @@ package
 	public class World extends FlxGroup
 	{
 		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
+		[Embed(source = '../resources/sound/SurgeRamizHaddad.MP3')]private static var music:Class;
 		
 		//difficulty parameters, set by the main menu
 		public static var levelWidth : int = 200;
@@ -68,8 +69,11 @@ package
 		public var shakeTimer : int = 0;
 		
 		public var levelEndTimer : FlxTimer;
+
 		
 		public function World () {
+			
+			FlxG.playMusic(music);
 			
 			currentDifficulty = startingDifficulty;
 			minMonsterVelocity = startingMinMonsterVel;
@@ -89,8 +93,8 @@ package
 			monsterSprite = new FlxSprite();
 			monsterSprite.makeGraphic(1000, 1000, 0x8800bb00);
 			add(monsterSprite);
-			add(player);
 			add(entities);
+			add(player);
 			add(particles);
 			add(fgLayer);
 			
@@ -128,9 +132,10 @@ package
 		}
 		
 		private function GenLevel() : void{
-			var levGen : LevelGen = new LevelOneGen(currentElevation, levelWidth, currentDifficulty, alienTileset);
+			var levGen : LevelOneGen = new LevelOneGen(currentElevation, levelWidth, currentDifficulty, alienTileset);
 			levGen.difficultyIncrease = difficultyGain;
 			
+			//levGen.Balloon();
 			var newChunk : Chunk = levGen.GenerateLevel();
 			
 			currentDifficulty = levGen.difficulty;
@@ -216,6 +221,8 @@ package
 			FlxG.worldBounds.x = player.x - 256;
 			//FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
 			
+			//player.currentPlatform = null;
+			
 			//check collisions
 			FlxG.overlap(midLayer, player, null, player.collideTilemap);
 			FlxG.overlap(midLayer, entities, this.spriteCollisions);
@@ -234,8 +241,10 @@ package
 			}
 			
 			if (player.health <= 0) {
-				if(player.alive)
+				if(player.alive){
 					player.kill();
+					
+				}
 				if (player.lives <= 0) {
 					if(player.lives == 0){
 						var top : FlxText = hud.DisplayCenteredText("Game Over");

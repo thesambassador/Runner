@@ -1,12 +1,15 @@
 package 
 {
 	import org.flixel.FlxG;
+	import org.flixel.FlxPath;
+	import org.flixel.FlxObject;
 	/**
 	 * ...
 	 * @author ...
 	 */
 	public class LevelOneGen extends LevelGen 
 	{
+		
 		[Embed(source = '../resources/img/FireBall.png')]private static var fireball:Class;
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
@@ -21,15 +24,32 @@ package
 			
 			
 			//genFunctions.push(new GenFunction(GenDrop, 1, 9, "flat"));
-			genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat2"));
+			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat2"));
 			//genFunctions.push(new GenFunction(GenTripleEnemy, 1, 7, "enemy"));
 			//genFunctions.push(new GenFunction(GenFireballBarrage, 1, 7, "as"));
 			//genFunctions.push(new GenFunction(GenSpringboardEasy, 1, 7, "changeY"));
 			//genFunctions.push(new GenFunction(GenSpringboardGap, 1, 7, "gap"));
 			genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
+			genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
 
-
-
+		}
+		
+		public function BalloonCoins() : void {
+			var startX : int = currentX;
+			GenFlat(4);
+			
+			AddSimpleMovingPlatform(startX + 2, currentY, startX + 2, currentY - 6);
+			//addCollectible(startX + 2, currentY - 8);
+			AddCoinArch(startX + 4, currentY - 9, 4);
+		}
+		
+		public function BaloonGap() : void {
+			var startX : int = currentX;
+			GenGap(15);
+			
+			AddSimpleMovingPlatform(startX + 4, currentY, currentX - 4, currentY);
+			//addCollectible(startX + 2, currentY - 8);
+			//AddCoinArch(startX + 4, currentY - 9, 4);
 		}
 
 		public function FlatLevel() : void {
@@ -71,6 +91,8 @@ package
 			genFunctions.push(new GenFunction(GenTripleEnemy, 6, 100, "enemy"));
 			genFunctions.push(new GenFunction(GenEnemyJumper, 6, 100, "enemy"));
 			genFunctions.push(new GenFunction(GenEnemyJumper, 6, 100, "enemy"));
+			genFunctions.push(new GenFunction(BaloonGap, 6, 100, "gap"));
+			genFunctions.push(new GenFunction(BaloonGap, 6, 100, "gap"));
 
 			genFunctions.push(new GenFunction(GenOneCrumblePlatformGap , 6, 100, "gap", "enemy"));
 			genFunctions.push(new GenFunction(GenFireball, 8, 10, "hazard"));
@@ -280,7 +302,7 @@ package
 			GenSlide();
 			GenFlat(1);
 			GenGap(6);
-			currentY += CommonFunctions.getRandom( -3, 3);
+			currentY += CommonFunctions.getRandom( -2, 3);
 
 		}
 

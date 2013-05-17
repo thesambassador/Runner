@@ -1,14 +1,18 @@
 package  
 {
 	import org.flixel.FlxG;
+	import org.flixel.FlxSound;
 	 /* ...
 	 * @author ...
 	 */
 	public class Springboard extends Entity
 	{
 		[Embed(source = '../resources/img/springboard.png')]private static var springboard:Class;
+		[Embed(source = '../resources/sound/springboard.mp3')]private static var springboardSound:Class;
 		
 		var bounce : int = -500;
+		
+		public var soundSpringboard : FlxSound;
 		
 		public function Springboard() 
 		{
@@ -17,11 +21,15 @@ package
 			height = 16;
 			offset.y = 16;
 			this.immovable = true;
+			
+			soundSpringboard = new FlxSound();
+			soundSpringboard.loadEmbedded(springboardSound);
 		}
 		
 		override public function collidePlayer(player : Player) : void {
 			if(player.y <= this.y - 17){
 				player.Bounce(bounce * .85, bounce);
+				soundSpringboard.play();
 			}
 			else {
 				separate(player, this);

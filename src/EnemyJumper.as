@@ -13,6 +13,7 @@ package
 	public class EnemyJumper extends Entity
 	{
 		[Embed(source = '../resources/img/EnemyJumper.png')]private static var enemySprites:Class;
+		[Embed(source = '../resources/sound/enemyKill.mp3')]private static var enemyKillSound:Class;
 		
 		public var state : String = "ground";
 		
@@ -122,7 +123,8 @@ package
 		override public function collidePlayer(player : Player) : void {
 			if (player.y + player.height < this.y + 10) {
 				this.health = 0;
-				player.Bounce(-150, -350);
+				player.Bounce( -150, -350);
+				FlxG.play(enemyKillSound);
 			}
 			else if(health > 0){
 				player.hurt(1);

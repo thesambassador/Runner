@@ -1,6 +1,8 @@
 package 
 {
 	import org.flixel.FlxSprite;
+	import org.flixel.FlxSound;
+	import org.flixel.FlxG;
 	
 	/**
 	 * ...
@@ -14,14 +16,15 @@ package
 		{
 			super(startX, startY);
 			super.loadGraphic(collectibleImage, true, false, 16, 16);
-			//this.moves = false;
-			//this.solid = false;
-			//this.mass = .1;
+			
+
 		}
 		
 		override public function collidePlayer(playerObj:Player) : void {
 			if(this.exists){
-				playerObj.collectiblesCollected ++;
+				playerObj.collectCollectible(this);
+				
+				
 				this.kill();
 			}
 		}

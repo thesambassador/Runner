@@ -10,6 +10,18 @@ package
 	public class Player extends FlxSprite
 	{
 		[Embed(source = '../resources/img/aliensprites.png')]private static var playerSprites:Class;
+		[Embed(source = '../resources/sound/jump.mp3')]private static var jumpSound:Class;
+		[Embed(source = '../resources/sound/respawn.mp3')]private static var respawnSound:Class;
+		[Embed(source = '../resources/sound/playerDeath.mp3')]private static var deathSound:Class;
+		
+		[Embed(source = '../resources/sound/pickup1.mp3')]private static var pickupSound1:Class;
+		[Embed(source = '../resources/sound/pickup2.mp3')]private static var pickupSound2:Class;
+		[Embed(source = '../resources/sound/pickup3.mp3')]private static var pickupSound3:Class;
+		[Embed(source = '../resources/sound/pickup4.mp3')]private static var pickupSound4:Class;
+		
+		public var pickupSounds : Array;
+		public var pickupSoundIndex : int = 0;
+		public var pickupSoundDelay : int = 60;
 
 	
 		private var controlConfig : Dictionary;
@@ -23,8 +35,8 @@ package
 		private var airDragFactor : Number = 3;
 		private var gravity : Number = 1000;
 		
-		private var walkSpeed:Number = 160;
-		public var runSpeed:Number = 250;
+		private var walkSpeed:Number = 250;
+		public var runSpeed:Number = 300;
 		public var minSlideSpeed:Number = 100;
 		private var accelerationFactor:Number = 2;
 		
@@ -49,6 +61,7 @@ package
 		public var currentAnimationPriority : int = 0; //currently playing animation's priority, if I play something with a higher priority it will override
 		
 		public var playerEffect : PlayerEffects;
+		public var currentPlatform : MovingPlatform;
 
 		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
@@ -59,7 +72,7 @@ package
 			controlConfig["RIGHT"] = "RIGHT";
 			controlConfig["UP"] = "UP";
 			controlConfig["DOWN"] = "DOWN";
-			controlConfig["JUMP"] = "X";
+			controlConfig["JUMP"] = "SPACE";
 			controlConfig["RUN"] = "SHIFT";
 			
 			//movement
@@ -97,6 +110,12 @@ package
 			//FlxG.watch(this.velocity, "x", "Vel X");
 			//FlxG.watch(this.velocity, "y", "Vel Y");
 			
+			pickupSounds = new Array();
+			pickupSounds.push(pickupSound4);
+			pickupSounds.push(pickupSound3);
+			pickupSounds.push(pickupSound2);
+			pickupSounds.push(pickupSound1);
+		
 		}
 		
 		override public function update():void 
@@ -109,7 +128,12 @@ package
 			this.acceleration.x = 0;
 			this.acceleration.y = gravity;
 			
-			//some variables to keep track of things?  not sure if needed anymore
+			if(pickupSoundDelay > 0){
+				pickupSoundDelay --;
+			}
+			else {
+				pickupSoundIndex = 0;
+			}
 			
 			//save the last frame's state
 			lastState = state;
@@ -178,6 +202,7 @@ package
 		
 		override public function kill() : void {
 			super.kill();
+			FlxG.play(deathSound);
 			FlxG.state.add(PlayerEffects.deathByFire(this.x, this.y, playerSprites));
 		}
 		
@@ -193,6 +218,7 @@ package
 			respawnTimer.start(1, 1.5, finishRespawn);
 			
 			//this.visible = false;
+			FlxG.play(respawnSound);
 			changeState("respawn");
 			//this.collectiblesCollected = 0;
 		}
@@ -214,6 +240,7 @@ package
 				jumpEnergy = jumpTime; 
 				this.velocity.y = -jumpVel / 1.5;
 				changeState("air");
+				FlxG.play(jumpSound);
 				return false;
 			}
 			
@@ -470,6 +497,12 @@ package
 			else
 				this.velocity.y = small;
 			this.invulnerable = true;
+		}
+		
+		public function collectCollectible(c : Collectible) {
+			FlxG.play(pickupSounds[pickupSoundIndex] as Class);
+			if (pickupSoundIndex < pickupSounds.length - 1) pickupSoundIndex ++;
+			pickupSoundDelay = 60;
 		}
 		
 		public function collideTilemap(tilemap:FlxObject, playerObj:FlxObject) : Boolean{

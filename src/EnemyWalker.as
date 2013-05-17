@@ -1,5 +1,7 @@
 package  
 {
+	import org.flixel.FlxSave;
+	import org.flixel.FlxSound;
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxG;
 	import org.flixel.FlxTilemap;
@@ -14,6 +16,7 @@ package
 	public class EnemyWalker extends Entity 
 	{
 		[Embed(source = '../resources/img/slime.png')]private static var enemySprites:Class;
+		[Embed(source = '../resources/sound/enemyKill.mp3')]private static var enemyKillSound:Class;
 
 		private var moveSpeed : Number = 50;
 		private var currentSpeed : Number = 0;
@@ -36,7 +39,7 @@ package
 			this.addAnimation("run", new Array(0, 1, 2), 10);
 			this.addAnimation("die", new Array(5, 6, 7, 8, 9, 9, 9, 9), 20, false);
 			this.addAnimationCallback(handleAnimation);
-			
+
 		}
 		
 		public function ChangeDirection() : void {
@@ -105,6 +108,7 @@ package
 		override public function collidePlayer(player : Player) : void {
 			if(player.state != "respawn"){
 				if (player.y + player.height < this.y + 13 && this.health > 0) {
+					FlxG.play(enemyKillSound); 
 					this.health = 0;
 					player.Bounce(-150, -350);
 				}
@@ -113,6 +117,7 @@ package
 				}
 			}
 			else {
+				
 				this.health = 0;
 			}
 		}

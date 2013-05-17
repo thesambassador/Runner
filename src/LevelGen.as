@@ -218,6 +218,32 @@ package
 
 		}
 		
+		public function AddSimpleMovingPlatform(sx:int, sy:int, ex:int, ey:int, maxSpeed:int = 100, minSpeed:int = 20) {	
+			var sxReal : int = sx * CommonConstants.TILEWIDTH;
+			var syReal : int = sy * CommonConstants.TILEHEIGHT;
+			var exReal : int = ex * CommonConstants.TILEWIDTH;
+			var eyReal : int = ey * CommonConstants.TILEHEIGHT;
+			
+			var mp : MovingPlatform = new MovingPlatform();
+			mp.velocity.x = 0;
+			mp.velocity.y = 0;
+			mp.x = sxReal;
+			mp.y = syReal;
+			mp.topSpeed = maxSpeed;
+			mp.minSpeed = minSpeed;
+			
+			var path : FlxPath = new FlxPath();
+			path.add(sxReal, syReal);
+			path.add(exReal, eyReal);
+			
+			mp.path = path;
+			
+			//mp.followPath(path, maxSpeed, FlxObject.PATH_LOOP_BACKWARD);
+			
+			currentChunk.AddEntityAtTileCoords(mp, sx, sy);
+			
+		}
+		
 		public function addCollectible(x:int, y:int) : void{
 			var col : Collectible = new Collectible();
 			currentChunk.AddEntityAtTileCoords(col, x, y);

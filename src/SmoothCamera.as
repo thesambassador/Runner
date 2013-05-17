@@ -23,7 +23,10 @@ package
 		public var xDelay : Number = 1;
 		
 		public var lastY : int = 0;
-		public var forwardY : int = 0;
+		public var forwardY : int = 0; //Y coordinate 20 tiles in front of the player
+		public var focusY : int = 0 //actual point used to set camera
+		
+		public var focusPlayer : Boolean = false;
 		
 		public var ignoreFirst : Boolean = true;
 		
@@ -45,15 +48,9 @@ package
 		public function SetTargetY(targetY : int, force:Boolean = false) {
  			if (Math.abs(targetY - lastY) > 4 * 16 || force) {
 				forwardY = targetY + yOffset;
+				focusY = forwardY;
 			}
-			//don't let our player get off the screen
-           	var halfHeight : int = CommonConstants.WINDOWHEIGHT / 4;
-			if (playerRef.alive && forwardY + halfHeight < playerRef.y + 32) {
-				forwardY = playerRef.y + 48
-			}
-			else if (playerRef.alive && forwardY - halfHeight > playerRef.y) {
-				forwardY = playerRef.y - 16;
-			}
+			
 			
 		}
 		
@@ -89,18 +86,33 @@ package
 				if (heightAtTarget != -1) {
 					SetTargetY(heightAtTarget * CommonConstants.TILEHEIGHT);
 				}
-				else {
-					//SetTargetY(forwardY, true);
-				}
 				
-				if (forwardY == 0) SetTargetY(targetPoint.y, true);
+				if (forwardY == 0) 
+					SetTargetY(targetPoint.y, true);
 				
-				targetPoint.y = forwardY;
+				
+					
+				targetPoint.y = focusY;
 				
 				var diffy : Number = targetPoint.y - actualPoint.y;
 				diffy *= yDelay;
 				
 				actualPoint.y += diffy;
+				
+				//don't let our player get off the screen
+				var halfHeight : int = CommonConstants.WINDOWHEIGHT / 4;
+				if (playerRef.alive && actualPoint.y + halfHeight < playerRef.y + 32) {
+					targetPoint.y += 10;  
+					focusY += 10;
+				}
+				else if (playerRef.alive && actualPoint.y - halfHeight > playerRef.y) {
+					targetPoint.y -= 10;  
+					focusY -= 10;
+				}
+				else {
+					focusY = forwardY;
+				}
+				
 
 				this.focusOn(actualPoint);
 				
