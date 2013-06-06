@@ -71,9 +71,7 @@ package
 						this.pathSpeed = minSpeed + progress * (topSpeed - minSpeed);
 					}
 				}
-				else {
-					var x = 5;
-				}
+
 			}
 				
 			super.update();
@@ -84,7 +82,7 @@ package
 			//drawVines(this.x, this.y, anchor.x, anchor.y);
 		}
 		
-		public function drawVines(startX : int, startY: int, endX : int, endY : int) {
+		public function drawVines(startX : int, startY: int, endX : int, endY : int) : void{
 			var shape : Shape = new Shape();
 			shape.graphics.lineStyle(1, 0x008800);
 			shape.graphics.moveTo(0, Math.abs(startY - endY) - 1);

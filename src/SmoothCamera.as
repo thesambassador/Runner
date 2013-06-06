@@ -45,7 +45,7 @@ package
 			yOffset = -48;
 		}
 		
-		public function SetTargetY(targetY : int, force:Boolean = false) {
+		public function SetTargetY(targetY : int, force:Boolean = false) : void {
  			if (Math.abs(targetY - lastY) > 4 * 16 || force) {
 				forwardY = targetY + yOffset;
 				focusY = forwardY;
@@ -54,7 +54,7 @@ package
 			
 		}
 		
-		public function SetTargetX(targetX : int) {
+		public function SetTargetX(targetX : int) : void {
 			targetPoint.x = targetX + xOffset;
 		}
 		

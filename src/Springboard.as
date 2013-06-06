@@ -10,7 +10,7 @@ package
 		[Embed(source = '../resources/img/springboard.png')]private static var springboard:Class;
 		[Embed(source = '../resources/sound/springboard.mp3')]private static var springboardSound:Class;
 		
-		var bounce : int = -500;
+		public var bounce : int = -500;
 		
 		public var soundSpringboard : FlxSound;
 		

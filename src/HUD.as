@@ -24,7 +24,7 @@ package
 		private var score : int;
 		private var scoreText : FlxText;
 		private var levelText : FlxText;
-		private var livesText : FlxText;
+		private var coinsText : FlxText;
 		private var timerText : FlxText;
 		private var levelCompleteText : FlxText;
 		
@@ -41,18 +41,18 @@ package
 			worldRef = wRef;
 			player = wRef.player;
 			
-			scoreText = new FlxText(CommonConstants.WINDOWWIDTH / 2 - 200, 0, 200);
-			scoreText.alignment = "right";
+			coinsText = new FlxText(CommonConstants.WINDOWWIDTH / 2 - 200, 0, 200);
+			coinsText.alignment = "right";
+			add(coinsText);
+			
+			scoreText = new FlxText(CommonConstants.WINDOWWIDTH / 4 - 100, 0, 199);
+			scoreText.alignment = "center";
 			add(scoreText);
 			
-			levelText = new FlxText(CommonConstants.WINDOWWIDTH / 4 - 100, 0, 200);
+			levelText = new FlxText(0, 0, 200);
+			levelText.alignment = "left";
 			levelText.text = "0";
-			levelText.alignment = "center";
 			add(levelText);
-			
-			livesText = new FlxText(0, 0, 200);
-			livesText.alignment = "left";
-			add(livesText);
 			
 			timerText = new FlxText(CommonConstants.WINDOWWIDTH / 4 - 100, 20, 200);
 			timerText.text = "0";
@@ -102,12 +102,12 @@ package
 		}
 		
 		override public function update() : void {
-			var newTime = FlxU.getTicks();
+			var newTime : int = FlxU.getTicks();
 			
 			timerText.text = FlxU.formatTicks(0, newTime);
 
-			scoreText.text = "Coins \n   " + player.collectiblesCollected.toString();
-			livesText.text = "Lives \n" + (player.lives).toString();
+			coinsText.text = "Coins \n   " + player.collectiblesCollected.toString();
+			scoreText.text = "Score \n " + player.score;
 			levelText.text = "Level \n" + (FlxG.state as PlayState).world.currentLevel.toString();
 			
 			var playerGain : Number = player.x - worldRef.monsterX;

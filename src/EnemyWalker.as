@@ -54,7 +54,7 @@ package
 			//this.x += moveSpeed * 1 / 60;
 		}
 		
-		public function handleAnimation(animName : String, framenum : uint, frameIndex : uint ) {
+		public function handleAnimation(animName : String, framenum : uint, frameIndex : uint ) : void {
 			if (animName == "die") {
 				if (framenum > 2)
 					EmitParticles();
@@ -110,7 +110,8 @@ package
 				if (player.y + player.height < this.y + 13 && this.health > 0) {
 					FlxG.play(enemyKillSound); 
 					this.health = 0;
-					player.Bounce(-150, -350);
+					player.Bounce( -150, -350);
+					player.addScore(200);
 				}
 				else if(health > 0){
 					player.hurt(1);

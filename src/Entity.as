@@ -22,7 +22,7 @@ package
 			super(startX, startY);
 		}
 		
-		public function SetInitialPosition(ox : Number, oy:Number) {
+		public function SetInitialPosition(ox : Number, oy:Number) : void {
 			origPosX = ox;
 			origPosY = oy;
 			this.x = ox;

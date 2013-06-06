@@ -67,9 +67,9 @@ package
 		}
 		
 		public function getVector(angle : Number, length : Number) : FlxPoint {
-			var returned = new FlxPoint();
+			var returned : FlxPoint = new FlxPoint();
 			
-			var radians = angle * Math.PI/180
+			var radians : Number = angle * Math.PI/180
 
 			returned.x = Math.cos(radians) * length;
 			returned.y = Math.sin(radians) * length;

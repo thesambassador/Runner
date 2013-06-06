@@ -7,30 +7,25 @@ package
 	 * ...
 	 * @author ...
 	 */
+	 
 	public class LevelOneGen extends LevelGen 
 	{
 		
 		[Embed(source = '../resources/img/FireBall.png')]private static var fireball:Class;
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
-			//TestGenFunctions();
+			TestGenFunctions();
 			midBuffer = 4;
 			//difficultyIncrease = 6;
 		}
 
 		public function TestGenFunctions() : void {
-			genFunctions = new Array();
+			//genFunctions = new Array();
 			
 			
-			
-			//genFunctions.push(new GenFunction(GenDrop, 1, 9, "flat"));
-			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat2"));
-			//genFunctions.push(new GenFunction(GenTripleEnemy, 1, 7, "enemy"));
-			//genFunctions.push(new GenFunction(GenFireballBarrage, 1, 7, "as"));
-			//genFunctions.push(new GenFunction(GenSpringboardEasy, 1, 7, "changeY"));
-			//genFunctions.push(new GenFunction(GenSpringboardGap, 1, 7, "gap"));
-			genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
-			genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
+			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
+			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
+			//genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
 
 		}
 		
@@ -43,7 +38,7 @@ package
 			AddCoinArch(startX + 4, currentY - 9, 4);
 		}
 		
-		public function BaloonGap() : void {
+		public function BalloonGap() : void {
 			var startX : int = currentX;
 			GenGap(15);
 			
@@ -61,51 +56,49 @@ package
 		override public function InitializeGenFunctions() : void 
 		{
 
-			genFunctions.push(new GenFunction(GenSlope, 1, 100, "changeY"));
-			genFunctions.push(new GenFunction(GenSlope, 1, 2, "changeY"));
-			genFunctions.push(new GenFunction(GenHurtle, 1, 5, "hurtle"));
+			genFunctionHelper.addFunction("Slope", GenSlope, 1, 100, "yUp", 2);
+			genFunctionHelper.addFunction("Hurtle", GenHurtle, 1, 5, "hurtle");
 
-			genFunctions.push(new GenFunction(GenSmallGap, 1, 4, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenSmallGap, 2, 4, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenOptionalSlide, 1, 3, "slide"));
-			genFunctions.push(new GenFunction(GenDrop, 1, 100, "changeY"));
-			genFunctions.push(new GenFunction(GenEnemyWalker, 1, 100, "enemy"));
+			genFunctionHelper.addFunction("SmallGap", GenSmallGap, 1, 4, "gap");
+			genFunctionHelper.addFunction("SmallGap", GenSmallGap, 2, 4, "gap");
+			genFunctionHelper.addFunction("OptionalSlide", GenOptionalSlide, 1, 3, "slide");
+			genFunctionHelper.addFunction("Drop", GenDrop, 1, 100, "yDown");
+			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 1, 100, "enemy");
 
-			genFunctions.push(new GenFunction(GenAdvancedHurtle, 2, 6, "hurtle"));
+			genFunctionHelper.addFunction("AdvancedHurtle", GenAdvancedHurtle, 2, 6, "hurtle");
 
 			
-			genFunctions.push(new GenFunction(GenSlide, 2, 9, "slide", "enemy"));
-			genFunctions.push(new GenFunction(GenDrop, 2, 100, "changeY"));
-			genFunctions.push(new GenFunction(GenSteps, 2, 100, "changeY"));
-			genFunctions.push(new GenFunction(GenEnemyWalker, 2, 4, "enemy"));
-			genFunctions.push(new GenFunction(GenGap, 6, 7, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenGap, 6, 8, "gap", "enemy"));
+			genFunctionHelper.addFunction("Slide", GenSlide, 2, 9, "slide");
+			genFunctionHelper.addFunction("Drop", GenDrop, 2, 100, "yDown");
+			genFunctionHelper.addFunction("Steps", GenSteps, 2, 100, "yUp");
+			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 2, 4, "enemy");
+			genFunctionHelper.addFunction("Gap", GenGap, 6, 7, "gap");
+			genFunctionHelper.addFunction("Gap", GenGap, 6, 8, "gap");
 
-			genFunctions.push(new GenFunction(GenSpringboardEasy, 3, 8, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenSpringboardGap, 7, 100, "gap", "enemy"));
+			genFunctionHelper.addFunction("SpringboardEasy", GenSpringboardEasy, 3, 8, "yUp");
+			genFunctionHelper.addFunction("SpringboardGap", GenSpringboardGap, 7, 100, "gap");
 
-			genFunctions.push(new GenFunction(GenSlide, 3, 10, "slide", "enemy"));
-			genFunctions.push(new GenFunction(GenOnePlatformGap , 3, 5, "gap", "enemy"));
+			genFunctionHelper.addFunction("Slide", GenSlide, 3, 10, "slide");
+			genFunctionHelper.addFunction("OnePlatformGap", GenOnePlatformGap , 3, 5, "gap");
 			
-			genFunctions.push(new GenFunction(GenGapHurtle , 6, 100, "gap"));
-			genFunctions.push(new GenFunction(GenTripleEnemy, 6, 100, "enemy"));
-			genFunctions.push(new GenFunction(GenEnemyJumper, 6, 100, "enemy"));
-			genFunctions.push(new GenFunction(GenEnemyJumper, 6, 100, "enemy"));
-			genFunctions.push(new GenFunction(BaloonGap, 6, 100, "gap"));
-			genFunctions.push(new GenFunction(BaloonGap, 6, 100, "gap"));
+			genFunctionHelper.addFunction("GapHurtle", GenGapHurtle , 6, 100, "gap");
+			genFunctionHelper.addFunction("TripleEnemy", GenTripleEnemy, 6, 100, "enemy");
+			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 6, 100, "enemy");
+			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 6, 100, "enemy");
+			genFunctionHelper.addFunction("BalloonGap", BalloonGap, 6, 100, "gap");
+			genFunctionHelper.addFunction("BalloonGap", BalloonGap, 6, 100, "gap");
 
-			genFunctions.push(new GenFunction(GenOneCrumblePlatformGap , 6, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenFireball, 8, 10, "hazard"));
-			genFunctions.push(new GenFunction(GenFireball, 8, 9, "hazard"));
+			genFunctionHelper.addFunction("OneCrumblePlatformGap", GenOneCrumblePlatformGap , 6, 100, "gap");
+			genFunctionHelper.addFunction("Fireball", GenFireball, 8, 10, "hazard");
+			genFunctionHelper.addFunction("Fireball", GenFireball, 8, 9, "hazard");
 
-			genFunctions.push(new GenFunction(GenFlameStick, 9, 100, "hazard"));
-			genFunctions.push(new GenFunction(GenSlideJump, 7, 100, "slide", "enemy"));
-			genFunctions.push(new GenFunction(GenAdvancedHurtle, 2, 5, "hurtle"));
-			genFunctions.push(new GenFunction(GenLargeGap, 11, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenLargeGap, 13, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenLargeGap, 15, 100, "gap", "enemy"));
-			genFunctions.push(new GenFunction(GenFireballBarrage, 11, 100, "hazard"));
-			genFunctions.push(new GenFunction(GenFireballBarrage, 11, 100, "hazard"));
+			genFunctionHelper.addFunction("FlameStick", GenFlameStick, 9, 100, "hazard");
+			genFunctionHelper.addFunction("SlideJump", GenSlideJump, 7, 100, "slide");
+			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 11, 100, "gap");
+			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 13, 100, "gap");
+			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 15, 100, "gap");
+			genFunctionHelper.addFunction("FireballBarrage", GenFireballBarrage, 11, 100, "hazard");
+			genFunctionHelper.addFunction("FireballBarrage", GenFireballBarrage, 11, 100, "hazard");
 
 
 			//genFunctions.push(new GenFunction(GenMultiLevel, 3, 10, "multiLevel"));
@@ -248,6 +241,7 @@ package
 			GenEnemyWalker();
 			GenEnemyWalker();
 			GenEnemyWalker();
+			
 		}
 
 		public function GenSlope() : void {
@@ -268,6 +262,31 @@ package
 				currentY-= 2;
 				GenFlat(3);
 			}
+		}
+		
+		public function GenOneWayPlatformSteps() : void {
+			if (this.currentY < 8) return;
+			var numSteps : int = CommonFunctions.getRandom(1, 3);
+			var height : int = numSteps * 2;
+			var width : int = 0;
+			var startX : int = currentX;
+			
+			for (var i:int = 1; i <= numSteps; i++) {
+				var x : int = CommonFunctions.getRandom(0, 2);
+				var y : int = currentY - i * 2;
+				var w : int = CommonFunctions.getRandom(2, 4);
+				width += w;
+				currentChunk.FillSolidRect(currentChunk.mainTiles, startX + x, y, startX + x + w, y, Chunk.oneWayPlatform);
+				currentChunk.FillSolidRect(currentChunk.bgTiles, startX + x, y, startX + x + w, currentY-1, Chunk.middle);
+				
+				startX += w + x;
+			}
+			
+			//currentChunk.FillSolidRect(currentChunk.bgTiles, currentX, currentY, currentX + width, currentY - height, Chunk.middle);
+				
+			GenFlat(width);
+			
+			currentY -= height;
 		}
 
 		public function GenDrop() : void {
@@ -346,21 +365,22 @@ package
 
 		}
 
-		public function GenFireball(h : int = 2, buffer : int =10) : void {
+		public function GenFireball(h : int = 2, buffer : int = 10, seriesNum : int = 0) : void {
 			GenFlat(3);
 			var dp : DeathProjectile = new DeathProjectile(fireball, 16, 16, -150, 0, 3);
+			dp.activationDistance -= CommonConstants.TILEWIDTH * seriesNum * 3;
 			currentChunk.AddEntityAtTileCoords(dp, currentX + buffer, currentY - h);
 		}
 
-		public function GenFireballBarrage() {
+		public function GenFireballBarrage() : void {
 			var num : int = CommonFunctions.getRandom(2, 5);
 			for (var i : int = 0; i < num; i++) {
-				GenFireball(CommonFunctions.getRandom(1, 4), i*7);
+				GenFireball(CommonFunctions.getRandom(1, 4), i*7, i);
 			}
 			
 		}
 		
-		public function GenFlameStick() {
+		public function GenFlameStick() : void {
 			GenFlat(3);
 			var targetX : int = currentX - 2;
 			var targetY : int = currentY;

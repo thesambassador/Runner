@@ -13,21 +13,26 @@ package
 		[Embed(source = '../resources/sound/jump.mp3')]private static var jumpSound:Class;
 		[Embed(source = '../resources/sound/respawn.mp3')]private static var respawnSound:Class;
 		[Embed(source = '../resources/sound/playerDeath.mp3')]private static var deathSound:Class;
+		[Embed(source = '../resources/sound/slide.mp3')]private static var slideSound:Class;
 		
 		[Embed(source = '../resources/sound/pickup1.mp3')]private static var pickupSound1:Class;
 		[Embed(source = '../resources/sound/pickup2.mp3')]private static var pickupSound2:Class;
 		[Embed(source = '../resources/sound/pickup3.mp3')]private static var pickupSound3:Class;
 		[Embed(source = '../resources/sound/pickup4.mp3')]private static var pickupSound4:Class;
 		
+		public var soundSlide : FlxSound;
+		
 		public var pickupSounds : Array;
 		public var pickupSoundIndex : int = 0;
 		public var pickupSoundDelay : int = 60;
 
-	
+		
 		private var controlConfig : Dictionary;
 		
 		public var collectiblesCollected : int = 0;
-		public var invulnerable : Boolean = false;
+		public var score : int = 0;
+		public var invulnerable : int = 0; //how many frames to be invulnerable
+	
 		public var lives : int = 2;
 		
 		//movement constants:
@@ -115,6 +120,8 @@ package
 			pickupSounds.push(pickupSound3);
 			pickupSounds.push(pickupSound2);
 			pickupSounds.push(pickupSound1);
+			
+			soundSlide = FlxG.loadSound(slideSound);
 		
 		}
 		
@@ -122,7 +129,8 @@ package
 		{
 			if (FlxG.keys.justPressed("K")) this.health = 0;
 			
-			this.invulnerable = false;
+			
+			if(invulnerable > 0) invulnerable -= 1;
 			totalFrames ++;
 			//reset acceleration and apply gravity
 			this.acceleration.x = 0;
@@ -292,7 +300,7 @@ package
 		}
 		
 		override public function hurt(damage : Number) : void{
-			if (!invulnerable) super.hurt(damage);
+			if (invulnerable == 0) super.hurt(damage);
 		}
 
 		
@@ -378,6 +386,7 @@ package
 		//slide can only transition to the ground state, which will transition to the air state when it sees it's not on the ground.
 		private function updateSlideState () : Boolean {
 			this.setBoundHeight(15);
+			
 			if (state != lastState) {
 				this.playPriority("startslide", 6);
 			}
@@ -412,6 +421,10 @@ package
 			
 			this.drag.x = this.maxVelocity.x * 1; //less drag for sliding... weeee
 			
+			if (Math.abs(this.velocity.x) > 30) {
+				soundSlide.play();
+			}
+			
 			this.playPriority("slide", 1);
 
 			return true;
@@ -425,7 +438,7 @@ package
 		}
 		
 		private function updateRespawn() : Boolean {
-			this.invulnerable = true;
+			this.invulnerable = 240;
 			
 		
 			return true;
@@ -496,13 +509,15 @@ package
 				this.velocity.y = big;
 			else
 				this.velocity.y = small;
-			this.invulnerable = true;
+			this.invulnerable = 1;
 		}
 		
-		public function collectCollectible(c : Collectible) {
+		public function collectCollectible(c : Collectible) : void {
 			FlxG.play(pickupSounds[pickupSoundIndex] as Class);
 			if (pickupSoundIndex < pickupSounds.length - 1) pickupSoundIndex ++;
 			pickupSoundDelay = 60;
+			addScore(100);
+			this.collectiblesCollected ++ ;
 		}
 		
 		public function collideTilemap(tilemap:FlxObject, playerObj:FlxObject) : Boolean{
@@ -520,6 +535,10 @@ package
 			
 			
 			return returned;
+		}
+		
+		public function addScore(amount : int) : void {
+			score += amount;
 		}
 		
 		public function calcCanStand(collided : FlxTilemap) : Boolean {

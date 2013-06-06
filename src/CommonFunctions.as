@@ -17,6 +17,7 @@ package
 		public static function killPlayer(tile : FlxTile, player:FlxObject) : void {
 			player.hurt(1);
 		}
+		
 	}
 	
 }

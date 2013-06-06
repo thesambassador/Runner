@@ -11,14 +11,20 @@ package
 	{
 		public static var endBuffer : int = 15; //stop generating level pieces once we get to total width of the level minus endBuffer.
 		
+		public var levelHistoryType : Array; //remembers each generated chunk type
+		public var levelHistoryX : Array // remembers each generated chunk's starting x position
+		
 		public var currentX : int; //tile coords
 		public var currentY : int; //tile coords
+		public var backgroundPlatformHeight : int = -1; //we draw the "background platform" stuff when this is not -1 in the "base" functions
 		
 		public var tileset : Class //tileset to use to generate
+
+		public var genFunctionHelper : GenFunctionHelper;
 		
-		public var genFunctions : Array; //array of level generation functions
 		public var consecutiveCategories : int = 0; //number of times the current category has been generated in a row
 		public var lastCategory : String = "";
+		public var lastName : String = "";
 		public var bannedCategory : String = "";
 		
 		public var currentChunk : Chunk; //current chunk we're operating on, generated when we create the LevelGen object
@@ -38,71 +44,40 @@ package
 			startDifficulty = startingDifficulty;
 			//diffWidth = width / difficultyIncrease;
 			
+			levelHistoryType = new Array();
+			levelHistoryX = new Array();
 			
-			genFunctions = new Array();
+			genFunctionHelper = new GenFunctionHelper();
 			InitializeGenFunctions();
 			
 			currentChunk = new Chunk(tileset, width);
 			
 		}
 		
-		public function InitializeGenFunctions() : void{
-			genFunctions.push(new GenFunction(GenFlat, 0, 10, "flat"));
-			genFunctions.push(new GenFunction(GenGap, 0, 10, "gap"));
-		}
-		
-		public function GetGenFunction(diff : int) : GenFunction {
-			var validFunctions : Array = new Array();
-			
-			for each(var genFunct : GenFunction in genFunctions) {
-				if (diff >= genFunct.minDifficulty && diff <= genFunct.maxDifficulty) {
-
-						validFunctions.push(genFunct);
-				}
-			}
-			
-			return FlxU.getRandom(validFunctions) as GenFunction;
+		public function InitializeGenFunctions() : void {
+			genFunctionHelper.addFunction("Flat", GenFlat, 0, 10, "flat");
+			genFunctionHelper.addFunction("Gap", GenGap, 0, 10, "gap");
 		}
 		
 		public function GenerateLevel() : Chunk {
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
+				var startX : int = currentX;
 				var gf : GenFunction = null;
 				if (currentX > (difficulty + 1 - startDifficulty) * (currentChunk.widthInTiles / (difficultyIncrease + 1))) {
 					difficulty ++;
 				}
-				while(gf == null){
-					//get a random genfunction valid for our current difficulty
-					gf = GetGenFunction(difficulty);
-					
-					if (gf.category == bannedCategory) { 
-						gf = null;
-						continue;
-					}
-					
-					//if we generated this category last iteration, take note
-					if (lastCategory == gf.category) {
-						consecutiveCategories += 1;
-//
-					}
-					else {
-						consecutiveCategories = 0;
-					}
-					
-					//now stop consecutive runs of the same function:
-					if (consecutiveCategories > 0) {
-						if (gf.category == "gap") gf = null;
-						else if (gf.category == "changeY" && consecutiveCategories >= 2) gf = null;
-						else if (gf.category == "slide"  && consecutiveCategories >= 2) gf = null;
-						else if (gf.category == "hurtle"  && consecutiveCategories >= 1) gf = null;
-						else if (gf.category == "enemy"  && consecutiveCategories >= 2) gf = null;
-					}
-					
-					
-				}
-				if(gf.category != lastCategory) consecutiveCategories = 0;
+				//get a random genfunction valid for our current difficulty
+				gf = genFunctionHelper.getRandomValidFunction(difficulty, "", lastName);
+
+				levelHistoryX.push(currentX);
+				levelHistoryType.push(gf.category);
+				
 				gf.genFunction();
+				
+				//check to see if we actually generated a level section
+				
 				lastCategory = gf.category;
-				bannedCategory = gf.bannedCategory;
+				lastName = gf.name;
 				
 				if (currentY <= 0) {
 					currentY = 3;
@@ -142,16 +117,18 @@ package
 			for (var x : int = currentX; x < width + currentX; x++) {
 				var setTile : int = 1;
 				
-				//if (x == currentX + width - 1) {
-				//	setTile = 10;
-				//}
-				
 				currentChunk.mainTiles.setTile(x, currentY, setTile);
 				
 				FillUnder(x, currentY, currentChunk.mainTiles, 4);
+				
+				//adds background tiles from the ground up to the background height
+				if (backgroundPlatformHeight != -1) {
+					currentChunk.FillSolidRect(currentChunk.bgTiles, x, backgroundPlatformHeight, x, currentY, 20);
+				}
 			}
 			currentX += width;
-
+			
+			
 		}
 		
 		protected function GenElevationChange() : void{
@@ -218,7 +195,10 @@ package
 
 		}
 		
-		public function AddSimpleMovingPlatform(sx:int, sy:int, ex:int, ey:int, maxSpeed:int = 100, minSpeed:int = 20) {	
+		
+
+		
+		public function AddSimpleMovingPlatform(sx:int, sy:int, ex:int, ey:int, maxSpeed:int = 100, minSpeed:int = 20) : void {	
 			var sxReal : int = sx * CommonConstants.TILEWIDTH;
 			var syReal : int = sy * CommonConstants.TILEHEIGHT;
 			var exReal : int = ex * CommonConstants.TILEWIDTH;

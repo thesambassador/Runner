@@ -7,8 +7,8 @@ package
 	 */
 	public class DeathProjectile extends Entity
 	{
-		var velX : Number = 0;
-		var velY : Number = 0;
+		public var velX : Number = 0;
+		public var velY : Number = 0;
 		
 		public function DeathProjectile(image : Class, sizeX: int, sizeY: int, speedX : int, speedY : int, numFrames : int = 1) 
 		{

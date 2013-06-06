@@ -60,7 +60,7 @@ package
 			
 		}
 		
-		public function EmitParticles() {
+		public function EmitParticles() : void {
 			var emitter : FlxEmitter = new FlxEmitter(0,0);
 			emitter.at(this);
 			
@@ -124,6 +124,7 @@ package
 			if (player.y + player.height < this.y + 10) {
 				this.health = 0;
 				player.Bounce( -150, -350);
+				player.addScore(500);
 				FlxG.play(enemyKillSound);
 			}
 			else if(health > 0){

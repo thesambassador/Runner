@@ -8,35 +8,35 @@ package
 	 */
 	public class Chunk 
 	{
-		
 		//tilemap indexes
 		//main level tiles
-		private static var groundTop : int = 1; //main tile that the player runs on
-		private static var groundTopLeft: int = 2;
-		private static var groundTopRight : int = 3;
-		private static var underground : int = 4;
-		private static var barrier : int = 8;
-		private static var spike : int = 16;
+		public static var groundTop : int = 1; //main tile that the player runs on
+		public static var groundTopLeft: int = 2;
+		public static var groundTopRight : int = 3;
+		public static var underground : int = 4;
+		public static var barrier : int = 8;
+		public static var spike : int = 16;
+		public static var oneWayPlatform : int = 14;
 		
 		//background platforms
-		private static var topleft : int = 11;
-		private static var topmiddle : int = 12;
-		private static var topright : int = 13;
-		private static var left : int = 19;
-		private static var middle : int = 20;
-		private static var right : int = 21;
+		public static var topleft : int = 11;
+		public static var topmiddle : int = 12;
+		public static var topright : int = 13;
+		public static var left : int = 19;
+		public static var middle : int = 20;
+		public static var right : int = 21;
 		
 		//decorative tiles
-		private static var bgGrass : int = 24;
-		private static var bushLeft : int = 28;
+		public static var bgGrass : int = 24;
+		public static var bushLeft : int = 28;
 		
-		private static var treeBotLeft : int = 40;
-		private static var treeBotMid : int = 41;
-		private static var treeBotRight : int = 42;
+		public static var treeBotLeft : int = 40;
+		public static var treeBotMid : int = 41;
+		public static var treeBotRight : int = 42;
 		
-		private static var treeLeft : int = 32;
-		private static var treeMid : int = 33;
-		private static var treeRight : int = 34;
+		public static var treeLeft : int = 32;
+		public static var treeMid : int = 33;
+		public static var treeRight : int = 34;
 
 		public var mainTiles : FlxTilemap;  //main tiles for collision
 		public var bgTiles : FlxTilemap; //background tiles with no collision
@@ -70,6 +70,7 @@ package
 			mainTiles.setTileProperties(topleft, FlxObject.UP);
 			mainTiles.setTileProperties(topmiddle, FlxObject.UP);
 			mainTiles.setTileProperties(topright, FlxObject.UP);
+			mainTiles.setTileProperties(oneWayPlatform, FlxObject.UP);
 			mainTiles.setTileProperties(left, FlxObject.NONE);
 			mainTiles.setTileProperties(middle, FlxObject.NONE);
 			mainTiles.setTileProperties(right, FlxObject.NONE);
@@ -102,7 +103,8 @@ package
 		
 		//this will add scenery and non-gameplay related stuff
 		public function Decorate() : void {
-			
+
+
 			//PlaceTrees();
 			//add the rounded corners of the grass as needed:
 			var topGrassTiles : Array = mainTiles.getTileInstances(1);
@@ -121,7 +123,7 @@ package
 							fgTiles.setTileByIndex(tile-mainTiles.widthInTiles, bgGrass + grassTile + 1);
 						}
 						//randomly add some bushes
-						var shouldPlace = Math.random();
+						var shouldPlace : Number = Math.random();
 						if (shouldPlace < .1) {
 							var indexLeft : int = tile-mainTiles.widthInTiles;
 							var indexRight : int = tile-mainTiles.widthInTiles + 1;
@@ -137,6 +139,44 @@ package
 					
 				}
 			}
+			//add rounded corners/edges to background tiles
+			var bgPlatformTiles : Array = bgTiles.getTileInstances(20);
+			if (bgPlatformTiles != null && bgPlatformTiles.length > 0) {
+				for each (tile in bgPlatformTiles) {
+					
+					//check the tile above us to see if it's empty (top of the background)
+					var indexAbove : int = tile - widthInTiles;
+					var indexRight : int = tile + 1;
+					var indexLeft : int = tile - 1;
+					
+					var setTile : int = middle;
+					
+					if (bgTiles.getTileByIndex(indexAbove) == 0 && mainTiles.getTileByIndex(indexAbove) == 0) {
+						setTile -= 8;
+					}
+					
+					if (bgTiles.getTileByIndex(indexLeft) == 0 && mainTiles.getTileByIndex(indexLeft) == 0) {
+						setTile -= 1;
+					}
+					
+					if (bgTiles.getTileByIndex(indexRight) == 0 && mainTiles.getTileByIndex(indexRight) == 0) {
+						setTile += 1;
+					}
+					
+					//if it's the top, we want the player to be able to collide with it
+					if (setTile == topright || setTile == topleft || setTile == topmiddle) {
+						if(mainTiles.getTileByIndex(tile) == 0){
+							mainTiles.setTileByIndex(tile, setTile);
+							bgTiles.setTileByIndex(tile, 0);
+						}
+					}
+					//otherwise, we just change the background
+					else {
+						bgTiles.setTileByIndex(tile, setTile);
+					}
+				}
+			}
+			
 			
 			
 			
@@ -282,6 +322,28 @@ package
 				for (var setY:int = y; setY < y + h; setY++) {
 					mainTiles.setTile(setX, setY, fillBlock);
 				
+				}
+			}
+		}
+		
+		//fills between left (inclusive) and right (exclusive), top(inclusive) and bottom(exclusive)
+		//this should work even if you pass in "backwards" values (ie, left < right, top < bottom, etc)
+		public function FillSolidRect(tileset : FlxTilemap, left : int, top : int, right : int, bottom : int, fillBlock : int) : void {
+
+			if (left > right) {
+				var save : int = left;
+				left = right;
+				right = save;
+			}
+			if (top > bottom) {
+				var save : int = top; 
+				top = bottom;
+				bottom = save;
+			}
+			
+			for (var setX:int = left; setX <= right; setX++) {
+				for (var setY:int = top; setY <= bottom; setY++) {
+					tileset.setTile(setX, setY, fillBlock);
 				}
 			}
 		}

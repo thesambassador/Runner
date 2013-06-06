@@ -307,7 +307,7 @@ package
 				else {
 					for (var i : int = 0; i < chunk.safeZones.length; i++) {
 						var check : FlxPoint = chunk.safeZones[i] as FlxPoint;
-						var checkX = chunk.tileXToRealX(check.x);
+						var checkX : Number = chunk.tileXToRealX(check.x);
 						if (player.x < checkX) {
 							if (i == 0) i++;
 							validPoint = chunk.safeZones[i - 1];  //tilemap coords
@@ -342,11 +342,11 @@ package
 			
 		}
 		
-		public function clearCollided(player:FlxObject, entity:FlxObject) {
+		public function clearCollided(player:FlxObject, entity:FlxObject) : void {
 			entity.kill();
 		}
 		
-		public function secondCollide(sprite1:FlxObject, sprite2:FlxObject) {
+		public function secondCollide(sprite1:FlxObject, sprite2:FlxObject) : void {
 			if (sprite1 is Player) {
 				if (sprite2 is CrumbleTile) {
 					FlxObject.separate(sprite1, sprite2);

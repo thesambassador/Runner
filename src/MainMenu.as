@@ -31,7 +31,7 @@ package
 		override public function create():void
 		{
 			FlxG.mouse.show();
-			var middleScreen = CommonConstants.WINDOWWIDTH / 4;
+			var middleScreen : int = CommonConstants.WINDOWWIDTH / 4;
 			
 			logo = new FlxText(middleScreen - 200, 30, 400, "ALIEN RUNNER");
 			logo.size = 20;
@@ -40,7 +40,7 @@ package
 			
 			startButton = new FlxButton(middleScreen, 100, "Start", startGame);
 			startButton.x = middleScreen - (startButton.width / 2);
-			var centeredButton = middleScreen - startButton.width / 2;
+			var centeredButton : int = middleScreen - startButton.width / 2;
 			
 			//difficulty buttons
 			easyDifficulty = new FlxButton(middleScreen, 150, "Easy", setEasy);
@@ -67,7 +67,7 @@ package
 			super.update();
 		}
 		
-		public function startGame() {
+		public function startGame() : void {
 			var startDiff : int = 1;
 			var diffGain : int = 2;
 			var monsterAcc : int = 15;
@@ -99,25 +99,25 @@ package
 			World.monsterAcceleration = monsterAcc;
 			World.startingMinMonsterVel = monsterVel;
 			
-			var playState = new PlayState();
+			var playState : FlxState = new PlayState();
 			FlxG.switchState(playState);
 		}
 		
-		public function setEasy() {
+		public function setEasy() : void {
 			difficulty = "easy";
 			easyDifficulty.color = 0x00FF00;
 			mediumDifficulty.color = grey;
 			hardDifficulty.color = grey;
 		}
 		
-		public function setMedium() {
+		public function setMedium() : void {
 			difficulty = "medium";
 			easyDifficulty.color = grey;
 			mediumDifficulty.color = 0xFFFF00;
 			hardDifficulty.color = grey;
 		}
 		
-		public function setHard() {
+		public function setHard() : void {
 			difficulty = "hard";
 			easyDifficulty.color = grey;
 			mediumDifficulty.color = grey;
