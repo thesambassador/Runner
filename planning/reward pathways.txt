@@ -1,0 +1,32 @@
+Reward pathways
+	Places where the level splits into a harder short "path" that has more rewards than the standard path
+First pass = generate level
+	record history, mark X locations for potential reward pathways
+	potential reward pathways:
+		Any enemy/springboard that can launch you upwards
+		Right before a drop in the Y position, jump on some floating platforms
+		After a multi-level, jump from top level?
+		During a larger gap, platforms below? maybe a cave?
+		Rarely, just a normal split off from the level?
+		
+Second pass = generate reward pathways
+	Types of reward pathways:
+		Easy/short 
+			Higher coins (have to jump on an enemy to reach)
+			Single high platform with coins
+			
+		Medium/shortish
+			In a gap, lower area with dissolving platform with coins on it
+			Platforms (dissolving?) after a drop in Y
+			Platforms (dissolving?) after a one-way platform
+			In a gap, lower area with dissolving platforms into cave?
+			
+			Powerup at the end?
+			
+		Hard/longer (1 or less per level?)
+			Start with a enemy/springboard up onto a high one-way platform
+				Hard set of platforms (1-2 in width) onto an even harder set of platforms
+			Start with a large gap, drop onto dissolving platforms of the same difficulty
+			Powerup at the end?
+			
+Third pass = decorate

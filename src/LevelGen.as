@@ -102,11 +102,16 @@ package
 			}
 			
 			currentChunk.Decorate();
+			AddRewardPathways();
 			
 			return currentChunk;
 		}
 	
-
+		//goes through and adds harder paths to parts of the level to add variety
+		protected function AddRewardPathways() : void {
+			
+		}
+		
 		protected function GenFlat(w:int = -1) : void {
 			var width : int ;
 			if(w == -1)
@@ -196,7 +201,7 @@ package
 		}
 		
 		
-
+		
 		
 		public function AddSimpleMovingPlatform(sx:int, sy:int, ex:int, ey:int, maxSpeed:int = 100, minSpeed:int = 20) : void {	
 			var sxReal : int = sx * CommonConstants.TILEWIDTH;
