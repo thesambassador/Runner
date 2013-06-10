@@ -50,6 +50,8 @@ package
 		
 		public var tileset : Class;
 		
+		private var _heightmap : Array;
+		
 		//constructor creates an empty chunk and adds itself to the stage
 		public function Chunk(tilesetToUse : Class, width:int, height:int = -1) 
 		{
@@ -241,6 +243,13 @@ package
 				}
 			}
 			return returned;
+		}
+		
+		public function get heightmap() : Array {
+			if (_heightmap == null) {
+				_heightmap = GetHeightmap();
+			}
+			return _heightmap;
 		}
 		
 		public function get width() : Number {

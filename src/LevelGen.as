@@ -70,7 +70,7 @@ package
 				gf = genFunctionHelper.getRandomValidFunction(difficulty, "", lastName);
 
 				levelHistoryX.push(currentX);
-				levelHistoryType.push(gf.category);
+				levelHistoryType.push(gf);
 				
 				gf.genFunction();
 				
@@ -109,8 +109,61 @@ package
 	
 		//goes through and adds harder paths to parts of the level to add variety
 		protected function AddRewardPathways() : void {
+			var validIndices : Array = new Array();
+			
+			//2 high coin areas per level
+			//find valid places for higher coins (enemies, springboards, drops, hurtles)
+			for (var i : int = 0; i < levelHistoryType.length; i++) {
+				var gf : GenFunction = levelHistoryType[i] as GenFunction;
+				if (gf.category == "enemy" || gf.category == "yDown" || gf.category == "hurtle") {
+					validIndices.push(i);
+				}
+			}
+			
+			//add some higher coins to a random 3 of these
+			for (var i : int = 0; i < 3; i++) {
+				if(validIndices.length > 0){
+					var index = FlxG.getRandom(validIndices);
+					AddHighCoins(index);
+					validIndices.splice(validIndices.lastIndexOf(index), 1);
+				}
+			}
+
+			//1 simple high area with coins
+			
+			//2 medium reward pathways
+			
+			//1 hard reward pathway
+		}
+		
+		protected function AddHighCoins(index : int) {
+			var gf : GenFunction = levelHistoryType[index] as GenFunction;
+			var startX : int = levelHistoryX[index] as int;
+			var elevation : int = currentChunk.heightmap[startX];
+			
+			if (gf.category == "enemy") {
+				AddCoinArch(startX, elevation - 7, 4);
+			}
+			else if (gf.name == "AdvancedHurtle") {
+				AddCoinArch(startX + 12, elevation - 9, 4);
+			}
+			else if (gf.name == "Hurtle") {
+				AddCoinArch(startX + 5, elevation - 7, 3);
+			}
+			else if (gf.category == "yDown") {
+				if(startX > 0)
+					elevation = currentChunk.heightmap[startX - 1];
+				AddCoinArch(startX + 3, elevation - 4, 3);
+			}
+			
+			
+			
+			
 			
 		}
+		
+		
+		
 		
 		protected function GenFlat(w:int = -1) : void {
 			var width : int ;
@@ -136,18 +189,6 @@ package
 			
 		}
 		
-		protected function GenElevationChange() : void{
-			if (currentY > CommonConstants.LEVELHEIGHT - 2) {
-				currentY += CommonFunctions.getRandom( -2, -1);
-			}
-			else if (currentY <= 2) {
-				currentY += CommonFunctions.getRandom(2, 1);
-			}
-			else {
-				currentY += CommonFunctions.getRandom( -2, 2);
-			}
-			GenFlat(2);
-		}
 		
 		protected function GenGap(w:int = -1) : void {		
 			
@@ -170,37 +211,6 @@ package
 			
 			currentX += width;
 		}
-		
-		//this is the same as flat, but a bit wider and adds multiple "levels" that the player can jump onto for some variation
-		protected function GenMultiLevel(w:int = -1) : void {
-			var startX : int = currentX;
-			var width : int ;
-			if(w == -1)
-				width = CommonFunctions.getRandom(10, 15);
-			else
-				width = w;
-				
-			GenFlat(width);
-			
-			//number of additional levels (not including the ground)
-			var numLevels : int = CommonFunctions.getRandom(1, 3);
-			
-			//higher levels must be generated first, each level will be a random width and height
-			while (numLevels > 0) {
-				var genX : int = CommonFunctions.getRandom(startX, startX + 2);
-				var h : int = numLevels * CommonConstants.JUMPHEIGHT - CommonFunctions.getRandom(0, 1);
-				var w : int = CommonFunctions.getRandom(2, width-2);
-				currentChunk.AddOneWayPlatform(genX, currentY - 1, w, h);
-					
-				var spacing : int = CommonFunctions.getRandom(1, 4);
-					
-				genX = genX + w + spacing;
-				numLevels --;
-			}
-
-		}
-		
-		
 		
 		
 		public function AddSimpleMovingPlatform(sx:int, sy:int, ex:int, ey:int, maxSpeed:int = 100, minSpeed:int = 20) : void {	
@@ -227,6 +237,45 @@ package
 			
 			currentChunk.AddEntityAtTileCoords(mp, sx, sy);
 			
+		}
+		
+		public function GenSpringboard() : void {
+			GenFlat(2);
+			var springboard : Springboard = new Springboard();
+			currentChunk.AddEntityAtTileCoords(springboard, currentX - 2, currentY - 1);
+		}
+		
+		//adds a platform of width w starting at sx,sy.  Crumble tiles will be used if crumble is specified
+		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false) {
+			for (var x:int = sx; x < sx + w; x++) {
+				if (crumble) {
+					var ct : CrumbleTile = new CrumbleTile();
+					currentChunk.AddEntityAtTileCoords(ct, x, sy);
+				}
+				else {
+					currentChunk.mainTiles.setTile(x, sy, 8);
+				}
+			}
+		}
+		
+		//x: x value of first collectible
+		//y: elevation to start
+		//  **        *
+		// *  *  or  * *
+		// w=4       w=3
+		public function AddCoinArch(sx:int, sy:int, w:int) : void{
+			if (w < 3) return;
+
+			addCollectible(sx, sy);
+			addCollectible(sx + w - 1, sy);
+
+
+			var y : int = sy - 1;
+
+			for (var x : int = sx + 1; x < sx + w - 1; x++) {
+				addCollectible(x, y);
+			}
+
 		}
 		
 		public function addCollectible(x:int, y:int) : void{

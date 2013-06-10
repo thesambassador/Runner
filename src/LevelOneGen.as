@@ -21,7 +21,8 @@ package
 			//difficultyIncrease = 6;
 		}
 		
-			override public function InitializeGenFunctions() : void 
+		//populates the gen function helper with the genfunctions that we'll use in this level
+		override public function InitializeGenFunctions() : void 
 		{
 
 			genFunctionHelper.addFunction("Slope", GenSlope, 1, 100, "yUp", 2);
@@ -148,9 +149,6 @@ package
 
 			currentChunk.FillSolid(startX + 1, currentY - height, 2, height, 8);
 
-
-			addCollectible(startX + 1, currentY - height - 1);
-			addCollectible(startX + 2, currentY - height - 1);
 
 		}
 
@@ -390,43 +388,7 @@ package
 		//} end Election change obstacles
 
 		//{ Helper functions
-		public function GenSpringboard() : void {
-			GenFlat(2);
-			var springboard : Springboard = new Springboard();
-			currentChunk.AddEntityAtTileCoords(springboard, currentX - 2, currentY - 1);
-		}
 		
-		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false) {
-			for (var x:int = sx; x < sx + w; x++) {
-				if (crumble) {
-					var ct : CrumbleTile = new CrumbleTile();
-					currentChunk.AddEntityAtTileCoords(ct, x, sy);
-				}
-				else {
-					currentChunk.mainTiles.setTile(x, sy, 8);
-				}
-			}
-		}
-		
-		//x: x value of first collectible
-		//y: elevation to start
-		//  **        *
-		// *  *  or  * *
-		// w=4       w=3
-		public function AddCoinArch(sx:int, sy:int, w:int) : void{
-			if (w < 3) return;
-
-			addCollectible(sx, sy);
-			addCollectible(sx + w - 1, sy);
-
-
-			var y : int = sy - 1;
-
-			for (var x : int = sx + 1; x < sx + w - 1; x++) {
-				addCollectible(x, y);
-			}
-
-		}
 
 		//} end Helper functions
 
