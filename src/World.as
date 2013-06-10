@@ -21,7 +21,7 @@ package
 		public static var startingMinMonsterVel : Number = 150;
 		public static var maxMinMonsterVelocity : Number = 225; //this is the fastest that the monster will go when he's closer than maxMonsterDistance
 		
-		public var startElevation : int = 32;
+		public var startElevation : int = CommonConstants.LEVELHEIGHT / 2;
 		public var currentDifficulty : int = 1;
 		
 		public var currentLevel : int = 1;

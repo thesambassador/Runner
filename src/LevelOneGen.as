@@ -174,7 +174,7 @@ package
 		}
 		
 		public function GenFlameStick() : void {
-			GenFlat(3);
+			GenFlat(4);
 			var targetX : int = currentX - 2;
 			var targetY : int = currentY;
 			currentChunk.mainTiles.setTile(targetX, targetY, 9);

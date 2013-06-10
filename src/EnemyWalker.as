@@ -110,7 +110,7 @@ package
 				if (player.y + player.height < this.y + 13 && this.health > 0) {
 					FlxG.play(enemyKillSound); 
 					this.health = 0;
-					player.Bounce( -150, -350);
+					player.Bounce( -150, -400);
 					player.addScore(200);
 				}
 				else if(health > 0){

@@ -119,22 +119,28 @@ package
 					validIndices.push(i);
 				}
 			}
-			
 			//add some higher coins to a random 3 of these
 			for (var i : int = 0; i < 3; i++) {
 				if(validIndices.length > 0){
 					var index = FlxG.getRandom(validIndices);
+					var x = levelHistoryX[index];
+					
 					AddHighCoins(index);
 					validIndices.splice(validIndices.lastIndexOf(index), 1);
+					//remove other valid locations that are close to the one that we just used
+					for (var j : int = 0; j < validIndices.length; j++) {
+						var otherX : int = levelHistoryX[j] as int;
+						if (Math.abs(x - otherX) < 20) {
+							validIndices.splice(j, 1);
+						}
+					}
+
 				}
 			}
-
-			//1 simple high area with coins
 			
-			//2 medium reward pathways
-			
-			//1 hard reward pathway
 		}
+		
+
 		
 		protected function AddHighCoins(index : int) {
 			var gf : GenFunction = levelHistoryType[index] as GenFunction;
@@ -155,10 +161,6 @@ package
 					elevation = currentChunk.heightmap[startX - 1];
 				AddCoinArch(startX + 3, elevation - 4, 3);
 			}
-			
-			
-			
-			
 			
 		}
 		

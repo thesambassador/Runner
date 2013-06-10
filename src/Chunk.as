@@ -182,7 +182,7 @@ package
 			
 			
 			
-			RandomizeGroundTiles();
+			//RandomizeGroundTiles();
 		}
 		
 		public function PlaceTrees() : void {

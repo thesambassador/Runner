@@ -123,7 +123,7 @@ package
 		override public function collidePlayer(player : Player) : void {
 			if (player.y + player.height < this.y + 10) {
 				this.health = 0;
-				player.Bounce( -150, -350);
+				player.Bounce( -150, -400);
 				player.addScore(500);
 				FlxG.play(enemyKillSound);
 			}
