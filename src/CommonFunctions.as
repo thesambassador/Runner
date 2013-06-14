@@ -18,6 +18,24 @@ package
 			player.hurt(1);
 		}
 		
+		public static function addCoins(amount : int) {
+			var current : int = CommonConstants.SAVE.data.Coins;
+			
+			current += amount;
+			CommonConstants.SAVE.data.Coins = current;
+			
+			CommonConstants.SAVE.flush();
+		}
+		
+		public static function saveScore(score : int) {
+			var current : int = CommonConstants.SAVE.data.BestScore;
+			
+			if(score > current)
+				CommonConstants.SAVE.data.BestScore = score;
+			
+			CommonConstants.SAVE.flush();
+		}
+		
 	}
 	
 }

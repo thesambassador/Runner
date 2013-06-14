@@ -2,6 +2,7 @@ package
 {
 	import org.flixel.FlxButton;
 	import org.flixel.FlxGroup;
+	import org.flixel.FlxSave;
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
 	import org.flixel.FlxG;
@@ -12,6 +13,7 @@ package
 	 */
 	public class MainMenu extends FlxState
 	{
+		
 		public var buttons : FlxGroup;
 		
 		public var startButton : FlxButton;
@@ -21,12 +23,17 @@ package
 		public var mediumDifficulty : FlxButton;
 		public var hardDifficulty : FlxButton;
 		
+		public var textCoins : FlxText;
+		public var textScore : FlxText;
+		
 		public var difficulty : String = "Medium";
 		
 		public var state : String = "intro";
 		
 		public var grey : uint;
 		
+		public var bestScore : int = 0;
+		public var coins : int = 0;
 		
 		override public function create():void
 		{
@@ -60,6 +67,21 @@ package
 			add(hardDifficulty);
 			
 			grey = startButton.color;
+			
+			CommonConstants.SAVE = new FlxSave();
+			CommonConstants.SAVE.bind("AlienRunner");
+			
+			coins = CommonConstants.SAVE.data.Coins;
+			bestScore = CommonConstants.SAVE.data.BestScore;
+			
+			textCoins = new FlxText(0, CommonConstants.VISIBLEHEIGHT - 12, 200, coins.toString());
+			textScore = new FlxText(CommonConstants.VISIBLEWIDTH - 200, CommonConstants.VISIBLEHEIGHT - 12, 200, bestScore.toString());
+			textScore.alignment = "right";
+			
+			add(textCoins);
+			add(textScore);
+	
+			
 		}
 		
 		override public function update():void {

@@ -182,7 +182,7 @@ package
 			
 			
 			
-			//RandomizeGroundTiles();
+			RandomizeGroundTiles();
 		}
 		
 		public function PlaceTrees() : void {
@@ -370,16 +370,35 @@ package
 		//Ground = 1-3
 		//Underground = 4-6
 		private function RandomizeGroundTiles() : void {
-			//get all tiles with index 1
-			var groundTiles : Array = mainTiles.getTileInstances(4);
-			var tileIndex : int;
+			//get all tiles with index of the main ground tile
+			var groundTiles : Array = mainTiles.getTileInstances(underground);
+			var tile : int;
 			
-			for each(tileIndex in groundTiles) {
-				mainTiles.setTileByIndex(tileIndex, getRandom(4, 6));
+			if(groundTiles.length > 0){
+				for each(tile in groundTiles) {
+					
+					var indexBelow : int = tile + widthInTiles;
+					var indexRight : int = tile + 1;
+					var indexLeft : int = tile - 1;
+					
+					var setTile : int = underground;
+					
+					if (mainTiles.getTileByIndex(indexBelow) == 0) {
+						setTile = 7;
+					}
+					
+					else if (mainTiles.getTileByIndex(indexLeft) == 0) {
+						setTile = 5;
+					}
+					
+					else if (mainTiles.getTileByIndex(indexRight) == 0) {
+						setTile = 6;
+					}
+					
+					mainTiles.setTileByIndex(tile, setTile);
+					
+				}
 			}
-			
-
-			
 		}
 		
 	

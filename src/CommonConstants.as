@@ -1,5 +1,6 @@
 package  
 {
+	import org.flixel.FlxSave;
 	/**
 	 * ...
 	 * @author ...
@@ -20,6 +21,8 @@ package
 		
 		public static var JUMPHEIGHT : Number = 3; //maximum height in tiles that the player can jump vertically
 		public static var JUMPLENGTH : Number = 10; // maximum length, assuming same-level sides, that the player can jump over horizontally
+		
+		public static var SAVE : FlxSave;
 	}
 
 }

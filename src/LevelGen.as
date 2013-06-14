@@ -36,6 +36,10 @@ package
 		protected var collectiblesLeft : int = 20;  //how many more collectibles can be added to the level
 		protected var midBuffer : int = 5; //buffer between sections
 		
+		public var ceilingHeight : int = 19;
+		public var inCave : Boolean = false;
+		public var caveWidth : int = 0;
+		
 		public function LevelGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			currentX = 0;
 			currentY = initialElevation;
@@ -87,6 +91,8 @@ package
 				}
 				currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
 				GenFlat(midBuffer); 
+				
+				if (caveWidth <= 10 && caveWidth > 0) GenCaveEnd();
 			}
 			
 			//fill in the rest of the level with flatness
@@ -174,6 +180,8 @@ package
 			else
 				width = w;
 			
+			if (width + currentX > currentChunk.widthInTiles) return;
+				
 			for (var x : int = currentX; x < width + currentX; x++) {
 				var setTile : int = 1;
 				
@@ -181,14 +189,16 @@ package
 				
 				FillUnder(x, currentY, currentChunk.mainTiles, 4);
 				
+				
 				//adds background tiles from the ground up to the background height
 				if (backgroundPlatformHeight != -1) {
 					currentChunk.FillSolidRect(currentChunk.bgTiles, x, backgroundPlatformHeight, x, currentY, 20);
 				}
 			}
+			
+			AddCeiling(currentX, currentY, width);
+			
 			currentX += width;
-			
-			
 		}
 		
 		
@@ -200,18 +210,46 @@ package
 			else
 				width = w;
 	
+			AddCeiling(currentX, currentY, width);
 			
 			if (currentY < CommonConstants.LEVELHEIGHT - 6) {
 				var pitDepth : int = 7;
 				for (var i : int = 0; i < width; i++) {
+					var x = currentX + i;
 					currentChunk.mainTiles.setTile(currentX + i, currentY + pitDepth, 16);
 					FillUnder(currentX + i, currentY + pitDepth, currentChunk.mainTiles, 4);
+						
 				}
 			}
-				
-			//FillUnder(currentX + width - 1, currentY, currentChunk.mainTiles, 4);
+			
+			
 			
 			currentX += width;
+		}
+		
+		public function AddCeiling(startX:int, floorElevation : int, width:int) : void {
+
+			if (ceilingHeight > 0 && ceilingHeight < 20) {
+				for (var i : int = startX; i < startX + width; i++) {
+					
+					if (caveWidth >= 10 || caveWidth <= 0) {
+						var rand : Number = FlxG.random();
+						if (ceilingHeight > 8) ceilingHeight -= 1;
+						else if (ceilingHeight < 8) ceilingHeight += 1;
+					}
+					FillAbove(i, floorElevation - ceilingHeight, currentChunk.mainTiles, 4);
+					
+					if (caveWidth > 0) {
+						FillUnder(i, 0, currentChunk.bgTiles, 36);
+						caveWidth --;
+					}
+					
+					else { 
+						ceilingHeight = 50;
+					}
+				}
+			}
+
 		}
 		
 		
@@ -241,6 +279,15 @@ package
 			
 		}
 		
+		public function GenCaveEnd() : void { 
+			while (ceilingHeight > 3) {
+				ceilingHeight -= 1;
+				GenFlat(1);
+			}
+			ceilingHeight = 0;
+			GenFlat(5);
+		}
+		
 		public function GenSpringboard() : void {
 			GenFlat(2);
 			var springboard : Springboard = new Springboard();
@@ -248,7 +295,7 @@ package
 		}
 		
 		//adds a platform of width w starting at sx,sy.  Crumble tiles will be used if crumble is specified
-		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false) {
+		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false, coins:Boolean = false) {
 			for (var x:int = sx; x < sx + w; x++) {
 				if (crumble) {
 					var ct : CrumbleTile = new CrumbleTile();
@@ -256,6 +303,9 @@ package
 				}
 				else {
 					currentChunk.mainTiles.setTile(x, sy, 8);
+				}
+				if (coins) {
+					addCollectible(x, sy - 1);
 				}
 			}
 		}
@@ -280,15 +330,41 @@ package
 
 		}
 		
+		public function AddCoinRect(left : int, top : int, right : int, bottom : int) : void {
+
+			if (left > right) {
+				var save : int = left;
+				left = right;
+				right = save;
+			}
+			if (top > bottom) {
+				var save : int = top; 
+				top = bottom;
+				bottom = save;
+			}
+			
+			for (var setX:int = left; setX <= right; setX++) {
+				for (var setY:int = top; setY <= bottom; setY++) {
+					addCollectible(setX, setY);
+				}
+			}
+		}
+		
 		public function addCollectible(x:int, y:int) : void{
 			var col : Collectible = new Collectible();
 			currentChunk.AddEntityAtTileCoords(col, x, y);
 			collectiblesLeft --;
 		}
 		
-		//fill all tiles under the specific tile.
-		protected function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 1) : void {
+		//fill all tiles under the specific tile (not including it).
+		protected function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 4) : void {
 			for (var y : int = sy + 1; y < CommonConstants.LEVELHEIGHT; y++) {
+				tiles.setTile(sx, y, fillTile);
+			}
+		}
+		//fill all tiles above the specific tile (not including it).
+		protected function FillAbove(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 4) : void {
+			for (var y : int = sy - 1; y >= 0; y--) {
 				tiles.setTile(sx, y, fillTile);
 			}
 		}

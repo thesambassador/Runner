@@ -16,7 +16,7 @@ package
 		
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
-			TestGenFunctions();
+			//TestGenFunctions();
 			midBuffer = 4;
 			//difficultyIncrease = 6;
 		}
@@ -33,6 +33,10 @@ package
 			genFunctionHelper.addFunction("OptionalSlide", GenOptionalSlide, 1, 3, "slide");
 			genFunctionHelper.addFunction("Drop", GenDrop, 1, 100, "yDown");
 			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 1, 100, "enemy");
+			genFunctionHelper.addFunction("GenCave", GenCave, 2, 100, "flat", 3);
+			
+			genFunctionHelper.addFunction("Pyramid", GenPyramid, 3, 6, "flat", 1);
+			genFunctionHelper.addFunction("BasicPlatforms", GenBasicPlatforms, 1, 5, "platform", 1);
 
 			genFunctionHelper.addFunction("AdvancedHurtle", GenAdvancedHurtle, 2, 6, "hurtle");
 
@@ -76,8 +80,11 @@ package
 		
 		//function to reset the function list and load a set of genfunctions for testing
 		public function TestGenFunctions() : void {
-			//genFunctions = new Array();
-		
+			genFunctionHelper = new GenFunctionHelper;
+			
+			genFunctionHelper.addFunction("flat", GenFlat, 1, 100, "flat", 1);
+			genFunctionHelper.addFunction("platofrm", GenPyramid, 1, 100, "platform", 1);
+			
 			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
 			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
 			//genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
@@ -95,6 +102,39 @@ package
 			GenFlat(50);
 			GenEnemyWalker();
 			GenFlat(currentChunk.widthInTiles - 65);
+		}
+		
+		public function GenBasicPlatforms() : void {
+			var startX : int = currentX;
+			
+			var height : int = 3;
+			var spacing : int = CommonFunctions.getRandom(1, 2);
+			var platformWidth : int = CommonFunctions.getRandom(2, 4);
+			var sidesCrumble : int = CommonFunctions.getRandom(0, 2);
+			
+			var coinPlatform = CommonFunctions.getRandom(1, 2);
+			
+			GenFlat(platformWidth * 3 + spacing * 2);
+			
+			AddPlatform(startX, currentY - height, platformWidth, sidesCrumble == 2);
+			AddPlatform(startX + platformWidth + spacing, currentY - 2 * height, platformWidth, sidesCrumble == 1, coinPlatform == 1);
+			AddPlatform(startX + platformWidth * 2 + 2 * spacing, currentY - height, platformWidth, sidesCrumble == 2, coinPlatform == 2);
+			
+		}
+		
+		public function GenCave() : void {
+			if (caveWidth > 0) return;
+			if ((levelHistoryType[levelHistoryType.length - 1] as GenFunction).name == "Pyramid") return;
+			
+			var width : int = CommonFunctions.getRandom(4, 8);
+			caveWidth = CommonFunctions.getRandom(30, 100);
+			
+			if (currentX + caveWidth > currentChunk.widthInTiles - 10) return;
+			
+			ceilingHeight = CommonFunctions.getRandom(2, 3);
+			
+			GenFlat(width);
+			
 		}
 		
 		public function GenEnemyJumper() : void {
@@ -153,9 +193,37 @@ package
 		}
 
 		public function GenAdvancedHurtle() : void {
+			if(difficulty <= 4){
+				addCollectible(currentX - 5, currentY -4);
+				addCollectible(currentX - 4, currentY -5);
+			}
+
 			GenHurtle(2);
 			GenFlat(2);
 			GenHurtle(4);
+		}
+		
+		public function GenPyramid() : void {
+			if (caveWidth > 0) return;
+			var startX : int = currentX;
+			var height : int = CommonFunctions.getRandom(2, 4);
+			var width : int = (height-1) * 2 + 1
+			
+			GenFlat(width);
+			
+			for (var i:int = 0;  i < height; i++) {
+				AddPlatform(startX + i, currentY - 1 - i, width - (2 * i));
+			}
+			
+			if (FlxG.random() > .6) {
+				var platHeight : int = currentY - height - 3;
+				AddPlatform(currentX + 3, platHeight, 1, 0);
+				AddCoinRect(currentX + 3, platHeight - 1, currentX + 3, platHeight - 2);
+				
+				platHeight -= 2;
+				AddPlatform(currentX + 12, platHeight, 1, 0);
+				AddCoinRect(currentX + 12, platHeight - 1, currentX + 12, platHeight - 2);
+			}
 		}
 		
 		public function GenFireball(h : int = 2, buffer : int = 10, seriesNum : int = 0) : void {
@@ -313,6 +381,7 @@ package
 		
 		//large gap that requires springboard usage to get over
 		public function GenSpringboardGap() : void {
+			if (caveWidth > 0) return;
 			var gapWidth : int = CommonFunctions.getRandom(10, 15);
 			if (gapWidth + 2 + currentX >= this.currentChunk.widthInTiles) return;
 			GenSpringboard();
@@ -369,13 +438,16 @@ package
 		}
 		
 		public function GenDrop() : void {
+			if(caveWidth > 0) 
 			if (this.currentY > CommonConstants.LEVELHEIGHT - 12) return;
 			var dropHeight : int = CommonFunctions.getRandom(2, 6);
+			ceilingHeight += dropHeight + 2;
 			currentY += dropHeight;
 
 		}
 		
 		public function GenSpringboardEasy() : void {
+			if (caveWidth > 0) return;
 			var cliffHeight : int = CommonFunctions.getRandom(5, 7);
 			if (currentY - cliffHeight < 10) return;
 

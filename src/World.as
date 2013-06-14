@@ -251,6 +251,10 @@ package
 						var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
 						top.y -= 32;
 						bottom.size = 10;
+						
+						CommonFunctions.addCoins(player.collectiblesCollected);
+						CommonFunctions.saveScore(player.score);
+						
 						player.lives --;
 					}
 					if (FlxG.keys.justPressed("R")) 
