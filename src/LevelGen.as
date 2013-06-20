@@ -35,10 +35,7 @@ package
 		
 		protected var collectiblesLeft : int = 20;  //how many more collectibles can be added to the level
 		protected var midBuffer : int = 5; //buffer between sections
-		
-		public var ceilingHeight : int = 19;
-		public var inCave : Boolean = false;
-		public var caveWidth : int = 0;
+
 		
 		public function LevelGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			currentX = 0;
@@ -67,9 +64,12 @@ package
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
 				var startX : int = currentX;
 				var gf : GenFunction = null;
+				
+				//increase difficulty throughout the level
 				if (currentX > (difficulty + 1 - startDifficulty) * (currentChunk.widthInTiles / (difficultyIncrease + 1))) {
 					difficulty ++;
 				}
+				
 				//get a random genfunction valid for our current difficulty
 				gf = genFunctionHelper.getRandomValidFunction(difficulty, "", lastName);
 
@@ -78,10 +78,10 @@ package
 				
 				gf.genFunction();
 				
-				//check to see if we actually generated a level section
-				
 				lastCategory = gf.category;
 				lastName = gf.name;
+				
+				currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
 				
 				if (currentY <= 0) {
 					currentY = 3;
@@ -89,10 +89,8 @@ package
 				else if (currentY > CommonConstants.LEVELHEIGHT) {
 					currentY = CommonConstants.LEVELHEIGHT - 3;
 				}
-				currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
-				GenFlat(midBuffer); 
 				
-				if (caveWidth <= 10 && caveWidth > 0) GenCaveEnd();
+				GenFlat(midBuffer); 
 			}
 			
 			//fill in the rest of the level with flatness
@@ -170,9 +168,6 @@ package
 			
 		}
 		
-		
-		
-		
 		protected function GenFlat(w:int = -1) : void {
 			var width : int ;
 			if(w == -1)
@@ -180,7 +175,7 @@ package
 			else
 				width = w;
 			
-			if (width + currentX > currentChunk.widthInTiles) return;
+			//if (width + currentX > currentChunk.widthInTiles) return;
 				
 			for (var x : int = currentX; x < width + currentX; x++) {
 				var setTile : int = 1;
@@ -195,8 +190,7 @@ package
 					currentChunk.FillSolidRect(currentChunk.bgTiles, x, backgroundPlatformHeight, x, currentY, 20);
 				}
 			}
-			
-			AddCeiling(currentX, currentY, width);
+
 			
 			currentX += width;
 		}
@@ -209,9 +203,7 @@ package
 				width = CommonFunctions.getRandom(4, 8);
 			else
 				width = w;
-	
-			AddCeiling(currentX, currentY, width);
-			
+
 			if (currentY < CommonConstants.LEVELHEIGHT - 6) {
 				var pitDepth : int = 7;
 				for (var i : int = 0; i < width; i++) {
@@ -225,31 +217,6 @@ package
 			
 			
 			currentX += width;
-		}
-		
-		public function AddCeiling(startX:int, floorElevation : int, width:int) : void {
-
-			if (ceilingHeight > 0 && ceilingHeight < 20) {
-				for (var i : int = startX; i < startX + width; i++) {
-					
-					if (caveWidth >= 10 || caveWidth <= 0) {
-						var rand : Number = FlxG.random();
-						if (ceilingHeight > 8) ceilingHeight -= 1;
-						else if (ceilingHeight < 8) ceilingHeight += 1;
-					}
-					FillAbove(i, floorElevation - ceilingHeight, currentChunk.mainTiles, 4);
-					
-					if (caveWidth > 0) {
-						FillUnder(i, 0, currentChunk.bgTiles, 36);
-						caveWidth --;
-					}
-					
-					else { 
-						ceilingHeight = 50;
-					}
-				}
-			}
-
 		}
 		
 		
@@ -279,14 +246,7 @@ package
 			
 		}
 		
-		public function GenCaveEnd() : void { 
-			while (ceilingHeight > 3) {
-				ceilingHeight -= 1;
-				GenFlat(1);
-			}
-			ceilingHeight = 0;
-			GenFlat(5);
-		}
+		
 		
 		public function GenSpringboard() : void {
 			GenFlat(2);

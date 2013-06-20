@@ -33,7 +33,6 @@ package
 			genFunctionHelper.addFunction("OptionalSlide", GenOptionalSlide, 1, 3, "slide");
 			genFunctionHelper.addFunction("Drop", GenDrop, 1, 100, "yDown");
 			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 1, 100, "enemy");
-			genFunctionHelper.addFunction("GenCave", GenCave, 2, 100, "flat", 3);
 			
 			genFunctionHelper.addFunction("Pyramid", GenPyramid, 3, 6, "flat", 1);
 			genFunctionHelper.addFunction("BasicPlatforms", GenBasicPlatforms, 1, 5, "platform", 1);
@@ -83,7 +82,7 @@ package
 			genFunctionHelper = new GenFunctionHelper;
 			
 			genFunctionHelper.addFunction("flat", GenFlat, 1, 100, "flat", 1);
-			genFunctionHelper.addFunction("platofrm", GenPyramid, 1, 100, "platform", 1);
+			genFunctionHelper.addFunction("platofrm", GenEnemyWalker, 1, 100, "platform", 1);
 			
 			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
 			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
@@ -119,21 +118,6 @@ package
 			AddPlatform(startX, currentY - height, platformWidth, sidesCrumble == 2);
 			AddPlatform(startX + platformWidth + spacing, currentY - 2 * height, platformWidth, sidesCrumble == 1, coinPlatform == 1);
 			AddPlatform(startX + platformWidth * 2 + 2 * spacing, currentY - height, platformWidth, sidesCrumble == 2, coinPlatform == 2);
-			
-		}
-		
-		public function GenCave() : void {
-			if (caveWidth > 0) return;
-			if ((levelHistoryType[levelHistoryType.length - 1] as GenFunction).name == "Pyramid") return;
-			
-			var width : int = CommonFunctions.getRandom(4, 8);
-			caveWidth = CommonFunctions.getRandom(30, 100);
-			
-			if (currentX + caveWidth > currentChunk.widthInTiles - 10) return;
-			
-			ceilingHeight = CommonFunctions.getRandom(2, 3);
-			
-			GenFlat(width);
 			
 		}
 		
@@ -193,9 +177,11 @@ package
 		}
 
 		public function GenAdvancedHurtle() : void {
-			if(difficulty <= 4){
-				addCollectible(currentX - 5, currentY -4);
-				addCollectible(currentX - 4, currentY -5);
+			if (difficulty <= 4) {
+				if(currentChunk.mainTiles.getTile(currentX-5, currentY-4) == 0){
+					addCollectible(currentX - 5, currentY -4);
+					addCollectible(currentX - 4, currentY -5);
+				}
 			}
 
 			GenHurtle(2);
@@ -204,7 +190,6 @@ package
 		}
 		
 		public function GenPyramid() : void {
-			if (caveWidth > 0) return;
 			var startX : int = currentX;
 			var height : int = CommonFunctions.getRandom(2, 4);
 			var width : int = (height-1) * 2 + 1
@@ -381,7 +366,6 @@ package
 		
 		//large gap that requires springboard usage to get over
 		public function GenSpringboardGap() : void {
-			if (caveWidth > 0) return;
 			var gapWidth : int = CommonFunctions.getRandom(10, 15);
 			if (gapWidth + 2 + currentX >= this.currentChunk.widthInTiles) return;
 			GenSpringboard();
@@ -438,16 +422,13 @@ package
 		}
 		
 		public function GenDrop() : void {
-			if(caveWidth > 0) 
 			if (this.currentY > CommonConstants.LEVELHEIGHT - 12) return;
 			var dropHeight : int = CommonFunctions.getRandom(2, 6);
-			ceilingHeight += dropHeight + 2;
 			currentY += dropHeight;
 
 		}
 		
 		public function GenSpringboardEasy() : void {
-			if (caveWidth > 0) return;
 			var cliffHeight : int = CommonFunctions.getRandom(5, 7);
 			if (currentY - cliffHeight < 10) return;
 

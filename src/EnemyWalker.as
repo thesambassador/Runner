@@ -106,17 +106,21 @@ package
 		}
 		
 		override public function collidePlayer(player : Player) : void {
-			if(player.state != "respawn"){
-				if (player.y + player.height < this.y + 13 && this.health > 0) {
-					FlxG.play(enemyKillSound); 
-					this.health = 0;
-					player.Bounce( -150, -400);
-					player.addScore(200);
-				}
-				else if(health > 0){
-					player.hurt(1);
-				}
+			var playerBounce : Boolean = player.y + player.height < this.y + 10 && this.health > 0;
+			
+			if (playerBounce) {
+				player.Bounce( -150, -400);
 			}
+			
+			if (playerBounce || player.invulnerable) {
+				FlxG.play(enemyKillSound); 
+				this.health = 0;
+				player.addScore(200);
+			}
+			else if(health > 0){
+				player.hurt(1);
+			}
+
 			else {
 				
 				this.health = 0;

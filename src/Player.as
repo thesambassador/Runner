@@ -1,5 +1,6 @@
 package 
 {
+	import flash.geom.ColorTransform;
 	import flash.utils.Dictionary;
 	import org.flixel.*;
 	import org.flixel.system.FlxAnim;
@@ -67,6 +68,9 @@ package
 		
 		public var playerEffect : PlayerEffects;
 		public var currentPlatform : MovingPlatform;
+		
+		public var invulnFlashValue : Number = 0;
+		public var invulnFlashDirection : Number = .1;
 
 		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
@@ -130,7 +134,28 @@ package
 			if (FlxG.keys.justPressed("K")) this.health = 0;
 			
 			
-			if(invulnerable > 0) invulnerable -= 1;
+			if (invulnerable > 0) {
+				invulnerable -= 1;
+				invulnFlashValue += invulnFlashDirection;
+				
+				_colorTransform = new ColorTransform();
+				_colorTransform.blueOffset = 255 * invulnFlashValue;
+				_colorTransform.redOffset = 255 * invulnFlashValue;
+				_colorTransform.greenOffset = 255 * invulnFlashValue;
+				
+				if (invulnFlashValue <= 0) {
+					invulnFlashDirection = .05;
+				}
+				else if(invulnFlashValue >= 1){
+					invulnFlashDirection = -.05;
+				}
+				
+				
+			}
+			else {
+				alpha = 1;
+				_colorTransform = null;
+			}
 			totalFrames ++;
 			//reset acceleration and apply gravity
 			this.acceleration.x = 0;
@@ -210,6 +235,8 @@ package
 		
 		override public function kill() : void {
 			super.kill();
+			this.health = 0;
+			this.invulnerable = 60;
 			FlxG.play(deathSound);
 			FlxG.state.add(PlayerEffects.deathByFire(this.x, this.y, playerSprites));
 		}
@@ -223,7 +250,7 @@ package
 			visibleTimer.start(1, 1, makeVisible);
 			
 			var respawnTimer : FlxTimer = new FlxTimer();
-			respawnTimer.start(1, 1.5, finishRespawn);
+			respawnTimer.start(1, 1, finishRespawn);
 			
 			//this.visible = false;
 			FlxG.play(respawnSound);
@@ -301,6 +328,7 @@ package
 		
 		override public function hurt(damage : Number) : void{
 			if (invulnerable == 0) super.hurt(damage);
+			
 		}
 
 		
@@ -509,7 +537,6 @@ package
 				this.velocity.y = big;
 			else
 				this.velocity.y = small;
-			this.invulnerable = 1;
 		}
 		
 		public function collectCollectible(c : Collectible) : void {
@@ -552,8 +579,14 @@ package
 			//var overheadPointVel : FlxPoint = new FlxPoint(this.x + 14 + this.velocity.x, this.y + this.height - 18);
 			
 			try{
-				if (collided.overlapsPoint(overheadPointL) || collided.overlapsPoint(overheadPointR) || collided.overlapsPoint(overheadPointFuture)) {
+				if (collided.overlapsPoint(overheadPointL) || collided.overlapsPoint(overheadPointR)) {
 					return false;
+					
+				}
+				if (this.velocity.x != 0) {
+					if (collided.overlapsPoint(overheadPointFuture)) {
+						return false;
+					}
 				}
 			}
 			catch (e:Error) {

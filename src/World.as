@@ -270,7 +270,7 @@ package
 						//camera.targetPoint.x += camera.xOffset;
 						//camera.forwardY = camera.targetPoint.y;
 						levelEndTimer = new FlxTimer();
-						levelEndTimer.start(1, 1, RestartLevel);
+						levelEndTimer.start(.5, 1, RestartLevel);
 					}
 					//RestartLevel(levelEndTimer);
 				}
@@ -341,7 +341,7 @@ package
 			
 			entities.callAll("ResetToOriginal");
 			
-			FlxG.overlap(player, entities, clearCollided);
+			//FlxG.overlap(player, entities, clearCollided);
 				
 			
 		}

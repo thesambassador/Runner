@@ -121,9 +121,14 @@ package
 		}
 		
 		override public function collidePlayer(player : Player) : void {
-			if (player.y + player.height < this.y + 10) {
-				this.health = 0;
+			var playerBounce : Boolean = player.y + player.height < this.y + 10 && this.health > 0;
+			
+			if (playerBounce) {
 				player.Bounce( -150, -400);
+			}
+			
+			if (playerBounce || player.invulnerable) {
+				this.health = 0;
 				player.addScore(500);
 				FlxG.play(enemyKillSound);
 			}
