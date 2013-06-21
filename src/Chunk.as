@@ -430,6 +430,29 @@ package
 				tiles.setTile(sx, y, fillTile);
 			}
 		}
+		
+		//checks a rectangular area to see if there are any non-0 tiles there
+		public static function CheckIfBoxIsEmpty(left:int, top:int, right:int, bottom:int, tileset:FlxTilemap) : Boolean {
+			if (left > right) {
+				var save : int = left;
+				left = right;
+				right = save;
+			}
+			if (top > bottom) {
+				var save : int = top; 
+				top = bottom;
+				bottom = save;
+			}
+			
+			for (var setX:int = left; setX <= right; setX++) {
+				for (var setY:int = top; setY <= bottom; setY++) {
+					if (tileset.getTile(setX, setY) != 0) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
 	}
 
 }

@@ -11,7 +11,7 @@ package
 	{
 		public static var endBuffer : int = 15; //stop generating level pieces once we get to total width of the level minus endBuffer.
 		
-		public var levelHistoryType : Array; //remembers each generated chunk type
+		public var levelHistoryType : Vector.<GenFunction>; //remembers each generated chunk type
 		public var levelHistoryX : Array // remembers each generated chunk's starting x position
 		
 		public var currentX : int; //tile coords
@@ -47,7 +47,7 @@ package
 			startDifficulty = startingDifficulty;
 			//diffWidth = width / difficultyIncrease;
 			
-			levelHistoryType = new Array();
+			levelHistoryType = new Vector.<GenFunction>();
 			levelHistoryX = new Array();
 			
 			genFunctionHelper = new GenFunctionHelper();
@@ -88,7 +88,7 @@ package
 					levelHistoryX.push(currentX);
 					levelHistoryType.push(gf);
 					
-					currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
+					currentChunk.safeZones.push(new FlxPoint(currentX-2, currentY));
 					
 					if (currentY < 10) {
 						currentY = 10;
@@ -276,6 +276,11 @@ package
 			for (var y : int = sy - 1; y >= 0; y--) {
 				tiles.setTile(sx, y, fillTile);
 			}
+		}
+		
+		public function checkPreviousType() : String {
+			if (levelHistoryType.length == 0) return "";
+			else return levelHistoryType[levelHistoryType.length - 1].name;
 		}
 		
 		protected function GetDifficulty() : int{

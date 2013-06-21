@@ -76,14 +76,16 @@ package
 			//genFunctions.push(new GenFunction(GenMultiLevel, 3, 10, "multiLevel"));
 
 		}
+		
 
 		
 		//function to reset the function list and load a set of genfunctions for testing
 		public function TestGenFunctions() : void {
 			genFunctionHelper = new GenFunctionHelper;
 			
-			genFunctionHelper.addFunction("flat", GenFlat, 1, 100, "flat", 1);
-			genFunctionHelper.addFunction("FloorFireball", GenLargeGap, 1, 100, "platform", 1);
+			//genFunctionHelper.addFunction("Slide", GenSlide, 1, 100, "flat", 1);
+			genFunctionHelper.addFunction("GenSpringboardEasy", GenSpringboardEasy, 1, 100, "yUp", 1);
+			genFunctionHelper.addFunction("Flat", GenFlat, 1, 100, "platform", 1);
 			
 			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
 			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
@@ -129,18 +131,22 @@ package
 			currentChunk.AddEntityAtTileCoords(jumper, startX + 2, currentY - 1); 
 		}
 		
-		public function GenEnemyWalker() : void {
+		public function GenEnemyWalker(coinChange : Number = 0) : void {
 			var en : EnemyWalker = new EnemyWalker();
 
 			GenFlat(2);
 
+			if (FlxG.random() < coinChange) {
+				AddCoinArch(currentX + 1, currentY - 7, 4);
+			}
+			
 			currentChunk.AddEntityAtTileCoords(en, currentX-1, currentY - 2);
 
 		}
 
 		public function GenTripleEnemy() : void {
 			GenEnemyWalker();
-			GenEnemyWalker();
+			GenEnemyWalker(.5);
 			GenEnemyWalker();
 			
 		}
@@ -156,7 +162,12 @@ package
 		public function GenSlide() : void {
 			var startX : int = currentX;
 			GenFlat(3);
-			currentChunk.FillSolid(startX + 1, currentY - 6, 1, 5, 8);
+			currentChunk.FillSolid(startX + 1, currentY - 5, 1, 4, 8);
+			
+			var prevType : String = checkPreviousType();
+			if (prevType == "Drop" || prevType == "EnemyWalker") {
+				AddCoinRect(startX + 1, currentY - 7, startX + 1, currentY - 6); 
+			}
 		}
 		
 		public function GenHurtle(h : int = -1) : void {
@@ -174,17 +185,17 @@ package
 
 			currentChunk.FillSolid(startX + 1, currentY - height, 2, height, 8);
 
-
 		}
 
 		public function GenAdvancedHurtle() : void {
 			if (difficulty <= 4) {
-				if(currentChunk.mainTiles.getTile(currentX-5, currentY-4) == 0){
-					addCollectible(currentX - 5, currentY -4);
-					addCollectible(currentX - 4, currentY -5);
+				if(currentChunk.mainTiles.getTile(currentX-1, currentY-4) == 0){
+					addCollectible(currentX - 1, currentY -4);
+					addCollectible(currentX, currentY -5);
 				}
 			}
-
+			
+			GenFlat(4);
 			GenHurtle(2);
 			GenFlat(2);
 			GenHurtle(4);
@@ -437,12 +448,16 @@ package
 		}
 		
 		public function GenSpringboardEasy() : void {
-			var cliffHeight : int = CommonFunctions.getRandom(5, 7);
+			var cliffHeight : int = CommonFunctions.getRandom(3, 5);
 			if (currentY - cliffHeight < 10) return;
 
 			GenSpringboard();
 			GenFlat(6);
 			currentY -= cliffHeight;
+			
+			if (FlxG.random() < .5) {
+				AddCoinArch(currentX - 1, currentY + cliffHeight - 10, 3);
+			}
 		}
 		
 		
