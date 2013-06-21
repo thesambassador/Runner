@@ -16,7 +16,7 @@ package
 		
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
-			//TestGenFunctions();
+			TestGenFunctions();
 			midBuffer = 4;
 			//difficultyIncrease = 6;
 		}
@@ -77,12 +77,17 @@ package
 
 		}
 		
+		public function FloorFireball() : void {
+			GenFlat(4);
+			GenFireball(0);
+		}
+		
 		//function to reset the function list and load a set of genfunctions for testing
 		public function TestGenFunctions() : void {
 			genFunctionHelper = new GenFunctionHelper;
 			
 			genFunctionHelper.addFunction("flat", GenFlat, 1, 100, "flat", 1);
-			genFunctionHelper.addFunction("platofrm", GenEnemyWalker, 1, 100, "platform", 1);
+			genFunctionHelper.addFunction("FloorFireball", GenLargeGap, 1, 100, "platform", 1);
 			
 			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
 			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
@@ -332,6 +337,10 @@ package
 			for (var i:int = 0; i < numPlatforms; i++) {
 				startX += jumpWidths[i];
 				currentY += jumpHeights[i];
+				
+				while (currentChunk.mainTiles.getTile(startX, currentY) != 0) {
+					currentY--;
+				}
 				
 				AddPlatform(startX, currentY, 2);
 

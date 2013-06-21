@@ -27,6 +27,8 @@ package
 		public var lastName : String = "";
 		public var bannedCategory : String = "";
 		
+		public var pitDepth = 7;
+		
 		public var currentChunk : Chunk; //current chunk we're operating on, generated when we create the LevelGen object
 		
 		public var difficulty : int;
@@ -205,7 +207,6 @@ package
 				width = w;
 
 			if (currentY < CommonConstants.LEVELHEIGHT - 6) {
-				var pitDepth : int = 7;
 				for (var i : int = 0; i < width; i++) {
 					var x = currentX + i;
 					currentChunk.mainTiles.setTile(currentX + i, currentY + pitDepth, 16);
