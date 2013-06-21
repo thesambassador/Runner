@@ -477,6 +477,7 @@ package
 		}
 		
 		public function finishRespawn(poop:FlxTimer) : void {
+			this.setBoundHeight(31);
 			changeState("ground");
 		}
 		
