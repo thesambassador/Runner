@@ -65,6 +65,7 @@ package
 		public function GenerateLevel() : Chunk {
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
 				var startX : int = currentX;
+				var startY : int = currentY;
 				var gf : GenFunction = null;
 				
 				//increase difficulty throughout the level
@@ -74,25 +75,28 @@ package
 				
 				//get a random genfunction valid for our current difficulty
 				gf = genFunctionHelper.getRandomValidFunction(difficulty, "", lastName);
-
-				levelHistoryX.push(currentX);
-				levelHistoryType.push(gf);
 				
 				gf.genFunction();
 				
-				lastCategory = gf.category;
-				lastName = gf.name;
+				//check if we actually generated something
+				if(currentX != startX || startY != currentY){
+					GenFlat(midBuffer); 
 				
-				currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
-				
-				if (currentY <= 0) {
-					currentY = 3;
+					lastCategory = gf.category;
+					lastName = gf.name;
+					
+					levelHistoryX.push(currentX);
+					levelHistoryType.push(gf);
+					
+					currentChunk.safeZones.push(new FlxPoint(currentX, currentY));
+					
+					if (currentY < 10) {
+						currentY = 10;
+					}
+					else if (currentY > CommonConstants.LEVELHEIGHT - 10) {
+						currentY = CommonConstants.LEVELHEIGHT - 10;
+					}
 				}
-				else if (currentY > CommonConstants.LEVELHEIGHT) {
-					currentY = CommonConstants.LEVELHEIGHT - 3;
-				}
-				
-				GenFlat(midBuffer); 
 			}
 			
 			//fill in the rest of the level with flatness
@@ -108,67 +112,11 @@ package
 			}
 			
 			currentChunk.Decorate();
-			AddRewardPathways();
 			
 			return currentChunk;
 		}
 	
-		//goes through and adds harder paths to parts of the level to add variety
-		protected function AddRewardPathways() : void {
-			var validIndices : Array = new Array();
-			
-			//2 high coin areas per level
-			//find valid places for higher coins (enemies, springboards, drops, hurtles)
-			for (var i : int = 0; i < levelHistoryType.length; i++) {
-				var gf : GenFunction = levelHistoryType[i] as GenFunction;
-				if (gf.category == "enemy" || gf.category == "yDown" || gf.category == "hurtle") {
-					validIndices.push(i);
-				}
-			}
-			//add some higher coins to a random 3 of these
-			for (var i : int = 0; i < 3; i++) {
-				if(validIndices.length > 0){
-					var index = FlxG.getRandom(validIndices);
-					var x = levelHistoryX[index];
-					
-					AddHighCoins(index);
-					validIndices.splice(validIndices.lastIndexOf(index), 1);
-					//remove other valid locations that are close to the one that we just used
-					for (var j : int = 0; j < validIndices.length; j++) {
-						var otherX : int = levelHistoryX[j] as int;
-						if (Math.abs(x - otherX) < 20) {
-							validIndices.splice(j, 1);
-						}
-					}
 
-				}
-			}
-			
-		}
-		
-
-		
-		protected function AddHighCoins(index : int) {
-			var gf : GenFunction = levelHistoryType[index] as GenFunction;
-			var startX : int = levelHistoryX[index] as int;
-			var elevation : int = currentChunk.heightmap[startX];
-			
-			if (gf.category == "enemy") {
-				AddCoinArch(startX, elevation - 7, 4);
-			}
-			else if (gf.name == "AdvancedHurtle") {
-				AddCoinArch(startX + 12, elevation - 9, 4);
-			}
-			else if (gf.name == "Hurtle") {
-				AddCoinArch(startX + 5, elevation - 7, 3);
-			}
-			else if (gf.category == "yDown") {
-				if(startX > 0)
-					elevation = currentChunk.heightmap[startX - 1];
-				AddCoinArch(startX + 3, elevation - 4, 3);
-			}
-			
-		}
 		
 		protected function GenFlat(w:int = -1) : void {
 			var width : int ;

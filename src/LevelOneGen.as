@@ -16,7 +16,7 @@ package
 		
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
-			TestGenFunctions();
+			//TestGenFunctions();
 			midBuffer = 4;
 			//difficultyIncrease = 6;
 		}
@@ -76,11 +76,7 @@ package
 			//genFunctions.push(new GenFunction(GenMultiLevel, 3, 10, "multiLevel"));
 
 		}
-		
-		public function FloorFireball() : void {
-			GenFlat(4);
-			GenFireball(0);
-		}
+
 		
 		//function to reset the function list and load a set of genfunctions for testing
 		public function TestGenFunctions() : void {
@@ -352,6 +348,7 @@ package
 		
 		//slide, followed by a gap
 		public function GenSlideJump() : void {
+			if (currentY < 10) return;
 			GenSlide();
 			GenFlat(1);
 			GenGap(6);
@@ -361,7 +358,9 @@ package
 		
 		//set of short jumps with gaps between them
 		public function GenGapHurtle() : void {
-			var numJumps : int = CommonFunctions.getRandom(3, 5);
+			if (currentY < 10) return;
+			
+			var numJumps : int = CommonFunctions.getRandom(2, 4);
 			for (var i:int = 0; i < numJumps; i++) {
 				var gapWidth : int = CommonFunctions.getRandom(2, 4);
 				var gapHeight : int = FlxG.getRandom([-2, 2, -3]) as int;
@@ -386,7 +385,7 @@ package
 		//{ Elevation change obstacles
 		//functions that will mess with the elevation
 		public function GenSlope() : void {
-			if (this.currentY < 5) return;
+			if (this.currentY < 10) return;
 			var numSteps : int = CommonFunctions.getRandom(1, 3);
 
 			for (var i:int = 0; i < numSteps; i++) {
