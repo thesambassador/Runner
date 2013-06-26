@@ -15,6 +15,8 @@ package
 		public var currentAngle : Number = 0;
 		public var speed : Number = 180;
 		
+		public var activationTargetX : int;
+		
 		public var targetX : Number;
 		public var targetY : Number;
 		public var distance : Number;
@@ -38,8 +40,14 @@ package
 		override public function checkActivation() : void {
 			var playerX : int = FlxG.worldBounds.left + 256;
 			
-			if (this.targetX - playerX < activationDistance) 
+			if (!activated) {
+				currentAngle = 0;
 				activated = true;
+			}
+			
+			
+			//if (this.targetX - playerX < activationDistance) 
+			//	activated = true;
 		}
 		
 		override public function setX(desiredX : Number) : void{
@@ -49,7 +57,7 @@ package
 		
 		override public function ResetToOriginal() : void {
 			super.ResetToOriginal();
-			currentAngle = 0;
+			//currentAngle = 0;
 		}
 		
 		override public function behavior() : void {
@@ -79,6 +87,10 @@ package
 		
 		override public function collidePlayer(player : Player) : void {
 			player.hurt(1);
+		}
+		
+		override public function PausedState() : void {
+			behavior();
 		}
 	}
 

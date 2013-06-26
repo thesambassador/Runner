@@ -14,7 +14,7 @@ package
 			genFunctions = new Array();
 		}
 		
-		public function addFunction(name : String, funct : Function, minD : int, maxD : int, cat : String, weight:int = 1) {
+		public function addFunction(name : String, funct : Function, minD : int, maxD : int, cat : String, weight:int = 1) : void {
 			for (var i : int = 0; i < weight; i++)
 				genFunctions.push(new GenFunction(name, funct, minD, maxD, cat));
 		}

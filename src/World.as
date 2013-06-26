@@ -193,10 +193,15 @@ package
 		
 		override public function update():void 
 		{
-			monsterVel = 250 * ((player.x - monsterX) / maxMonsterDistance);
+			var monsterDist : Number = Math.abs(player.x - monsterX);
+			monsterVel = 300 * (monsterDist / maxMonsterDistance);
 			if (monsterVel < minMonsterVelocity) {
 				monsterVel = minMonsterVelocity;
 			}
+			if (monsterDist < 50) {
+				monsterVel = 150;
+			}
+			
 			monsterX += monsterVel * FlxG.elapsed;
 			if (monsterX > player.x  && player.alive) {
 				player.lives = 0;

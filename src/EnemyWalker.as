@@ -112,7 +112,7 @@ package
 				player.Bounce( -150, -400);
 			}
 			
-			if (playerBounce || player.invulnerable) {
+			if (this.health > 0 && (playerBounce || player.invulnerable)) {
 				FlxG.play(enemyKillSound); 
 				this.health = 0;
 				player.addScore(200);

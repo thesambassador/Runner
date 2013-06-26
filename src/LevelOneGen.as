@@ -21,6 +21,21 @@ package
 			//difficultyIncrease = 6;
 		}
 		
+		//function to reset the function list and load a set of genfunctions for testing
+		public function TestGenFunctions() : void {
+			genFunctionHelper = new GenFunctionHelper;
+			
+			//genFunctionHelper.addFunction("Slide", GenSlide, 1, 100, "flat", 1);
+			genFunctionHelper.addFunction("GenDeathTunnel", GenDeathTunnel, 1, 100, "flat2", 1);
+			genFunctionHelper.addFunction("Flat", GenFlat, 1, 100, "flat", 1);
+			genFunctionHelper.addFunction("Flat2", GenFlat, 1, 100, "flat3", 1);
+			
+			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
+			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
+			//genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
+
+		}
+		
 		//populates the gen function helper with the genfunctions that we'll use in this level
 		override public function InitializeGenFunctions() : void 
 		{
@@ -54,10 +69,10 @@ package
 			genFunctionHelper.addFunction("OnePlatformGap", GenOnePlatformGap , 3, 5, "gap");
 			
 			genFunctionHelper.addFunction("GapHurtle", GenGapHurtle , 6, 100, "gap");
+			genFunctionHelper.addFunction("LowHeightGap", GenLowHeightGap , 6, 100, "gap");
 			genFunctionHelper.addFunction("TripleEnemy", GenTripleEnemy, 6, 100, "enemy");
 			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 6, 100, "enemy");
 			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 6, 100, "enemy");
-			genFunctionHelper.addFunction("BalloonGap", BalloonGap, 6, 100, "gap");
 			genFunctionHelper.addFunction("BalloonGap", BalloonGap, 6, 100, "gap");
 
 			genFunctionHelper.addFunction("OneCrumblePlatformGap", GenOneCrumblePlatformGap , 6, 100, "gap");
@@ -71,6 +86,8 @@ package
 			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 15, 100, "gap");
 			genFunctionHelper.addFunction("FireballBarrage", GenFireballBarrage, 11, 100, "hazard");
 			genFunctionHelper.addFunction("FireballBarrage", GenFireballBarrage, 11, 100, "hazard");
+			genFunctionHelper.addFunction("DeathTunnel", GenDeathTunnel, 11, 100, "hazard");
+			genFunctionHelper.addFunction("DeathTunnel", GenDeathTunnel, 12, 100, "hazard");
 
 
 			//genFunctions.push(new GenFunction(GenMultiLevel, 3, 10, "multiLevel"));
@@ -79,19 +96,7 @@ package
 		
 
 		
-		//function to reset the function list and load a set of genfunctions for testing
-		public function TestGenFunctions() : void {
-			genFunctionHelper = new GenFunctionHelper;
-			
-			//genFunctionHelper.addFunction("Slide", GenSlide, 1, 100, "flat", 1);
-			genFunctionHelper.addFunction("GenSpringboardEasy", GenSpringboardEasy, 1, 100, "yUp", 1);
-			genFunctionHelper.addFunction("Flat", GenFlat, 1, 100, "platform", 1);
-			
-			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
-			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
-			//genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
-
-		}
+		
 		//} end Constructors/Initialization
 		
 		//{ Level Generation Functions
@@ -132,6 +137,8 @@ package
 		}
 		
 		public function GenEnemyWalker(coinChange : Number = 0) : void {
+			if (lastCategory == "slide") return;
+			
 			var en : EnemyWalker = new EnemyWalker();
 
 			GenFlat(2);
@@ -201,9 +208,9 @@ package
 			GenHurtle(4);
 		}
 		
-		public function GenPyramid() : void {
+		public function GenPyramid(height:int = -1) : void {
 			var startX : int = currentX;
-			var height : int = CommonFunctions.getRandom(2, 4);
+			if(height == -1) height = CommonFunctions.getRandom(2, 4);
 			var width : int = (height-1) * 2 + 1
 			
 			GenFlat(width);
@@ -238,18 +245,52 @@ package
 			
 		}
 		
-		public function GenFlameStick() : void {
+		public function GenFlameStick(length : int = 4) : void {
 			GenFlat(4);
 			var targetX : int = currentX - 2;
 			var targetY : int = currentY;
 			currentChunk.mainTiles.setTile(targetX, targetY, 9);
-			
-			var length : int = 4;
+
 			for (var i:int = 0; i < length; i++) {
 				var fireball : RotatingFlame = new RotatingFlame(targetX * CommonConstants.TILEWIDTH, targetY * CommonConstants.TILEHEIGHT, (i + 1) * 16);
 				currentChunk.AddEntityAtTileCoords(fireball, targetX + 1 + i, targetY);
 			}
 			
+		}
+		
+		public function AddFlameStick(x:int, y:int, length:int, speed:int = 180) {
+			for (var i:int = 0; i < length; i++) {
+				var fireball : RotatingFlame = new RotatingFlame(x * CommonConstants.TILEWIDTH, y * CommonConstants.TILEHEIGHT, (i + 1) * 16, speed);
+
+				currentChunk.AddEntityAtTileCoords(fireball, x + 1 + i, y);
+			}
+		}
+		
+		public function GenDeathTunnel() : void {
+			if (currentX + 19 > currentChunk.widthInTiles - 10) return;
+			var startX : int = currentX;
+			GenFlat(20);
+			
+			currentChunk.mainTiles.setTile(startX, currentY - 1, 8);
+			currentChunk.mainTiles.setTile(startX + 1, currentY - 1, 8);
+			currentChunk.mainTiles.setTile(startX + 1, currentY - 2, 8);
+			currentChunk.FillSolidRect(currentChunk.mainTiles, startX + 2, currentY - 3, startX + 17, currentY - 1, 8);
+			currentChunk.FillSolidRect(currentChunk.mainTiles, startX + 2, currentY - 8, startX + 17, currentY - 30, 8);
+			
+			currentChunk.mainTiles.setTile(startX + 18, currentY - 1, 8);
+			currentChunk.mainTiles.setTile(startX + 18, currentY - 2, 8);
+			currentChunk.mainTiles.setTile(startX + 19, currentY - 1, 8);
+			
+			if(FlxG.random() <= .5){
+				AddFlameStick(startX + 5, currentY - 3, 3);
+				AddFlameStick(startX + 9, currentY - 8, 3);
+				AddFlameStick(startX + 14, currentY - 3, 3);
+			}
+			else {
+				AddFlameStick(startX + 5, currentY - 8, 3);
+				AddFlameStick(startX + 9, currentY - 3, 3);
+				AddFlameStick(startX + 14, currentY - 8, 3);
+			}
 		}
 		
 		
@@ -293,6 +334,12 @@ package
 		//Same as GenOnePlatformGap, but with crumble-tiles instead
 		public function GenOneCrumblePlatformGap() : void {
 			GenOnePlatformGap(true);
+		}
+		
+		public function GenLowHeightGap() : void {
+			GenGap(4);
+			currentChunk.FillSolidRect(currentChunk.mainTiles, currentX - 3, currentY - 6, currentX - 2, currentY - 15, 8);
+			currentChunk.FillSolidRect(currentChunk.mainTiles, currentX - 3, currentY - 5, currentX - 2, currentY - 5, 17);
 		}
 		
 		//A gap covered by crumble tiles
@@ -461,7 +508,7 @@ package
 		}
 		
 		
-		//} end Election change obstacles
+		//} end Elevation change obstacles
 
 		//{ Helper functions
 		

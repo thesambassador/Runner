@@ -68,7 +68,11 @@ package
 			playerIndicator.loadGraphic(trangleImage, true, false, 16, 16);
 			//playerIndicator.offset.x -= player.width / 2;
 			playerIndicator.color = 0xFF0000FF;
+			playerIndicator.x = CommonConstants.VISIBLEWIDTH - rightMargin - playerIndicator.width;
+			
 			add(playerIndicator);
+			
+			
 			
 			chaseIndicator = new FlxSprite(leftMargin, CommonConstants.WINDOWHEIGHT / 2 - 2 * bottomMargin - 5);
 			chaseIndicator.loadGraphic(trangleImage, true, false, 16, 16);
@@ -114,14 +118,14 @@ package
 			var barScale : Number = World.levelWidth * CommonConstants.TILEWIDTH
 			
 			if (playerGain > barScale) {
-				playerIndicator.x = CommonConstants.VISIBLEWIDTH - rightMargin - playerIndicator.width;
+				chaseIndicator.x = leftMargin; // CommonConstants.VISIBLEWIDTH - rightMargin - playerIndicator.width;
 			}
 			else if (playerGain <= 0) {
-				playerIndicator.x = leftMargin;
+				chaseIndicator.x = CommonConstants.VISIBLEWIDTH - rightMargin - chaseIndicator.width;
 			}
 			else {
-				var targetX : int = (playerGain / barScale) * (CommonConstants.VISIBLEWIDTH - leftMargin - rightMargin) + leftMargin;
-				playerIndicator.x = targetX;
+				var targetX : int = (1 - playerGain / barScale) * (CommonConstants.VISIBLEWIDTH - rightMargin - chaseIndicator.width - leftMargin) + leftMargin;
+				chaseIndicator.x = targetX;
 			}
 			
 			

@@ -104,10 +104,12 @@ package
 				if (playerRef.alive && actualPoint.y + halfHeight < playerRef.y + 32) {
 					targetPoint.y += 10;  
 					focusY += 10;
+					forwardY += 1;
 				}
 				else if (playerRef.alive && actualPoint.y - halfHeight > playerRef.y) {
 					targetPoint.y -= 10;  
 					focusY -= 10;
+					forwardY -= 1;
 				}
 				else {
 					focusY = forwardY;

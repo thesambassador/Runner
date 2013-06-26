@@ -77,6 +77,7 @@ package
 			mainTiles.setTileProperties(middle, FlxObject.NONE);
 			mainTiles.setTileProperties(right, FlxObject.NONE);
 			mainTiles.setTileProperties(spike, FlxObject.ANY, CommonFunctions.killPlayer);
+			mainTiles.setTileProperties(spike+1, FlxObject.ANY, CommonFunctions.killPlayer);
 			
 			safeZones = new Array();
 		}

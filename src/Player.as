@@ -327,7 +327,7 @@ package
 		}
 		
 		override public function hurt(damage : Number) : void{
-			if (invulnerable == 0) super.hurt(damage);
+			if (invulnerable == 0 || state != "levelEnd") super.hurt(damage);
 			
 		}
 
