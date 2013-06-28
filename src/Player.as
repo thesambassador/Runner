@@ -133,6 +133,9 @@ package
 		{
 			if (FlxG.keys.justPressed("K")) this.health = 0;
 			
+			if (alive && health <= 0) {
+				kill();
+			}
 			
 			if (invulnerable > 0) {
 				invulnerable -= 1;
@@ -327,7 +330,7 @@ package
 		}
 		
 		override public function hurt(damage : Number) : void{
-			if (invulnerable == 0 || state != "levelEnd") super.hurt(damage);
+			if (invulnerable == 0 && state != "levelEnd") super.hurt(damage);
 			
 		}
 

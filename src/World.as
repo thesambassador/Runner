@@ -51,13 +51,11 @@ package
 		
 		public var heightMap : Array;
 		public var heightMapEndIndex : int = 0;
-		
-		public var startLevelCollectibles : int = 0;
+	
 		
 		public var playerStartX : int  = CommonConstants.TILEWIDTH * 2;
 		public var playerStartY : int = CommonConstants.TILEHEIGHT * startElevation - 32;
 		
-		public var worldBoundsX : int = 0;
 		
 		public var monsterSprite : FlxSprite;
 		public var monsterX : Number;
@@ -69,7 +67,8 @@ package
 		public var shakeTimer : int = 0;
 		
 		public var levelEndTimer : FlxTimer;
-
+		
+		public var gameOver : Boolean = false;
 		
 		public function World () {
 			
@@ -114,9 +113,6 @@ package
 			CreateInitialPlatform();
 			GenLevel();
 			
-			worldBoundsX = FlxG.worldBounds.x;
-			
-			FlxG.watch(this, "worldBoundsX", "World X");
 			FlxG.watch(this, "monsterX", "Monster X");
 			FlxG.watch(this, "monsterVel", "Monster Vel");
 			
@@ -134,8 +130,7 @@ package
 		private function GenLevel() : void{
 			var levGen : LevelOneGen = new LevelOneGen(currentElevation, levelWidth, currentDifficulty, alienTileset);
 			levGen.difficultyIncrease = difficultyGain;
-			
-			//levGen.Balloon();
+
 			var newChunk : Chunk = levGen.GenerateLevel();
 			
 			currentDifficulty = levGen.difficulty;
@@ -193,6 +188,53 @@ package
 		
 		override public function update():void 
 		{
+			//basic game updating
+			updateMonster();
+			FlxG.worldBounds.x = player.x - 256;
+			checkCollisions();
+
+			
+			if (gameOver) {
+				if (FlxG.keys.justPressed("R")) 
+					FlxG.resetState();
+			}
+			else {
+				if (!player.alive && (levelEndTimer.finished || levelEndTimer.progress == 0)) {
+					var respawn:FlxPoint = findClosestRespawn();
+					camera.SetTargetY(respawn.y);
+					camera.SetTargetX(respawn.x);
+					camera.xDelay = .01;
+					levelEndTimer = new FlxTimer();
+					levelEndTimer.start(.5, 1, RestartLevel);
+				}
+			}
+			
+			
+			//end of level
+			if (player.state != "levelEnd" && player.x > endLevelX) {
+				player.state = "levelEnd";
+				hud.DisplayLevelComplete();
+				GenLevel();
+				RemoveFirstChunk();
+			}
+			
+			if (player.state == "levelEnd") {
+				if (player.x > startLevelX - 400) {
+					currentLevel += 1;
+					minMonsterVelocity += monsterAcceleration;
+					if (minMonsterVelocity > maxMinMonsterVelocity) {
+						minMonsterVelocity = maxMinMonsterVelocity;
+					}
+					player.state = "ground";
+					hud.RemoveLevelComplete();
+					RemoveFirstChunk();
+				}	
+			}
+			
+			super.update();
+		}
+		
+		public function updateMonster() : void {
 			var monsterDist : Number = Math.abs(player.x - monsterX);
 			monsterVel = 300 * (monsterDist / maxMonsterDistance);
 			if (monsterVel < minMonsterVelocity) {
@@ -206,7 +248,7 @@ package
 			if (monsterX > player.x  && player.alive) {
 				player.lives = 0;
 				player.health = 0;
-				//player.kill();
+				SetGameOver();
 			}
 			else if (monsterX > player.x + shakeBoundary) {
 				
@@ -221,13 +263,9 @@ package
 			}
 			
 			monsterSprite.x = monsterX - 1000;
-			
-			worldBoundsX = 816 - (FlxG.worldBounds.left + 256);
-			FlxG.worldBounds.x = player.x - 256;
-			//FlxG.worldBounds.y = player.y - CommonConstants.WINDOWHEIGHT + 64;
-			
-			//player.currentPlatform = null;
-			
+		}
+		
+		public function checkCollisions() : void {
 			//check collisions
 			FlxG.overlap(midLayer, player, null, player.collideTilemap);
 			FlxG.overlap(midLayer, entities, this.spriteCollisions);
@@ -244,66 +282,6 @@ package
 			if (player.y > CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT) {
 				player.health = 0;
 			}
-			
-			if (player.health <= 0) {
-				if(player.alive){
-					player.kill();
-					
-				}
-				if (player.lives <= 0) {
-					if(player.lives == 0){
-						var top : FlxText = hud.DisplayCenteredText("Game Over");
-						var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
-						top.y -= 32;
-						bottom.size = 10;
-						
-						CommonFunctions.addCoins(player.collectiblesCollected);
-						CommonFunctions.saveScore(player.score);
-						
-						player.lives --;
-					}
-					if (FlxG.keys.justPressed("R")) 
-						FlxG.resetState();
-				}
-				else {
-					//player.lives --;
-					if (levelEndTimer.finished || levelEndTimer.progress == 0) {
-						var respawn:FlxPoint = findClosestRespawn();
-						camera.SetTargetY(respawn.y);
-						camera.SetTargetX(respawn.x);
-						camera.xDelay = .01;
-						//camera.targetPoint.x += camera.xOffset;
-						//camera.forwardY = camera.targetPoint.y;
-						levelEndTimer = new FlxTimer();
-						levelEndTimer.start(.5, 1, RestartLevel);
-					}
-					//RestartLevel(levelEndTimer);
-				}
-			}
-			
-			//end of level
-			if (player.state != "levelEnd" && player.x > endLevelX) {
-				player.state = "levelEnd";
-				hud.DisplayLevelComplete();
-				GenLevel();
-				RemoveFirstChunk();
-			}
-			
-			if (player.state == "levelEnd") {
-				startLevelCollectibles = player.collectiblesCollected;
-				if (player.x > startLevelX - 400) {
-					currentLevel += 1;
-					minMonsterVelocity += monsterAcceleration;
-					if (minMonsterVelocity > maxMinMonsterVelocity) {
-						minMonsterVelocity = maxMinMonsterVelocity;
-					}
-					player.state = "ground";
-					hud.RemoveLevelComplete();
-					RemoveFirstChunk();
-				}	
-			}
-			
-			super.update();
 		}
 		
 		public function findClosestRespawn() : FlxPoint {
@@ -332,6 +310,17 @@ package
 		
 			
 			return new FlxPoint(chunk.tileXToRealX(validPoint.x), validPoint.y * CommonConstants.TILEHEIGHT - 32);
+		}
+		
+		public function SetGameOver() : void {
+			gameOver = true;
+			var top : FlxText = hud.DisplayCenteredText("Game Over");
+			var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
+			top.y -= 32;
+			bottom.size = 10;
+			
+			CommonFunctions.addCoins(player.collectiblesCollected);
+			CommonFunctions.saveScore(player.score);
 		}
 		
 		public function RestartLevel(timer:FlxTimer) : void {
