@@ -116,6 +116,7 @@ package
 				FlxG.play(enemyKillSound); 
 				this.health = 0;
 				player.addScore(200);
+				player.enemiesKilled += 1;
 			}
 			else if(health > 0){
 				player.hurt(1);

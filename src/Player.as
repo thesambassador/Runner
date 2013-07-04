@@ -31,7 +31,9 @@ package
 		private var controlConfig : Dictionary;
 		
 		public var collectiblesCollected : int = 0;
+		public var enemiesKilled : int = 0;
 		public var score : int = 0;
+		public var level : int = 0;
 		public var invulnerable : int = 0; //how many frames to be invulnerable
 	
 		public var lives : int = 2;

@@ -15,6 +15,7 @@ package
 		public static var levelWidth : int = 200;
 		public static var startingDifficulty : int = 1; //what level of difficulty the first level will contain
 		public static var difficultyGain : int = 1; //how much the difficulty increases throughout each level
+		public static var difficultyString : String = "medium";
 		
 		public static var monsterAcceleration : Number = 10; //acceleration per level
 		public static var maxMonsterDistance : Number = levelWidth * CommonConstants.TILEWIDTH; //maximum distance that the monster can fall behind
@@ -221,6 +222,7 @@ package
 			if (player.state == "levelEnd") {
 				if (player.x > startLevelX - 400) {
 					currentLevel += 1;
+					player.level += 1;
 					minMonsterVelocity += monsterAcceleration;
 					if (minMonsterVelocity > maxMinMonsterVelocity) {
 						minMonsterVelocity = maxMinMonsterVelocity;
@@ -243,6 +245,7 @@ package
 			if (monsterDist < 50) {
 				monsterVel = 150;
 			}
+			//monsterVel = 500;
 			
 			monsterX += monsterVel * FlxG.elapsed;
 			if (monsterX > player.x  && player.alive) {
@@ -314,10 +317,13 @@ package
 		
 		public function SetGameOver() : void {
 			gameOver = true;
-			var top : FlxText = hud.DisplayCenteredText("Game Over");
-			var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
-			top.y -= 32;
-			bottom.size = 10;
+			//var top : FlxText = hud.DisplayCenteredText("Game Over");
+			//var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
+			//top.y -= 32;
+			//bottom.size = 10;
+			
+			add(new GameOverScreen(player));
+			hud.visible = false;
 			
 			CommonFunctions.addCoins(player.collectiblesCollected);
 			CommonFunctions.saveScore(player.score);

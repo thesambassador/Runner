@@ -120,6 +120,7 @@ package
 			World.difficultyGain = diffGain;
 			World.monsterAcceleration = monsterAcc;
 			World.startingMinMonsterVel = monsterVel;
+			World.difficultyString = difficulty;
 			
 			var playState : FlxState = new PlayState();
 			FlxG.switchState(playState);
