@@ -9,37 +9,34 @@ package
 	public class World extends FlxGroup
 	{
 		[Embed(source = '../resources/img/alientileset.png')]private static var alienTileset:Class;
-		[Embed(source = '../resources/sound/SurgeRamizHaddad.MP3')]private static var music:Class;
-		
+
 		//difficulty parameters, set by the main menu
-		public static var levelWidth : int = 200;
+		public static var levelWidth : int = 200; //actual width of each level
 		public static var startingDifficulty : int = 1; //what level of difficulty the first level will contain
-		public static var difficultyGain : int = 1; //how much the difficulty increases throughout each level
+		public static var difficultyGain : int = 2; //how much the difficulty increases throughout each level
 		public static var difficultyString : String = "medium";
 		
-		public static var monsterAcceleration : Number = 10; //acceleration per level
-		public static var maxMonsterDistance : Number = levelWidth * CommonConstants.TILEWIDTH; //maximum distance that the monster can fall behind
+		public static var monsterAcceleration : Number = 10; //how much faster the "monster" gets after completing each level
+		public static var maxMonsterDistance : Number = levelWidth * CommonConstants.TILEWIDTH; //once the player gets this far "ahead", the monster's velocity will match player's max velocity
 		public static var startingMinMonsterVel : Number = 150;
-		public static var maxMinMonsterVelocity : Number = 225; //this is the fastest that the monster will go when he's closer than maxMonsterDistance
+		public static var maxMinMonsterVelocity : Number = 220; //this is the fastest that the monster will go when he's closer than maxMonsterDistance
+		public static var startElevation : int = CommonConstants.LEVELHEIGHT / 2; //elevation that the level begins generating at (in tiles)
 		
-		public var startElevation : int = CommonConstants.LEVELHEIGHT / 2;
-		public var currentDifficulty : int = 1;
+		public var currentDifficulty : int = 1; //current difficulty of the current level
+		public var currentLevel : int = 1; //level number
 		
-		public var currentLevel : int = 1;
-
+		//variables for all the stuff that's displayed
 		public var hud : HUD; //ui group
 		public var bgLayer : FlxGroup; //background tiles
 		public var midLayer: FlxGroup; //main/collision tiles
-		public var particles: FlxGroup; //main/collision tiles
+		public var particles: FlxGroup; //group for particles
 		public var fgLayer : FlxGroup; //foreground tiles
 		
 		public var entities : FlxGroup; //entities, excluding the player
 		
-		public var player : Player;
+		public var player : Player; 
 		public var camera : SmoothCamera;
 		public var background : ScrollingBackground;
-		
-		
 		
 		public var firstChunk : Chunk;
 		public var lastChunk : Chunk;
@@ -52,11 +49,9 @@ package
 		
 		public var heightMap : Array;
 		public var heightMapEndIndex : int = 0;
-	
 		
-		public var playerStartX : int  = CommonConstants.TILEWIDTH * 2;
+		public var playerStartX : int  = CommonConstants.TILEWIDTH * 5;
 		public var playerStartY : int = CommonConstants.TILEHEIGHT * startElevation - 32;
-		
 		
 		public var monsterSprite : FlxSprite;
 		public var monsterX : Number;
@@ -71,10 +66,13 @@ package
 		
 		public var gameOver : Boolean = false;
 		
+		public var avgSpeed : Number = 0;
+		public var elapsed : Number = 0;
+		
+		public var gameStarted : Boolean = false;
+		
 		public function World () {
-			
-			FlxG.playMusic(music);
-			
+
 			currentDifficulty = startingDifficulty;
 			minMonsterVelocity = startingMinMonsterVel;
 			background = new ScrollingBackground();
@@ -98,11 +96,14 @@ package
 			add(particles);
 			add(fgLayer);
 			
+			entities.active = false;
+			
 			//monsterX = -levelWidth * CommonConstants.TILEWIDTH;
 			monsterX = -1000;
 			monsterSprite.x = monsterX - 1000;
 			
 			hud = new HUD(this);
+			hud.visible = false;
 			add(hud);
 			
 			//set camera
@@ -115,7 +116,10 @@ package
 			GenLevel();
 			
 			FlxG.watch(this, "monsterX", "Monster X");
+			FlxG.watch(player.velocity, "x", "Player Velocity");
 			FlxG.watch(this, "monsterVel", "Monster Vel");
+			FlxG.watch(this, "avgSpeed", "Average speed");
+			FlxG.watch(this, "elapsed", "Average speed");
 			
 			levelEndTimer = new FlxTimer();
 		}
@@ -164,7 +168,7 @@ package
 			entities.add(chunk.entities);
 			chunk.SetX(endX);
 			
-			mergeHeightmap(chunk.GetHeightmap());
+			mergeHeightmap(chunk.heightmap);
 			
 			endX += chunk.width;
 			currentElevation = chunk.endElevation;
@@ -189,15 +193,19 @@ package
 		
 		override public function update():void 
 		{
+			elapsed += FlxG.elapsed;
+			avgSpeed = (player.x - playerStartX) / elapsed;
+			
 			//basic game updating
-			updateMonster();
+			if(gameStarted == true)
+				updateMonster();
 			FlxG.worldBounds.x = player.x - 256;
 			checkCollisions();
 
 			
 			if (gameOver) {
-				if (FlxG.keys.justPressed("R")) 
-					FlxG.resetState();
+				//if (FlxG.keys.justPressed("R")) 
+					//FlxG.resetState();
 			}
 			else {
 				if (!player.alive && (levelEndTimer.finished || levelEndTimer.progress == 0)) {
@@ -237,35 +245,40 @@ package
 		}
 		
 		public function updateMonster() : void {
-			var monsterDist : Number = Math.abs(player.x - monsterX);
-			monsterVel = 300 * (monsterDist / maxMonsterDistance);
-			if (monsterVel < minMonsterVelocity) {
-				monsterVel = minMonsterVelocity;
-			}
-			if (monsterDist < 50) {
-				monsterVel = 150;
-			}
-			//monsterVel = 500;
-			
-			monsterX += monsterVel * FlxG.elapsed;
-			if (monsterX > player.x  && player.alive) {
-				player.lives = 0;
-				player.health = 0;
-				SetGameOver();
-			}
-			else if (monsterX > player.x + shakeBoundary) {
-				
-				shakeTimer++;
-				if (shakeTimer >= shakeDelay) {
-					shakeTimer = 0;
-					camera.shake(.005);
+			if(monsterX < player.x + 500){
+				var monsterDist : Number = Math.abs(player.x - monsterX);
+				monsterVel = 300 * (monsterDist / maxMonsterDistance);
+				if (monsterVel < minMonsterVelocity) {
+					monsterVel = minMonsterVelocity;
 				}
+				if (monsterDist < 50) {
+					monsterVel = 150;
+				}
+				//monsterVel = 500;
+				
+				monsterX += monsterVel * FlxG.elapsed;
+				
+				if (monsterX > player.x  && player.alive) {
+					player.lives = 0;
+					player.health = 0;
+					SetGameOver();
+				}
+				else if (monsterX > player.x + shakeBoundary) {
+					
+					shakeTimer++;
+					if (shakeTimer >= shakeDelay) {
+						shakeTimer = 0;
+						camera.shake(.005);
+					}
+				}
+				else {
+					shakeTimer = 0;
+				}
+				
+				monsterSprite.x = monsterX - 1000;
+				monsterSprite.y = player.y - (monsterSprite.height / 2);
 			}
-			else {
-				shakeTimer = 0;
-			}
-			
-			monsterSprite.x = monsterX - 1000;
+
 		}
 		
 		public function checkCollisions() : void {
@@ -372,6 +385,15 @@ package
 					(sprite2 as Entity).collideTilemap(sprite1 as FlxTilemap);
 				}
 			}
+		}
+		
+		//function is called when the player clicks "play" from the menu
+		public function startGame() : void {
+			gameStarted = true;
+			entities.active = true;
+			hud.visible = true;
+			FlxG.mouse.hide();
+			player.state = "ground";
 		}
 		
 	}

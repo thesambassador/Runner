@@ -1,14 +1,14 @@
 package
 {
-	import org.flixel.*; //Allows you to refer to flixel objects in your code
+	import org.flixel.*; 
 	[SWF(width="800", height="600", backgroundColor="#000000")] //Set the size and color of the Flash file
-	[Frame(factoryClass="Preloader")] 
+	[Frame(factoryClass="Preloader")] //refers to Preloader.as to show the default Flixel loading screen
 	
 	public class Base extends FlxGame
 	{
 		public function Base()
 		{
-			super(CommonConstants.WINDOWWIDTH / 2, CommonConstants.WINDOWHEIGHT / 2, MainMenu, 2); //Create a new FlxGame object and load "PlayState"
+			super(CommonConstants.WINDOWWIDTH / CommonConstants.SCALEFACTOR, CommonConstants.WINDOWHEIGHT / CommonConstants.SCALEFACTOR, PlayState, CommonConstants.SCALEFACTOR); //
 			this.forceDebugger = true;
 			this.useSystemCursor = true;
 			

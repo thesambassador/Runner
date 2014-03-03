@@ -1,151 +1,295 @@
 package  
 {
+	import mx.core.FlexSprite;
+	import org.flixel.FlxBasic;
 	import org.flixel.FlxButton;
-	import org.flixel.FlxGroup;
-	import org.flixel.FlxSave;
-	import org.flixel.FlxState;
-	import org.flixel.FlxText;
 	import org.flixel.FlxG;
-
+	import org.flixel.FlxGroup;
+	import org.flixel.FlxObject;
+	import org.flixel.FlxSprite;
+	import org.flixel.FlxText;
+	import org.flixel.plugin.photonstorm.FlxButtonPlus;
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class MainMenu extends FlxState
+	public class MainMenu extends FlxGroup
 	{
+		[Embed(source = '../resources/img/menu_logo.png')]public static var imgLogo:Class;
 		
-		public var buttons : FlxGroup;
+		[Embed(source = '../resources/img/menu_play.png')]public static var imgPlay:Class;
+		[Embed(source = '../resources/img/menu_play_hover.png')]public static var imgPlayHover:Class;
 		
-		public var startButton : FlxButton;
-		public var logo : FlxText;
+		[Embed(source = '../resources/img/menu_howto.png')]public static var imgHowto:Class;
+		[Embed(source = '../resources/img/menu_howto_hover.png')]public static var imgHowtoHover:Class;
 		
-		public var easyDifficulty : FlxButton;
-		public var mediumDifficulty : FlxButton;
-		public var hardDifficulty : FlxButton;
+		[Embed(source = '../resources/img/menu_highscores.png')]public static var imgHighScores:Class;
+		[Embed(source = '../resources/img/menu_highscores_hover.png')]public static var imgHighScoresHover:Class;
 		
-		public var textCoins : FlxText;
-		public var textScore : FlxText;
+		[Embed(source = '../resources/img/menu_credits.png')]public static var imgCredits:Class;
+		[Embed(source = '../resources/img/menu_credits_hover.png')]public static var imgCreditsHover:Class;
 		
-		public var difficulty : String = "Medium";
+		[Embed(source = '../resources/img/menu_back.png')]public static var imgBack:Class;
+		[Embed(source = '../resources/img/menu_back_hover.png')]public static var imgBackHover:Class;
+		[Embed(source = '../resources/img/3.png')]private static var img3:Class;
 		
-		public var state : String = "intro";
 		
-		public var grey : uint;
+		[Embed(source = '../resources/img/howto.png')]private static var imgHowToFull:Class;
 		
-		public var bestScore : int = 0;
-		public var coins : int = 0;
 		
-		override public function create():void
+		
+		public var logo : FlxSprite;
+		public var btnPlay : FlxButtonPlus;
+		public var btnHowto : FlxButtonPlus;
+		public var btnHighScores : FlxButtonPlus;
+		public var btnCredits : FlxButtonPlus;
+		public var btnBack : FlxButtonPlus;
+		
+		public var menuRoot : FlxGroup;
+		public var menuHowto : FlxGroup;
+		public var menuHighscores : FlxGroup;
+		public var menuCredits : FlxGroup;
+		
+		public var removing : Boolean = false;
+		
+		public var hsView : HighScoresView;
+		
+		public function MainMenu(startGameFunction : Function)
 		{
-			FlxG.mouse.show();
-			var middleScreen : int = CommonConstants.WINDOWWIDTH / 4;
+			super();
 			
-			logo = new FlxText(middleScreen - 200, 30, 400, "ALIEN RUNNER");
-			logo.size = 20;
-			logo.alignment = "center";
-			add(logo);
+			menuRoot = new FlxGroup();
+			menuHowto = new FlxGroup();
+			menuHighscores = new FlxGroup();
+			menuCredits = new FlxGroup();
 			
-			startButton = new FlxButton(middleScreen, 100, "Start", startGame);
-			startButton.x = middleScreen - (startButton.width / 2);
-			var centeredButton : int = middleScreen - startButton.width / 2;
+			add(menuRoot);
+			add(menuHowto);
+			add(menuHighscores);
+			add(menuCredits);
 			
-			//difficulty buttons
-			easyDifficulty = new FlxButton(middleScreen, 150, "Easy", setEasy);
-			easyDifficulty.x = centeredButton - easyDifficulty.width;
+			menuHowto.visible = false;
+			menuHighscores.visible = false;
+			menuCredits.visible = false;
 			
-			mediumDifficulty = new FlxButton(middleScreen, 150, "Medium", setMedium);
-			mediumDifficulty.x = centeredButton;
-			mediumDifficulty.color = 0xFFFF00;
+			menuHowto.active = false;
+			menuHighscores.active = false;
+			menuCredits.active = false;
 			
-			hardDifficulty = new FlxButton(middleScreen, 150, "Hard", setHard);
-			hardDifficulty.x = centeredButton + hardDifficulty.width;
+			logo = new FlxSprite();
+			logo.loadGraphic(imgLogo);
+			logo.scrollFactor.x = 0;
+			logo.scrollFactor.y = 0;
+			logo.x = CommonFunctions.alignX(logo.width);
+			logo.y = 15;
+			menuRoot.add(logo);
 			
+			initButtons(startGameFunction);
+			initMenus();
+		}
+		
+		public function initMenus() : void {
+			if (menuHighscores.members.length == 0) {
+				var bgHighScores : FlxSprite = new FlxSprite();
+				bgHighScores.loadGraphic(CommonConstants.MENUBG);
+				bgHighScores.scrollFactor.x = 0;
+				bgHighScores.scrollFactor.y = 0;
+				
+				menuHighscores.add(bgHighScores);
+				
+				hsView = new HighScoresView();
+				hsView.RefreshScores();
+				hsView.ShowEntries();
+				menuHighscores.add(hsView);
+			}
+			
+			var howto : FlxSprite = new FlxSprite();
+			howto.loadGraphic(imgHowToFull);
+			howto.scrollFactor.x = 0;
+			howto.scrollFactor.y = 0;
+			menuHowto.add(howto);
+			
+			initCredits();
+		}
+		
+		public function initCredits() : void {
+			//background sprite
+			var bgCredits : FlxSprite = new FlxSprite();
+			bgCredits.loadGraphic(CommonConstants.MENUBG);
+			bgCredits.scrollFactor.x = 0;
+			bgCredits.scrollFactor.y = 0;
+			menuCredits.add(bgCredits);
+			
+			//text
+			var message : String = ( <![CDATA[
+Game Design, Programming, Graphics, Sound Effects
+Sam Tregillus
 
-			add(startButton);
-			add(easyDifficulty);
-			add(mediumDifficulty);
-			add(hardDifficulty);
+Music
+Some guy
+
+Thank you to the creators of:
+Flixel and Flixel Power Tools
+BFGX
+Flash Develop
+Graphics Gale and Paint.Net
+And special thanks to my wife Katie for all of her ideas and support
+
+			]]> ).toString();
+
 			
-			grey = startButton.color;
+			var text : FlxText = new FlxText(0, 0, 400, message);
+			text.scrollFactor.x = 0;
+			text.scrollFactor.y = 0;
+			text.alignment = "center";
+			text.antialiasing = false;
+			text.size = 8;
+			menuCredits.add(text);
 			
-			CommonConstants.SAVE = new FlxSave();
-			CommonConstants.SAVE.bind("AlienRunner");
 			
-			coins = CommonConstants.SAVE.data.Coins;
-			bestScore = CommonConstants.SAVE.data.BestScore;
-			
-			textCoins = new FlxText(0, CommonConstants.VISIBLEHEIGHT - 12, 200, coins.toString());
-			textScore = new FlxText(CommonConstants.VISIBLEWIDTH - 200, CommonConstants.VISIBLEHEIGHT - 12, 200, bestScore.toString());
-			textScore.alignment = "right";
-			
-			add(textCoins);
-			add(textScore);
-	
 			
 		}
 		
-		override public function update():void {
+		public function initButtons(startGameFunction : Function) : void {
 			
+			btnPlay = CreateButton(imgPlay, imgPlayHover, startGameFunction);
+			btnPlay.x = CommonFunctions.alignX(btnPlay.width);
+			btnPlay.y = CommonConstants.VISIBLEHEIGHT / 2;
+			menuRoot.add(btnPlay);
+			
+			btnHowto = CreateButton(imgHowto, imgHowtoHover, ShowHowto);
+			btnHowto.x = CommonFunctions.alignX(btnHowto.width, "left", 15);
+			btnHowto.y = CommonConstants.VISIBLEHEIGHT - btnHowto.height - 15;
+			menuRoot.add(btnHowto);
+			
+			btnHighScores = CreateButton(imgHighScores, imgHighScoresHover, ShowHighscores);
+			btnHighScores.x = CommonFunctions.alignX(btnHighScores.width, "center");
+			btnHighScores.y = CommonConstants.VISIBLEHEIGHT - btnHighScores.height - 15;
+			menuRoot.add(btnHighScores);
+			
+			btnCredits = CreateButton(imgCredits, imgCreditsHover, ShowCredits);
+			btnCredits.x = CommonFunctions.alignX(btnCredits.width, "right", 15);
+			btnCredits.y = CommonConstants.VISIBLEHEIGHT - btnCredits.height - 15;
+			menuRoot.add(btnCredits);
+			
+			btnBack = CreateButton(imgBack, imgBackHover, BackToRoot);
+			btnBack.x = CommonFunctions.alignX(btnBack.width, "right", 5);
+			btnBack.y = CommonConstants.VISIBLEHEIGHT - btnBack.height - 5;
+			btnBack.visible = false;
+			btnBack.active = false;
+			this.add(btnBack);
+		}
+		
+		override public function update() : void {
+			if (removing) {
+				var speed : int = 5;
+				logo.y -= speed;
+				btnPlay.visible = false;
+				btnHighScores.y += speed;
+				btnCredits.y += speed;
+				btnHowto.y += speed;
+			}
 			super.update();
 		}
 		
-		public function startGame() : void {
-			var startDiff : int = 1;
-			var diffGain : int = 2;
-			var monsterAcc : int = 15;
-			var monsterVel : int = 150;
+		public function CreateButton(basicImg : Class, hoverImg : Class, onClick : Function) : FlxButtonPlus{
+			var basic : FlxSprite = new FlxSprite();
+			var hover : FlxSprite = new FlxSprite();
 			
-			switch(difficulty) {
-				case "easy":
-					startDiff = 1;
-					diffGain = 2;
-					monsterAcc = 10;
-					monsterVel = 100;
-					break;
-				case "medium":
-					startDiff = 2;
-					diffGain = 3;
-					monsterAcc = 10;
-					monsterVel = 120;
-					break;
-				case "hard":
-					startDiff = 5; 
-					diffGain = 4;
-					monsterAcc = 10;
-					monsterVel = 120;
-					break;
+			basic.loadGraphic(basicImg);
+			hover.loadGraphic(hoverImg);
+			
+			var returned : FlxButtonPlus = new FlxButtonPlus(0, 0, onClick);
+			returned.loadGraphic(basic, hover);
+			return returned;
+		}
+		
+
+		public function ShowHowto() : void {
+			menuRoot.active = false;
+			menuRoot.visible = false;
+			
+			menuHowto.visible = true;
+			menuHowto.active = true;
+			
+			btnBack.visible = true;
+			btnBack.active = true;
+		}
+		
+		public function ShowHighscores() : void {
+			menuRoot.active = false;
+			menuRoot.visible = false;
+			
+			menuHighscores.visible = true;
+			menuHighscores.active = true;
+			
+			
+			
+			btnBack.visible = true;
+			btnBack.active = true;
+		}
+		
+		public function ShowCredits() : void {
+			menuRoot.active = false;
+			menuRoot.visible = false;
+			
+			menuCredits.visible = true;
+			menuCredits.active = true;
+			
+			btnBack.visible = true;
+			btnBack.active = true;
+			//btnBack._pressed = false;
+			//btnBack._status = FlxButtonPlus.NORMAL;
+		}
+		
+		public function BackToRoot() : void {
+			//disable and hide alternative menus
+			menuHowto.visible = false;
+			menuHighscores.visible = false;
+			menuCredits.visible = false;
+			
+			menuHowto.active = false;
+			menuHighscores.active = false;
+			menuCredits.active = false;
+			
+			//reactivate root menu
+			menuRoot.active = true;
+			menuRoot.visible = true;
+			
+			//remove back button
+			btnBack.visible = false;
+			btnBack.active = false;
+			btnBack._status = FlxButtonPlus.NORMAL;
+			btnBack._pressed = false;
+			
+		}
+		
+		public function AnimateRemoveMenu() : void {
+			removing = true;
+		}
+		
+
+		
+		public function MoveGroup(group : FlxGroup, x : Number, y : Number) : void {
+			for each(var member : FlxBasic in group.members) {
+				if (member != null) {
+					if (member is FlxObject) {
+						var obj : FlxObject = member as FlxObject;
+						obj.x += x;
+						obj.y += y;
+					}
+					else if (member is FlxButtonPlus) {
+						var btn : FlxButtonPlus = member as FlxButtonPlus;
+						btn.x += x;
+						btn.y += y;
+					}
+					else if (member is FlxGroup) {
+						MoveGroup(member as FlxGroup, x, y);
+					}
+				}
 			}
-			
-			World.startingDifficulty = startDiff;
-			World.difficultyGain = diffGain;
-			World.monsterAcceleration = monsterAcc;
-			World.startingMinMonsterVel = monsterVel;
-			World.difficultyString = difficulty;
-			
-			var playState : FlxState = new PlayState();
-			FlxG.switchState(playState);
 		}
 		
-		public function setEasy() : void {
-			difficulty = "easy";
-			easyDifficulty.color = 0x00FF00;
-			mediumDifficulty.color = grey;
-			hardDifficulty.color = grey;
-		}
-		
-		public function setMedium() : void {
-			difficulty = "medium";
-			easyDifficulty.color = grey;
-			mediumDifficulty.color = 0xFFFF00;
-			hardDifficulty.color = grey;
-		}
-		
-		public function setHard() : void {
-			difficulty = "hard";
-			easyDifficulty.color = grey;
-			mediumDifficulty.color = grey;
-			hardDifficulty.color = 0xFF0000;
-		}
 	}
 
 }

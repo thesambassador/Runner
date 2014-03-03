@@ -1,5 +1,6 @@
 package 
 {
+	import org.flixel.FlxBasic;
 	import org.flixel.FlxObject;
 	import org.flixel.FlxSprite;
 	import org.flixel.system.FlxTile;
@@ -18,7 +19,7 @@ package
 			player.kill();
 		}
 		
-		public static function addCoins(amount : int) {
+		public static function addCoins(amount : int) : void {
 			var current : int = CommonConstants.SAVE.data.Coins;
 			
 			current += amount;
@@ -27,7 +28,7 @@ package
 			CommonConstants.SAVE.flush();
 		}
 		
-		public static function saveScore(score : int) {
+		public static function saveScore(score : int) : void {
 			var current : int = CommonConstants.SAVE.data.BestScore;
 			
 			if(score > current)
@@ -36,6 +37,29 @@ package
 			CommonConstants.SAVE.flush();
 		}
 		
+		public static function saveUserSettings(name:String, group:String) : void {
+			CommonConstants.SAVE.data.name = name;
+			CommonConstants.SAVE.data.group = group;
+			CommonConstants.SAVE.flush();
+		}
+		
+		public static function alignX(width : int, type : String = "center", buffer : int = 0) : int {
+
+			var targetX : int = 0;
+			
+			switch(type){
+				case "left":
+					targetX = buffer;
+					break;
+				case "center":
+					targetX = (CommonConstants.VISIBLEWIDTH / 2) - (width / 2);
+					break;
+				case "right":
+					targetX = CommonConstants.VISIBLEWIDTH - width - buffer;
+					break;
+			}
+			
+			return targetX;
+		}
 	}
-	
 }

@@ -55,7 +55,7 @@ package
 		public var canStand:Boolean = true; //hack job... too tired to figure out an elegant way, and this is quick, simple, and dirty.
 		
 		//state stuff
-		public var state:String = "ground";
+		public var state:String = "menu";
 		public var lastState:String = ""; //this is the state that was active on the last frame.  
 		public var attacking:Boolean = false; //is the character currently attacking?
 		public var attackCooldown : int = 25; //cooldown before you can do another attack
@@ -203,6 +203,9 @@ package
 					case "respawn":
 						didUpdate = updateRespawn();
 						break;
+					case "menu":
+						didUpdate = updateMenu();
+						
 				}
 			}
 			
@@ -261,6 +264,11 @@ package
 			FlxG.play(respawnSound);
 			changeState("respawn");
 			//this.collectiblesCollected = 0;
+		}
+		
+		private function updateMenu() : Boolean {
+			this.playPriority("idle", 20);
+			return true;
 		}
 		
 		//ground state can transition to air (by jumping or running off an edge) or to sliding.
@@ -333,8 +341,9 @@ package
 		
 		override public function hurt(damage : Number) : void{
 			if (invulnerable == 0 && state != "levelEnd") super.hurt(damage);
-			
 		}
+		
+		
 
 		
 		//air state can transition to the ground state, obviously, and that's pretty much it.

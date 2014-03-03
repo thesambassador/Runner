@@ -1,0 +1,16 @@
+Powerups:
+Buyable:
+	Shield (absorb x hits from enemies/fireballs)
+	Defensive boost (Launches player forward at high speed when you contact the "death wall")
+	Double-jump (Grants double-jump ability for the run)
+	Float (like Princess from Mario 2, hold jump in mid-air to float for a short duration)
+	Forward respawn (skip the obstacle that you die at)
+	Slide control (still be able to move left/right while sliding)
+	
+Unbuyable (find in level)
+	Double coins for duration
+	Free boost next game
+	Single shield
+	Invulnerability for duration
+	
+	

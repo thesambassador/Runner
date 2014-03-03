@@ -106,8 +106,6 @@ package
 		
 		//this will add scenery and non-gameplay related stuff
 		public function Decorate() : void {
-
-
 			//PlaceTrees();
 			//add the rounded corners of the grass as needed:
 			var topGrassTiles : Array = mainTiles.getTileInstances(1);
@@ -179,11 +177,9 @@ package
 					}
 				}
 			}
-			
-			
-			
-			
+
 			RandomizeGroundTiles();
+			//DebugFlatLengths();
 		}
 		
 		public function PlaceTrees() : void {
@@ -453,6 +449,55 @@ package
 				}
 			}
 			return true;
+		}
+		
+		//returns large flat sections (where the height doesn't change
+		//lengthThreshold is the minimum section of flat area returned
+		//we return an array, every even number (incl. 0) of the array is the X of where the flat area starts, odd number is length of the flat area
+		public function FindFlatLengths(lengthThreshold : int) : Array {
+			var returned : Array = new Array();
+			
+			var startIndex : int = 0; //start of the current length of flat area
+			var currentHeight : int = -100; //the current height of the flat area
+			var currentLength : int = 0; //how long we've stayed at this length from startIndex to i
+			
+			for (var i:int = 0; i < heightmap.length; i++) {
+				var height : int = heightmap[i];
+				
+				//if the height changes, check to see if our current length is longer than our threshold, always reset at -1 (pit)
+				if (height != currentHeight || height == -1) {
+					//if it is, save the result in the returned array
+					if (currentLength >= lengthThreshold) {
+						returned.push(startIndex);
+						returned.push(currentLength);
+					}
+					//reset the startIndex to be the current index and the height to be the current height
+					startIndex = i;
+					currentHeight = height;
+					currentLength = 0;
+				}
+				
+				currentLength += 1;
+				
+			}
+			
+			return returned;
+		}
+		
+		public function DebugFlatLengths() : void {
+			var flatSections : Array = FindFlatLengths(20);
+			
+			for (var i:int = 0; i < flatSections.length; i += 2) {
+				var startX : int = flatSections[i];
+				var length : int = flatSections[i + 1];
+				
+				var endX : int = startX + length;
+				
+				var height : int = heightmap[startX];
+				
+				FillSolid(startX, height, length, 1, 10);
+			}
+			
 		}
 	}
 

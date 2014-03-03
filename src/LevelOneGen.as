@@ -25,72 +25,65 @@ package
 		public function TestGenFunctions() : void {
 			genFunctionHelper = new GenFunctionHelper;
 			
-			//genFunctionHelper.addFunction("Slide", GenSlide, 1, 100, "flat", 1);
-			genFunctionHelper.addFunction("GenDeathTunnel", GenDeathTunnel, 1, 100, "flat2", 1);
-			genFunctionHelper.addFunction("Flat", GenFlat, 1, 100, "flat", 1);
+			genFunctionHelper.addFunction("steps", GenSteps, 1, 100, "flat", 1);
 			genFunctionHelper.addFunction("Flat2", GenFlat, 1, 100, "flat3", 1);
-			
-			//genFunctions.push(new GenFunction(GenFlat, 1, 100, "flat"));
-			//genFunctions.push(new GenFunction(GenOneWayPlatformSteps, 1, 100, "yUp"));
-			//genFunctions.push(new GenFunction(BaloonGap, 1, 100, "balloon"));
+
 
 		}
 		
 		//populates the gen function helper with the genfunctions that we'll use in this level
 		override public function InitializeGenFunctions() : void 
 		{
-
-			genFunctionHelper.addFunction("Slope", GenSlope, 1, 100, "yUp", 2);
-			genFunctionHelper.addFunction("Hurtle", GenHurtle, 1, 5, "hurtle");
-
-			genFunctionHelper.addFunction("SmallGap", GenSmallGap, 1, 4, "gap");
-			genFunctionHelper.addFunction("SmallGap", GenSmallGap, 2, 4, "gap");
-			genFunctionHelper.addFunction("OptionalSlide", GenOptionalSlide, 1, 3, "slide");
-			genFunctionHelper.addFunction("Drop", GenDrop, 1, 100, "yDown");
-			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 1, 100, "enemy");
+			//game starts at a difficulty of 1, increases 2 per level, does increase halfway through the level (even numbered difficulties will show up mid-level)
 			
-			genFunctionHelper.addFunction("Pyramid", GenPyramid, 3, 6, "flat", 1);
-			genFunctionHelper.addFunction("BasicPlatforms", GenBasicPlatforms, 1, 5, "platform", 1);
-
-			genFunctionHelper.addFunction("AdvancedHurtle", GenAdvancedHurtle, 2, 6, "hurtle");
-
+			//most basic level gen stuff, NO danger to player, eventually phased out once difficulty starts getting high
+			genFunctionHelper.addFunction("Steps", GenSteps, 1, 11, "elevationChange", 1);
+			genFunctionHelper.addFunction("Slope", GenSlope, 1, 11, "elevationChange", 1);
+			genFunctionHelper.addFunction("Drop", GenDrop, 1, 11, "elevationChange", 1);
+			genFunctionHelper.addFunction("Pyramid", GenPyramid, 1, 7, "hurtle", 1);
+			genFunctionHelper.addFunction("TrianglePlatforms", GenTrianglePlatforms, 1, 9, "scenery", 1);
+			genFunctionHelper.addFunction("Hurtle", GenHurtle, 1, 11, "hurtle", 1);
 			
-			genFunctionHelper.addFunction("Slide", GenSlide, 2, 9, "slide");
-			genFunctionHelper.addFunction("Drop", GenDrop, 2, 100, "yDown");
-			genFunctionHelper.addFunction("Steps", GenSteps, 2, 100, "yUp");
-			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 2, 4, "enemy");
-			genFunctionHelper.addFunction("Gap", GenGap, 6, 7, "gap");
-			genFunctionHelper.addFunction("Gap", GenGap, 6, 8, "gap");
-
-			genFunctionHelper.addFunction("SpringboardEasy", GenSpringboardEasy, 3, 8, "yUp");
-			genFunctionHelper.addFunction("SpringboardGap", GenSpringboardGap, 7, 100, "gap");
-
-			genFunctionHelper.addFunction("Slide", GenSlide, 3, 10, "slide");
-			genFunctionHelper.addFunction("OnePlatformGap", GenOnePlatformGap , 3, 5, "gap");
+			//these two are sort of "teacher features", just a preview of upcoming hazards, stop them from showing up after the first level
+			genFunctionHelper.addFunction("OptionalSlide", GenOptionalSlide, 1, 3, "slide", 1);
+			genFunctionHelper.addFunction("CrumbleGap", GenCrumbleGap, 1, 3, "scenery", 1);
+			genFunctionHelper.addFunction("SpringboardEasy", GenSpringboardEasy, 3, 13, "elevationChange", 1);
+		
 			
-			genFunctionHelper.addFunction("GapHurtle", GenGapHurtle , 6, 100, "gap");
-			genFunctionHelper.addFunction("LowHeightGap", GenLowHeightGap , 6, 100, "gap");
-			genFunctionHelper.addFunction("TripleEnemy", GenTripleEnemy, 6, 100, "enemy");
-			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 6, 100, "enemy");
-			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 6, 100, "enemy");
-			genFunctionHelper.addFunction("BalloonGap", BalloonGap, 6, 100, "gap");
+			//SMALL danger to player, weight these a bit more than the others so we get more of them, but these also are phased out initially
+			genFunctionHelper.addFunction("SmallGap", GenSmallGap, 1, 9, "gap", 3);
+			genFunctionHelper.addFunction("EnemyWalker", GenEnemyWalker, 1, 11, "enemy", 2);
+			genFunctionHelper.addFunction("EnemyWalker", GenTripleEnemy, 3, 13, "enemy", 1);
+			genFunctionHelper.addFunction("OnePlatformGap", GenOnePlatformGap, 2, 5, "gap", 1);
+			
+			//These functions replace the "Helper" ones once those phase out
+			genFunctionHelper.addFunction("OneCrumblePlatformGap", GenOneCrumblePlatformGap, 5, 13, "gap", 1);
+			genFunctionHelper.addFunction("Slide", GenSlide, 3, 11, "slide", 1);
+			genFunctionHelper.addFunction("AdvancedHurtle", GenAdvancedHurtle, 4, 11, "hurtle", 1);
+			
+			//mid range difficulty stuff
+			genFunctionHelper.addFunction("FlameStick", GenFlameStick, 9, 12, "hazard", 1);
+			genFunctionHelper.addFunction("Fireball", GenFireball, 9, 15, "hazard", 1);
+			genFunctionHelper.addFunction("LowHeightGap", GenLowHeightGap, 7, 13, "hazard", 1);
+			genFunctionHelper.addFunction("SlideGap", GenLowHeightGap, 9, 15, "hazard", 1);
+			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 7, 15, "enemy", 1);
+			genFunctionHelper.addFunction("GapHurtle", GenGapHurtle, 9, 15, "gap", 1);
+			
+			
+			//more difficult stuff
+			genFunctionHelper.addFunction("SpringboardGap", GenSpringboardGap, 11, 19, "gap", 1);
+			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 13, 30, "gap", 1);
+			genFunctionHelper.addFunction("DeathTunnel", GenDeathTunnel, 14, 30, "hazard", 1);
+			genFunctionHelper.addFunction("FireballBarage", GenFireballBarrage, 14, 30, "hazard", 1);
+			
+			
+			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 17, 30, "gap", 1);
+			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 21, 30, "gap2", 2);
+			
+			
+			
+			
 
-			genFunctionHelper.addFunction("OneCrumblePlatformGap", GenOneCrumblePlatformGap , 6, 100, "gap");
-			genFunctionHelper.addFunction("Fireball", GenFireball, 8, 10, "hazard");
-			genFunctionHelper.addFunction("Fireball", GenFireball, 8, 9, "hazard");
-
-			genFunctionHelper.addFunction("FlameStick", GenFlameStick, 9, 100, "hazard");
-			genFunctionHelper.addFunction("SlideJump", GenSlideJump, 7, 100, "slide");
-			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 11, 100, "gap");
-			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 13, 100, "gap");
-			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 15, 100, "gap");
-			genFunctionHelper.addFunction("FireballBarrage", GenFireballBarrage, 11, 100, "hazard");
-			genFunctionHelper.addFunction("FireballBarrage", GenFireballBarrage, 11, 100, "hazard");
-			genFunctionHelper.addFunction("DeathTunnel", GenDeathTunnel, 11, 100, "hazard");
-			genFunctionHelper.addFunction("DeathTunnel", GenDeathTunnel, 12, 100, "hazard");
-
-
-			//genFunctions.push(new GenFunction(GenMultiLevel, 3, 10, "multiLevel"));
 
 		}
 		
@@ -111,7 +104,8 @@ package
 			GenFlat(currentChunk.widthInTiles - 65);
 		}
 		
-		public function GenBasicPlatforms() : void {
+		//generates 3 platforms, 2 low and 1 high, with a random platform being a 'crumble' platform and a random platform having coins.
+		public function GenTrianglePlatforms() : void {
 			var startX : int = currentX;
 			
 			var height : int = 3;
@@ -119,7 +113,7 @@ package
 			var platformWidth : int = CommonFunctions.getRandom(2, 4);
 			var sidesCrumble : int = CommonFunctions.getRandom(0, 2);
 			
-			var coinPlatform = CommonFunctions.getRandom(1, 2);
+			var coinPlatform : int = CommonFunctions.getRandom(1, 2);
 			
 			GenFlat(platformWidth * 3 + spacing * 2);
 			
@@ -208,6 +202,12 @@ package
 			GenHurtle(4);
 		}
 		
+		public function GenDeathHurtle() : void {
+			var height : int = 1;
+			GenHurtle(height);
+			currentChunk.FillSolidRect(currentChunk.mainTiles, currentX-3, currentY - height - 1, currentX-2, currentY - height - 1, 16);
+		}
+		
 		public function GenPyramid(height:int = -1) : void {
 			var startX : int = currentX;
 			if(height == -1) height = CommonFunctions.getRandom(2, 4);
@@ -221,11 +221,11 @@ package
 			
 			if (FlxG.random() > .6) {
 				var platHeight : int = currentY - height - 3;
-				AddPlatform(currentX + 3, platHeight, 1, 0);
+				AddPlatform(currentX + 3, platHeight, 1, false);
 				AddCoinRect(currentX + 3, platHeight - 1, currentX + 3, platHeight - 2);
 				
 				platHeight -= 2;
-				AddPlatform(currentX + 12, platHeight, 1, 0);
+				AddPlatform(currentX + 12, platHeight, 1, false);
 				AddCoinRect(currentX + 12, platHeight - 1, currentX + 12, platHeight - 2);
 			}
 		}
@@ -258,7 +258,7 @@ package
 			
 		}
 		
-		public function AddFlameStick(x:int, y:int, length:int, speed:int = 180) {
+		public function AddFlameStick(x:int, y:int, length:int, speed:int = 180) : void {
 			for (var i:int = 0; i < length; i++) {
 				var fireball : RotatingFlame = new RotatingFlame(x * CommonConstants.TILEWIDTH, y * CommonConstants.TILEHEIGHT, (i + 1) * 16, speed);
 
@@ -283,12 +283,12 @@ package
 			
 			if(FlxG.random() <= .5){
 				AddFlameStick(startX + 5, currentY - 3, 3);
-				AddFlameStick(startX + 9, currentY - 8, 3);
+				//AddFlameStick(startX + 9, currentY - 8, 3);
 				AddFlameStick(startX + 14, currentY - 3, 3);
 			}
 			else {
 				AddFlameStick(startX + 5, currentY - 8, 3);
-				AddFlameStick(startX + 9, currentY - 3, 3);
+				//AddFlameStick(startX + 9, currentY - 3, 3);
 				AddFlameStick(startX + 14, currentY - 8, 3);
 			}
 		}
@@ -343,11 +343,11 @@ package
 		}
 		
 		//A gap covered by crumble tiles
-		public function GenCrumbleGap() : void {
+		public function GenCrumbleGap(width : int = 3) : void {
 			var startX : int = currentX;
-			GenGap(5);
+			GenGap(width);
 			
-			AddPlatform(startX, currentY, 5, true);
+			AddPlatform(startX, currentY, width, true);
 		}
 
 		//large gap with randomized platforms and height differences
@@ -388,7 +388,7 @@ package
 			var startX : int = currentX + 1;
 			GenGap(totalWidth);
 
-			for (var i:int = 0; i < numPlatforms; i++) {
+			for (i = 0; i < numPlatforms; i++) {
 				startX += jumpWidths[i];
 				currentY += jumpHeights[i];
 				
@@ -443,23 +443,38 @@ package
 		//{ Elevation change obstacles
 		//functions that will mess with the elevation
 		public function GenSlope() : void {
-			if (this.currentY < 10) return;
-			var numSteps : int = CommonFunctions.getRandom(1, 3);
-
-			for (var i:int = 0; i < numSteps; i++) {
-				currentY--;
-				GenFlat(2);
-			}
+			
+			GenSteps(1, 3);
 		}
 
-		public function GenSteps() : void{
-			if (this.currentY < 10) return;
-			var numSteps : int = CommonFunctions.getRandom(1, 3);
+		public function GenSteps(stepHeight : int = 2, stepWidth : int = 5, steps : int = -1, dir : int = 0) : void{
+			var numSteps : int = steps;
+			if(numSteps == -1)
+				numSteps = CommonFunctions.getRandom(1, 3);
+				
+			if (dir == 0) {
+				var possibleDir : Array = new Array();
+				//check to see if we are too close to the ceiling/floor
+				
+				//ceiling, if far enough away we can still go up higher
+				if (currentY > 15) {
+					possibleDir.push(-1);
+				}
+				
+				//floor, if far enough away we can still go lower
+				if (currentY < CommonConstants.LEVELHEIGHT - 15) {
+					possibleDir.push(1);
+				}
+				//should be impossible: if (possibleDir.length == 0) return; 
+				
+				dir = FlxG.getRandom(possibleDir) as int;
+			}
 
 			for (var i:int = 0; i < numSteps; i++) {
-				currentY-= 2;
-				GenFlat(3);
+				currentY += stepHeight * dir;
+				GenFlat(stepWidth);
 			}
+			FlxG.log("dir" + dir.toString());
 		}
 		
 		public function GenOneWayPlatformSteps() : void {

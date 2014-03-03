@@ -27,13 +27,13 @@ package
 		public var lastName : String = "";
 		public var bannedCategory : String = "";
 		
-		public var pitDepth = 7;
+		public var pitDepth : int = 7;
 		
 		public var currentChunk : Chunk; //current chunk we're operating on, generated when we create the LevelGen object
 		
 		public var difficulty : int;
 		public var startDifficulty : int;
-		public var difficultyIncrease : int = 2; //increase difficulty by 2 over the course of this level.
+		public var difficultyIncrease : int = 2; //increase difficulty by 2 over the course of each level.
 		
 		protected var collectiblesLeft : int = 20;  //how many more collectibles can be added to the level
 		protected var midBuffer : int = 5; //buffer between sections
@@ -45,7 +45,6 @@ package
 			
 			difficulty = startingDifficulty;
 			startDifficulty = startingDifficulty;
-			//diffWidth = width / difficultyIncrease;
 			
 			levelHistoryType = new Vector.<GenFunction>();
 			levelHistoryX = new Array();
@@ -64,6 +63,11 @@ package
 		
 		public function GenerateLevel() : Chunk {
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
+				if (difficulty >= 11 && difficulty < 17) midBuffer = 4;
+				if (difficulty >= 17 && difficulty < 21) midBuffer = 3;
+				if (difficulty >= 21 && difficulty < 25) midBuffer = 2;
+				if (difficulty >= 25) midBuffer = 1;
+				
 				var startX : int = currentX;
 				var startY : int = currentY;
 				var gf : GenFunction = null;
@@ -74,11 +78,11 @@ package
 				}
 				
 				//get a random genfunction valid for our current difficulty
-				gf = genFunctionHelper.getRandomValidFunction(difficulty, "", lastName);
+				gf = genFunctionHelper.getRandomValidFunction(difficulty, lastCategory, lastName);
 				
 				gf.genFunction();
 				
-				//check if we actually generated something
+				//check if we actually generated something (if the current X or current Y changed at all)
 				if(currentX != startX || startY != currentY){
 					GenFlat(midBuffer); 
 				
@@ -96,7 +100,10 @@ package
 					else if (currentY > CommonConstants.LEVELHEIGHT - 10) {
 						currentY = CommonConstants.LEVELHEIGHT - 10;
 					}
+
+					
 				}
+						
 			}
 			
 			//fill in the rest of the level with flatness
@@ -111,9 +118,49 @@ package
 				currentX ++;
 			}
 			
+			//do a second pass on the level and add some one-way platforms and stuff
+			//AddRandomOneWayPlatforms();
+			
 			currentChunk.Decorate();
 			
 			return currentChunk;
+		}
+		
+		protected function AddRandomOneWayPlatforms() {
+			var flatSections : Array = currentChunk.FindFlatLengths(20);
+			
+			for (var i:int = 0; i < flatSections.length; i += 2) {
+				if(FlxG.random() > 0){
+					var flatStartX : int = flatSections[i];
+					var flatLength : int = flatSections[i + 1];
+					var flatEndX : int = flatStartX + flatLength;
+					var groundHeight : int = currentChunk.heightmap[flatStartX] - 1;
+					
+					//randomize bottom section length
+					
+					var botHeight : int = 3;
+					var botStartX : int = flatStartX + CommonFunctions.getRandom(5, 10);
+					var botLength : int = CommonFunctions.getRandom(10, flatLength - flatStartX);
+					
+					currentChunk.AddOneWayPlatform(botStartX, groundHeight, botLength, botHeight);
+					
+					var upperLevelChance : Number = .75;
+					var upperLevelX : int = botStartX + CommonFunctions.getRandom(3, 10);
+					var upperLevelHeight : int = botHeight + CommonFunctions.getRandom(2, 3);
+					
+					while (FlxG.random() < upperLevelChance) {
+						var upperLevelLength : int = CommonFunctions.getRandom(6, flatLength - upperLevelX);
+						if (upperLevelLength > flatLength - upperLevelX) break;
+						
+						currentChunk.AddOneWayPlatform(upperLevelX, groundHeight, upperLevelLength, upperLevelHeight);
+						
+						upperLevelChance -= .25;
+						upperLevelX = upperLevelX + CommonFunctions.getRandom(3, 10);
+						upperLevelHeight = upperLevelHeight + CommonFunctions.getRandom(2, 3);
+					}
+
+				}
+			}
 		}
 	
 
@@ -156,7 +203,7 @@ package
 
 			if (currentY < CommonConstants.LEVELHEIGHT - 6) {
 				for (var i : int = 0; i < width; i++) {
-					var x = currentX + i;
+					var x : int = currentX + i;
 					currentChunk.mainTiles.setTile(currentX + i, currentY + pitDepth, 16);
 					FillUnder(currentX + i, currentY + pitDepth, currentChunk.mainTiles, 4);
 						
@@ -204,7 +251,7 @@ package
 		}
 		
 		//adds a platform of width w starting at sx,sy.  Crumble tiles will be used if crumble is specified
-		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false, coins:Boolean = false) {
+		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false, coins:Boolean = false) : void {
 			for (var x:int = sx; x < sx + w; x++) {
 				if (crumble) {
 					var ct : CrumbleTile = new CrumbleTile();
@@ -240,14 +287,14 @@ package
 		}
 		
 		public function AddCoinRect(left : int, top : int, right : int, bottom : int) : void {
-
+			var save : int;
 			if (left > right) {
-				var save : int = left;
+				save = left;
 				left = right;
 				right = save;
 			}
 			if (top > bottom) {
-				var save : int = top; 
+				save = top; 
 				top = bottom;
 				bottom = save;
 			}

@@ -17,7 +17,8 @@ package
 			super(startX, startY);
 			super.loadGraphic(collectibleImage, true, false, 16, 16);
 			
-
+			this.addAnimation("pulse", [1, 2, 3, 2, 1], 4);
+			this.play("pulse");
 		}
 		
 		override public function collidePlayer(playerObj:Player) : void {

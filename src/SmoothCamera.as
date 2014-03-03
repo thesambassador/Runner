@@ -37,7 +37,7 @@ package
 			
 			var camBoundY : int = CommonConstants.LEVELHEIGHT * CommonConstants.TILEHEIGHT - 20;
 			
-			this.setBounds(0, -64, 5000000000, camBoundY);
+			this.setBounds(32, -64, 5000000000, camBoundY);
 			
 			heightmapRef = heightMap;
 			
