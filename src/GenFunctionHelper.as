@@ -1,5 +1,6 @@
 package  
 {
+	import org.flixel.FlxG;
 	import org.flixel.FlxU;
 	/**
 	 * ...
@@ -32,6 +33,7 @@ package
 				}
 			}
 			
+			FlxG.log(validFunctions.length.toString());
 			return validFunctions;
 		}
 		

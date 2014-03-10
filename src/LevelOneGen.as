@@ -16,7 +16,7 @@ package
 		
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
-			//TestGenFunctions();
+			TestGenFunctions();
 			midBuffer = 4;
 			//difficultyIncrease = 6;
 		}
@@ -25,7 +25,7 @@ package
 		public function TestGenFunctions() : void {
 			genFunctionHelper = new GenFunctionHelper;
 			
-			genFunctionHelper.addFunction("steps", GenSteps, 1, 100, "flat", 1);
+			genFunctionHelper.addFunction("steps", GenRandomEasyPlatform, 1, 100, "flat", 1);
 			genFunctionHelper.addFunction("Flat2", GenFlat, 1, 100, "flat3", 1);
 
 
@@ -65,7 +65,7 @@ package
 			genFunctionHelper.addFunction("FlameStick", GenFlameStick, 9, 12, "hazard", 1);
 			genFunctionHelper.addFunction("Fireball", GenFireball, 9, 15, "hazard", 1);
 			genFunctionHelper.addFunction("LowHeightGap", GenLowHeightGap, 7, 13, "hazard", 1);
-			genFunctionHelper.addFunction("SlideGap", GenLowHeightGap, 9, 15, "hazard", 1);
+			genFunctionHelper.addFunction("SlideGap", GenSlideJump, 9, 15, "hazard", 1);
 			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 7, 15, "enemy", 1);
 			genFunctionHelper.addFunction("GapHurtle", GenGapHurtle, 9, 15, "gap", 1);
 			
@@ -80,10 +80,6 @@ package
 			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 17, 30, "gap", 1);
 			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 21, 30, "gap2", 2);
 			
-			
-			
-			
-
 
 		}
 		
@@ -291,6 +287,47 @@ package
 				//AddFlameStick(startX + 9, currentY - 3, 3);
 				AddFlameStick(startX + 14, currentY - 8, 3);
 			}
+		}
+		
+		//hurtle leading to high zone with coins followed by another hurtle
+		public function GenEasyPlatform1() : void {
+			var topWidth : int = CommonFunctions.getRandom(4, 6);
+			
+			GenHurtle(3);
+			GenFlat(2)
+			AddPlatform(currentX, currentY - 6, topWidth, false, true);
+			GenFlat(topWidth + 2);
+			GenHurtle(3);
+		}
+		
+		
+		//2 levels of a solid platform with a springboard first
+		public function GenEasyPlatform2() : void {
+			var topWidth : int = CommonFunctions.getRandom(6, 8);
+			var whichCoin : Boolean = CommonFunctions.getRandom(0, 1) as Boolean;
+			
+			GenSpringboard();
+			GenFlat(4);
+			AddPlatform(currentX, currentY - 4, topWidth, false, whichCoin);
+			AddPlatform(currentX, currentY - 8, topWidth, false, !whichCoin);
+			GenFlat(topWidth);
+		}
+		
+		//2 platforms with a coin arch between
+		public function GenEasyPlatform3() : void {
+			var gapWidth : int = 8;
+			var platformWidth : int = 2;
+			
+			AddPlatform(currentX, currentY - 3, platformWidth, true, false);
+			AddPlatform(currentX + platformWidth + gapWidth, currentY - 3, platformWidth, true, false);
+			AddCoinArch(currentX + platformWidth + 2, currentY - 7, 4);
+			GenFlat(2 * platformWidth + gapWidth);
+		}
+		
+		public function GenRandomEasyPlatform() : void {
+			var choices : Array = [GenEasyPlatform1, GenEasyPlatform2, GenEasyPlatform3];
+			var choice : Function = FlxG.getRandom(choices) as Function;
+			choice();
 		}
 		
 		
@@ -514,12 +551,15 @@ package
 			if (currentY - cliffHeight < 10) return;
 
 			GenSpringboard();
-			GenFlat(6);
-			currentY -= cliffHeight;
 			
-			if (FlxG.random() < .5) {
+			GenFlat(5);
+			currentY -= 2;
+			GenFlat(1);
+			currentY -= cliffHeight - 2;
+			
+			//if (FlxG.random() < .5) {
 				AddCoinArch(currentX - 1, currentY + cliffHeight - 10, 3);
-			}
+			//}
 		}
 		
 		

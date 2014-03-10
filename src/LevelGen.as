@@ -251,7 +251,7 @@ package
 		}
 		
 		//adds a platform of width w starting at sx,sy.  Crumble tiles will be used if crumble is specified
-		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false, coins:Boolean = false) : void {
+		public function AddPlatform(sx:int, sy:int, w:int, crumble:Boolean = false, coins:Boolean = false, alternate : Boolean = false) : void {
 			for (var x:int = sx; x < sx + w; x++) {
 				if (crumble) {
 					var ct : CrumbleTile = new CrumbleTile();
@@ -260,8 +260,12 @@ package
 				else {
 					currentChunk.mainTiles.setTile(x, sy, 8);
 				}
-				if (coins) {
+				if (coins == 1) {
 					addCollectible(x, sy - 1);
+				}
+				if (coins == 2) {
+					if(x % 2 == 1)
+						addCollectible(x, sy - 1);
 				}
 			}
 		}
