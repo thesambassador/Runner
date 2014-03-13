@@ -122,17 +122,19 @@ package
 		}
 		
 		public function ShowEntries() : void {
-			currentDisplay.clear();
-			currentRow = 1;
-			
-			highscores.SortByScore();
-			
-			
-			for each(var entry : HighScoresEntry in highscores.entries) {
-				if(currentRow * rowHeight < 380)
-					AddEntryToTable(entry);
-				else 
-					break;
+			if(currentDisplay != null){
+				currentDisplay.clear();
+				currentRow = 1;
+				
+				highscores.SortByScore();
+				
+				
+				for each(var entry : HighScoresEntry in highscores.entries) {
+					if(currentRow * rowHeight < 380)
+						AddEntryToTable(entry);
+					else 
+						break;
+				}
 			}
 		}
 		
@@ -205,7 +207,7 @@ package
 		
 		public function resetState() : void {
 			PlayState.playImmediately = true;
-			FlxG.resetState();
+			FlxG.resetGame();
 		}
 		
 		override public function add(object : FlxBasic) : FlxBasic{

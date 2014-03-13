@@ -448,6 +448,7 @@ package
 					this.playPriority("endslide", 6);
 					this.setBoundHeight(31);
 					this.y -= 2;
+					this.x -= 1; //hack to fix getting pushed underground
 					return false;
 				}
 

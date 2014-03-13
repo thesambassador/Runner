@@ -74,6 +74,7 @@ package
 
 			mainMenu.AnimateRemoveMenu();
 			
+			
 			//remove the main menu after the animation of it moving off the screen is done
 			var timer : FlxDelay = new FlxDelay(2000);
 			timer.start();

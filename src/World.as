@@ -119,7 +119,7 @@ package
 			FlxG.watch(player.velocity, "x", "Player Velocity");
 			FlxG.watch(this, "monsterVel", "Monster Vel");
 			FlxG.watch(this, "avgSpeed", "Average speed");
-			FlxG.watch(this, "elapsed", "Average speed");
+			FlxG.watch(this, "elapsed", "elapsed");
 			
 			levelEndTimer = new FlxTimer();
 		}

@@ -27,7 +27,8 @@ package
 			
 			//genFunctionHelper.addFunction("steps", GenRandomEasyPlatform, 1, 100, "flat", 1);
 			genFunctionHelper.addFunction("Flat2", GenFlat, 1, 100, "flat3", 1);
-			genFunctionHelper.addFunction("Flat", GenLowHeightGap, 1, 100, "elevationChange", 1);
+			genFunctionHelper.addFunction("Flat1", GenFlat, 1, 100, "flat1", 1);
+			//genFunctionHelper.addFunction("Flat", GenLowHeightGap, 1, 100, "elevationChange", 1);
 			//genFunctionHelper.addFunction("Flat", GenTinyPlatformSlideGap, 2, 3, "elevationChange", 1);
 			//genFunctionHelper.addFunction("Flat", GenTinyPlatformSlideGapCrumble, 3, 100, "elevationChange", 1);
 			
