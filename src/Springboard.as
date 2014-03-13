@@ -12,7 +12,7 @@ package
 		
 		public var bounce : int = -500;
 		
-		public var soundSpringboard : FlxSound;
+		//public var soundSpringboard : FlxSound;
 		
 		public function Springboard() 
 		{
@@ -22,14 +22,15 @@ package
 			offset.y = 16;
 			this.immovable = true;
 			
-			soundSpringboard = new FlxSound();
-			soundSpringboard.loadEmbedded(springboardSound);
+			//soundSpringboard = new FlxSound();
+			//soundSpringboard.loadEmbedded(springboardSound);
 		}
 		
 		override public function collidePlayer(player : Player) : void {
 			if(player.y <= this.y - 17){
 				player.Bounce(bounce * .85, bounce);
-				soundSpringboard.play();
+				FlxG.play(springboardSound);
+				//soundSpringboard.play();
 			}
 			else {
 				separate(player, this);

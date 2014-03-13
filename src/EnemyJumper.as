@@ -123,11 +123,11 @@ package
 		override public function collidePlayer(player : Player) : void {
 			var playerBounce : Boolean = player.y + player.height < this.y + 10 && this.health > 0;
 			
-			if (playerBounce) {
+			if (playerBounce && this.health > 0) {
 				player.Bounce( -150, -400);
 			}
 			
-			if (playerBounce || player.invulnerable) {
+			if ((playerBounce || player.invulnerable) && this.health > 0) {
 				this.health = 0;
 				player.addScore(500);
 				player.enemiesKilled += 1;

@@ -43,6 +43,9 @@ package
 			
 			xOffset = this.width / 2 - 64;
 			yOffset = -48;
+			
+			forwardY = player.y;
+			focusY = player.y;
 		}
 		
 		public function SetTargetY(targetY : int, force:Boolean = false) : void {
@@ -86,8 +89,11 @@ package
 				if (heightAtTarget != -1) {
 					SetTargetY(heightAtTarget * CommonConstants.TILEHEIGHT);
 				}
+				else {
+					var x = 5;
+				}
 				
-				if (forwardY == 0) 
+				if (forwardY == 0 ) 
 					SetTargetY(targetPoint.y, true);
 				
 				

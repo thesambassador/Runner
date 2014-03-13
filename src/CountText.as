@@ -14,7 +14,7 @@ package
 		public var delay : int;
 		public var curDelay : int;
 		
-		public var increment : int = 1;
+		public var increment : int = 4;
 		
 		public var going : Boolean = false;
 		public var done : Boolean = false;

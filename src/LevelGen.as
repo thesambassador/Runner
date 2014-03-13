@@ -64,9 +64,9 @@ package
 		public function GenerateLevel() : Chunk {
 			while (currentX < currentChunk.mainTiles.widthInTiles - endBuffer) {
 				if (difficulty >= 11 && difficulty < 17) midBuffer = 4;
-				if (difficulty >= 17 && difficulty < 21) midBuffer = 3;
-				if (difficulty >= 21 && difficulty < 25) midBuffer = 2;
-				if (difficulty >= 25) midBuffer = 1;
+				if (difficulty >= 17 && difficulty < 27) midBuffer = 3;
+				if (difficulty >= 27) midBuffer = 2;
+				//if (difficulty >= 25) midBuffer = 1;
 				
 				var startX : int = currentX;
 				var startY : int = currentY;
@@ -347,6 +347,32 @@ package
 			
 
 			return returned;
+		}
+		
+		protected function GetRandomValidDirection() : int {
+		
+			var possibleDir : Array = new Array();
+			
+			//check to see if we are too close to the ceiling/floor
+			
+			//ceiling, if far enough away we can still go up higher
+			if (currentY > 15) {
+				possibleDir.push(-1);
+			}
+			
+			//floor, if far enough away we can still go lower
+			if (currentY < CommonConstants.LEVELHEIGHT - 15) {
+				possibleDir.push(1);
+			}
+			
+			//should be impossible?
+			if (possibleDir.length == 0) {
+				return 0;
+			}
+			else {
+				return(FlxG.getRandom(possibleDir) as int);
+			}
+			
 		}
 
 	}

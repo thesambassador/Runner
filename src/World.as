@@ -16,7 +16,7 @@ package
 		public static var difficultyGain : int = 2; //how much the difficulty increases throughout each level
 		public static var difficultyString : String = "medium";
 		
-		public static var monsterAcceleration : Number = 10; //how much faster the "monster" gets after completing each level
+		public static var monsterAcceleration : Number = 5; //how much faster the "monster" gets after completing each level
 		public static var maxMonsterDistance : Number = levelWidth * CommonConstants.TILEWIDTH; //once the player gets this far "ahead", the monster's velocity will match player's max velocity
 		public static var startingMinMonsterVel : Number = 150;
 		public static var maxMinMonsterVelocity : Number = 220; //this is the fastest that the monster will go when he's closer than maxMonsterDistance

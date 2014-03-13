@@ -15,7 +15,8 @@ package
 		public static var groundTopRight : int = 3;
 		public static var underground : int = 4;
 		public static var barrier : int = 8;
-		public static var spike : int = 16;
+		public static var spikeUp : int = 16;
+		public static var spikeDown : int = 17;
 		public static var oneWayPlatform : int = 14;
 		
 		//background platforms
@@ -76,8 +77,8 @@ package
 			mainTiles.setTileProperties(left, FlxObject.NONE);
 			mainTiles.setTileProperties(middle, FlxObject.NONE);
 			mainTiles.setTileProperties(right, FlxObject.NONE);
-			mainTiles.setTileProperties(spike, FlxObject.ANY, CommonFunctions.killPlayer);
-			mainTiles.setTileProperties(spike+1, FlxObject.ANY, CommonFunctions.killPlayer);
+			mainTiles.setTileProperties(spikeDown, FlxObject.ANY, CommonFunctions.killPlayer);
+			mainTiles.setTileProperties(spikeUp, FlxObject.ANY, CommonFunctions.killPlayer);
 			
 			safeZones = new Array();
 		}

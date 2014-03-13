@@ -51,9 +51,9 @@ package
 		
 		override public function update():void {
 			//Pause/Unpause the game if you hit P
-			if (FlxG.keys.justPressed("P")) {
-				FlxG.paused = !FlxG.paused;
-			}
+			//if (FlxG.keys.justPressed("P")) {
+			//	FlxG.paused = !FlxG.paused;
+			//}
 			
 			//If we're paused, 
 			if (FlxG.paused) {

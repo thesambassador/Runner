@@ -69,9 +69,10 @@ package
 			var emitter : FlxEmitter = new FlxEmitter(0,0);
 			emitter.at(this);
 			
-			for (var i:int = 0; i < 10; i++){
-				emitter.add(deathParticle);
+			for (var i:int = 0; i < 10; i++) {
 				var deathParticle : FlxParticle = new FlxParticle();
+				emitter.add(deathParticle);
+				
 			
 				deathParticle.makeGraphic(2, 2, 0xff009900);
 				deathParticle.exists = false;

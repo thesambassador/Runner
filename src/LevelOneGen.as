@@ -16,17 +16,22 @@ package
 		
 		public function LevelOneGen(initialElevation : int, width : int, startingDifficulty:int, tileset : Class) {
 			super(initialElevation, width, startingDifficulty, tileset)
-			TestGenFunctions();
+			//TestGenFunctions();
 			midBuffer = 4;
 			//difficultyIncrease = 6;
 		}
 		
 		//function to reset the function list and load a set of genfunctions for testing
-		public function TestGenFunctions() : void {
+		public function TestGenFunctions() :  void {
 			genFunctionHelper = new GenFunctionHelper;
 			
-			genFunctionHelper.addFunction("steps", GenRandomEasyPlatform, 1, 100, "flat", 1);
+			//genFunctionHelper.addFunction("steps", GenRandomEasyPlatform, 1, 100, "flat", 1);
 			genFunctionHelper.addFunction("Flat2", GenFlat, 1, 100, "flat3", 1);
+			genFunctionHelper.addFunction("Flat", GenLowHeightGap, 1, 100, "elevationChange", 1);
+			//genFunctionHelper.addFunction("Flat", GenTinyPlatformSlideGap, 2, 3, "elevationChange", 1);
+			//genFunctionHelper.addFunction("Flat", GenTinyPlatformSlideGapCrumble, 3, 100, "elevationChange", 1);
+			
+			//genFunctionHelper.addFunction("Flat", SinglePlatformElevationChange, 1, 100, "elevationChanges", 1);
 
 
 		}
@@ -41,8 +46,9 @@ package
 			genFunctionHelper.addFunction("Slope", GenSlope, 1, 11, "elevationChange", 1);
 			genFunctionHelper.addFunction("Drop", GenDrop, 1, 11, "elevationChange", 1);
 			genFunctionHelper.addFunction("Pyramid", GenPyramid, 1, 7, "hurtle", 1);
-			genFunctionHelper.addFunction("TrianglePlatforms", GenTrianglePlatforms, 1, 9, "scenery", 1);
+			//genFunctionHelper.addFunction("TrianglePlatforms", GenTrianglePlatforms, 1, 9, "scenery", 1);
 			genFunctionHelper.addFunction("Hurtle", GenHurtle, 1, 11, "hurtle", 1);
+			genFunctionHelper.addFunction("EasyPlatform", GenRandomEasyPlatform, 1, 11, "hurtle", 2);
 			
 			//these two are sort of "teacher features", just a preview of upcoming hazards, stop them from showing up after the first level
 			genFunctionHelper.addFunction("OptionalSlide", GenOptionalSlide, 1, 3, "slide", 1);
@@ -62,23 +68,34 @@ package
 			genFunctionHelper.addFunction("AdvancedHurtle", GenAdvancedHurtle, 4, 11, "hurtle", 1);
 			
 			//mid range difficulty stuff
+			genFunctionHelper.addFunction("OnePlatformElevation", GenSinglePlatformElevationChange, 9, 13, "elevationChange", 2);
 			genFunctionHelper.addFunction("FlameStick", GenFlameStick, 9, 12, "hazard", 1);
-			genFunctionHelper.addFunction("Fireball", GenFireball, 9, 15, "hazard", 1);
-			genFunctionHelper.addFunction("LowHeightGap", GenLowHeightGap, 7, 13, "hazard", 1);
+			genFunctionHelper.addFunction("Fireball", GenFireball, 9, 30, "hazard", 2);
+			genFunctionHelper.addFunction("LowHeightGap", GenLowHeightGap, 7, 17, "hazard", 1);
 			genFunctionHelper.addFunction("SlideGap", GenSlideJump, 9, 15, "hazard", 1);
 			genFunctionHelper.addFunction("EnemyJumper", GenEnemyJumper, 7, 15, "enemy", 1);
 			genFunctionHelper.addFunction("GapHurtle", GenGapHurtle, 9, 15, "gap", 1);
+			genFunctionHelper.addFunction("PlatformSlideGap", GenPlatformSlideGap, 13, 26, "gap", 1);
 			
+			
+			genFunctionHelper.addFunction("SmallerOnePlatformElevation", GenSmallerPlatformElevationChange, 12, 16, "elevationChange", 2);
+			genFunctionHelper.addFunction("CrumbleOnePlatformElevation", GenCrumblePlatformElevationChange, 15, 1000, "elevationChange", 2);
+
 			
 			//more difficult stuff
 			genFunctionHelper.addFunction("SpringboardGap", GenSpringboardGap, 11, 19, "gap", 1);
+			genFunctionHelper.addFunction("FlamestickGap", GenFlameStickPlatform, 15, 30, "gap", 1);
+			genFunctionHelper.addFunction("FlamePyramid", GenFirePyramid, 20, 1000, "hazard", 1);
 			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 13, 30, "gap", 1);
 			genFunctionHelper.addFunction("DeathTunnel", GenDeathTunnel, 14, 30, "hazard", 1);
-			genFunctionHelper.addFunction("FireballBarage", GenFireballBarrage, 14, 30, "hazard", 1);
+			
+			genFunctionHelper.addFunction("TinyPlatformSlideGap", GenTinyPlatformSlideGap, 26, 34, "gap", 1);
+			genFunctionHelper.addFunction("TinyCrumblePlatformSlideGap", GenTinyPlatformSlideGapCrumble, 34, 1000, "gap", 1);
 			
 			
+			genFunctionHelper.addFunction("FireballBarage", GenFireballBarrage, 30, 1000, "hazard", 1);
 			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 17, 30, "gap", 1);
-			genFunctionHelper.addFunction("LargeGap", GenLargeGap, 21, 30, "gap2", 2);
+			genFunctionHelper.addFunction("LargeGap", GenCrumbleLargeGap, 21, 1000, "gap2", 3);
 			
 
 		}
@@ -204,7 +221,7 @@ package
 			currentChunk.FillSolidRect(currentChunk.mainTiles, currentX-3, currentY - height - 1, currentX-2, currentY - height - 1, 16);
 		}
 		
-		public function GenPyramid(height:int = -1) : void {
+		public function GenPyramid(height:int = -1, bonusSection : Boolean = true) : void {
 			var startX : int = currentX;
 			if(height == -1) height = CommonFunctions.getRandom(2, 4);
 			var width : int = (height-1) * 2 + 1
@@ -215,7 +232,7 @@ package
 				AddPlatform(startX + i, currentY - 1 - i, width - (2 * i));
 			}
 			
-			if (FlxG.random() > .6) {
+			if (FlxG.random() > .6 && bonusSection) {
 				var platHeight : int = currentY - height - 3;
 				AddPlatform(currentX + 3, platHeight, 1, false);
 				AddCoinRect(currentX + 3, platHeight - 1, currentX + 3, platHeight - 2);
@@ -325,7 +342,7 @@ package
 		}
 		
 		public function GenRandomEasyPlatform() : void {
-			var choices : Array = [GenEasyPlatform1, GenEasyPlatform2, GenEasyPlatform3];
+			var choices : Array = [GenTrianglePlatforms, GenEasyPlatform1, GenEasyPlatform2, GenEasyPlatform3];
 			var choice : Function = FlxG.getRandom(choices) as Function;
 			choice();
 		}
@@ -373,11 +390,30 @@ package
 			GenOnePlatformGap(true);
 		}
 		
-		public function GenLowHeightGap() : void {
-			GenGap(4);
-			currentChunk.FillSolidRect(currentChunk.mainTiles, currentX - 3, currentY - 6, currentX - 2, currentY - 15, 8);
-			currentChunk.FillSolidRect(currentChunk.mainTiles, currentX - 3, currentY - 5, currentX - 2, currentY - 5, 17);
+		public function GenLowHeightGap(height : int = 5, width:int = 4) : void {
+			var columnHeight : int = 20;
+			currentChunk.FillSolid(currentX, currentY - columnHeight - height - 1, width, columnHeight,  Chunk.barrier);
+			currentChunk.FillSolid(currentX, currentY - height - 1, width, 1,  Chunk.spikeDown);
+			
+			var coinWidth = width / 2;
+			AddCoinRect(currentX + 1, currentY - 1, currentX + coinWidth, currentY - 1);
+			
+			GenGap(width);
+			
+			//currentChunk.FillSolidRect(currentChunk.mainTiles, currentX - 3, currentY - 5, currentX - 2, currentY - 5, Chunk.spikeDown);
 		}
+		
+		public function GenLowerHeightGap() : void {
+			GenLowHeightGap(4);
+		}
+		
+		public function GenDoubleLowHeightGap() : void {
+			GenLowHeightGap(4, 3);
+			GenFlat(2);
+			GenLowHeightGap(4, 3);
+		}
+		
+
 		
 		//A gap covered by crumble tiles
 		public function GenCrumbleGap(width : int = 3) : void {
@@ -386,9 +422,28 @@ package
 			
 			AddPlatform(startX, currentY, width, true);
 		}
+		
+		
+		//gap with a platform and a low pillar in the middle
+		public function GenPlatformSlideGap(platformWidth : int = 5, crumble : Boolean = false) : void {
+			var jumpWidth : int = CommonFunctions.getRandom(4, 8);
+			var platformHeightDifference : int = CommonFunctions.getRandom( -2, 2);
+			AddPlatform(currentX + jumpWidth, currentY + platformHeightDifference, platformWidth, crumble, true);
+			FillAbove(currentX + jumpWidth + platformWidth / 2, currentY + platformHeightDifference - 1, currentChunk.mainTiles, Chunk.barrier); 
+			
+			GenGap(jumpWidth * 2 + platformWidth);
+		}
+		
+		public function GenTinyPlatformSlideGap() : void{
+			GenPlatformSlideGap(3);
+		}
+		
+		public function GenTinyPlatformSlideGapCrumble() : void{
+			GenPlatformSlideGap(3, true);
+		}
 
 		//large gap with randomized platforms and height differences
-		public function GenLargeGap() : void {
+		public function GenLargeGap(crumble : Boolean = false) : void {
 			var remainingLevel : int = currentChunk.widthInTiles - currentX;
 			var numPlatforms : int = CommonFunctions.getRandom(1, 3);
 
@@ -426,19 +481,33 @@ package
 			GenGap(totalWidth);
 
 			for (i = 0; i < numPlatforms; i++) {
-				startX += jumpWidths[i];
-				currentY += jumpHeights[i];
+				
+				var jumpWidth : int = jumpWidths[i];
+				var jumpHeight : int = jumpHeights[i];
+				
+				if (FlxG.random() >= .5) {
+					addCollectible(startX + (jumpWidth / 2) - 1, currentY - 4);
+					addCollectible(startX + (jumpWidth / 2), currentY - 4);
+					addCollectible(startX + (jumpWidth / 2) + 1, currentY - 4);
+				}
+				
+				startX += jumpWidth;
+				currentY += jumpHeight;
 				
 				while (currentChunk.mainTiles.getTile(startX, currentY) != 0) {
 					currentY--;
 				}
 				
-				AddPlatform(startX, currentY, 2);
+				AddPlatform(startX, currentY, 2, crumble);
 
 				startX += 2;
 
 			}
 
+		}
+		
+		public function GenCrumbleLargeGap() : void {
+			GenLargeGap(true);
 		}
 		
 		//slide, followed by a gap
@@ -449,6 +518,41 @@ package
 			GenGap(6);
 			currentY += CommonFunctions.getRandom( -2, 3);
 
+		}
+		
+		//2 platforms with a spinning fire stick 
+		public function GenFlameStickPlatform() : void {
+			var gapBuffer : int = 4;
+			var botPlatformWidth : int = 5;
+			var yOffset : int = CommonFunctions.getRandom(-5, 0);
+			var dir = FlxG.getRandom([ -180, 180]);
+			AddPlatform(currentX + gapBuffer, currentY + 3 + yOffset, botPlatformWidth, false, dir < 0);
+			AddPlatform(currentX + gapBuffer + 1, currentY + yOffset, botPlatformWidth - 2, false, dir > 0);
+			AddFlameStick(currentX + gapBuffer + 2, currentY + yOffset, 3, dir);
+			GenGap(gapBuffer * 2 + botPlatformWidth);
+		}
+		
+		//pyramid with flaming sticks going around
+		public function GenFirePyramid() : void {
+			var gapHeight : int = 4;
+			var pyramidHeight : int = 3;
+			var baseWidth : int = (pyramidHeight - 1) * 2 + 1;
+			
+			for (var i:int = 0;  i < pyramidHeight; i++) {
+				AddPlatform(currentX + i, currentY - gapHeight - (2 * pyramidHeight) + i, baseWidth - (2 * i));
+			}
+			for (i = 0; i < baseWidth; i++){
+				FillAbove(currentX + i, currentY - gapHeight - (2 * pyramidHeight), currentChunk.mainTiles, Chunk.barrier);
+			}
+			
+			AddFlameStick(currentX + baseWidth / 2, currentY - pyramidHeight, 3);
+			AddFlameStick(currentX + baseWidth / 2, currentY - pyramidHeight - gapHeight - 1, 3, -180);
+				
+			AddCoinArch(currentX, currentY - pyramidHeight - 2, 4);
+			
+			GenPyramid(pyramidHeight, false);
+			
+			
 		}
 		
 		//set of short jumps with gaps between them
@@ -469,9 +573,12 @@ package
 		
 		//large gap that requires springboard usage to get over
 		public function GenSpringboardGap() : void {
-			var gapWidth : int = CommonFunctions.getRandom(10, 15);
+			var gapWidth : int = CommonFunctions.getRandom(10, 14);
 			if (gapWidth + 2 + currentX >= this.currentChunk.widthInTiles) return;
 			GenSpringboard();
+			
+			AddCoinArch(currentX + gapWidth / 2 - 2, currentY - 10, 4);
+			
 			GenGap(gapWidth);
 		}
 		
@@ -538,6 +645,34 @@ package
 			
 			currentY -= height;
 		}
+		
+		public function GenSinglePlatformElevationChange(platformWidth : int = 3, crumble : Boolean = false) {
+			var heightChange = CommonFunctions.getRandom(1, 3);
+			var dir = GetRandomValidDirection();
+			
+			heightChange *= 2 * dir; //only want 2, 4, and 6 as options, also get the random direction
+			var platformY = heightChange / 2;
+			
+			currentY += heightChange;
+			
+			var gapWidth : int = 5;
+			
+			AddPlatform(currentX + gapWidth, currentY - platformY, platformWidth, crumble); 
+			GenGap(gapWidth * 2 + platformWidth);
+		}
+		
+		public function GenSmallerPlatformElevationChange() {
+			GenSinglePlatformElevationChange(2, false);
+		}
+		
+		public function GenCrumblePlatformElevationChange() {
+			GenSinglePlatformElevationChange(2, true);
+		}
+		
+		public function GenTinyPlatformElevationChange() {
+			GenSinglePlatformElevationChange(1, true);
+		}
+		
 		
 		public function GenDrop() : void {
 			if (this.currentY > CommonConstants.LEVELHEIGHT - 12) return;

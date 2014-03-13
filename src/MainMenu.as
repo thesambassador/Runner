@@ -98,8 +98,6 @@ package
 				menuHighscores.add(bgHighScores);
 				
 				hsView = new HighScoresView();
-				hsView.RefreshScores();
-				hsView.ShowEntries();
 				menuHighscores.add(hsView);
 			}
 			
@@ -223,7 +221,8 @@ And special thanks to my wife Katie for all of her ideas and support
 			menuHighscores.visible = true;
 			menuHighscores.active = true;
 			
-			
+			hsView.RefreshScores();
+			hsView.ShowEntries();
 			
 			btnBack.visible = true;
 			btnBack.active = true;
