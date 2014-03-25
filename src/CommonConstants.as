@@ -8,6 +8,8 @@ package
 	public class CommonConstants 
 	{
 		[Embed(source = '../resources/img/menuBackgroundLarge.png')]public static var MENUBG:Class;
+		[Embed(source = '../resources/img/starFull.png')]public static var STARFULL:Class;
+		[Embed(source = '../resources/img/starEmpty.png')]public static var STAREMPTY:Class;
 		
 		public static var WINDOWWIDTH : Number = 800;
 		public static var WINDOWHEIGHT : Number = 600;
@@ -27,7 +29,8 @@ package
 		public static var SAVE : FlxSave;
 		
 		public static var SCORECOIN : int = 100;
-		public static var SCOREENEMY : int = 500;
+		public static var SCOREENEMY1 : int = 200;
+		public static var SCOREENEMY2 : int = 500;
 		public static var SCORELEVEL : int = 1000;
 	}
 

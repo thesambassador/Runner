@@ -129,8 +129,10 @@ package
 			
 			if ((playerBounce || player.invulnerable) && this.health > 0) {
 				this.health = 0;
-				player.addScore(500);
+				player.addScore(CommonConstants.SCOREENEMY2);
 				player.enemiesKilled += 1;
+				player.enemiesKilledLevel += 1;
+				
 				FlxG.play(enemyKillSound);
 			}
 			else if(health > 0){

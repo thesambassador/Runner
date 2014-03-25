@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MISSIONDEFINITION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<MISSION>
+		<ID>1</ID>
+		<DESCRIPTION>Collect 50 orbs in a single run</DESCRIPTION>
+		<STARVALUE>2</STARVALUE>
+		<TRACKVAR>orbsGame</TRACKVAR>
+		<PERSIST>0</PERSIST>
+		<GOAL>50</GOAL>
+		<PREREQ>-1</PREREQ>
+		<MINRANK>1</MINRANK>
+	</MISSION>
+	<MISSION>
+		<ID>1</ID>
+		<DESCRIPTION>Collect 50 orbs in a single run</DESCRIPTION>
+		<STARVALUE>2</STARVALUE>
+		<TRACKVAR>orbsGame</TRACKVAR>
+		<PERSIST>0</PERSIST>
+		<GOAL>50</GOAL>
+		<PREREQ>-1</PREREQ>
+		<MINRANK>1</MINRANK>
+	</MISSION>
+</MISSIONDEFINITION>

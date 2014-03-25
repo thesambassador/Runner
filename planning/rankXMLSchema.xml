@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RANKDEFINITION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<RANK>
+		<ID>1</ID>
+		<NAME>Beginner</NAME>
+		<STARS>3</STARS>
+	</RANK>
+	<RANK>
+		<ID>2</ID>
+		<NAME>Learner</NAME>
+		<STARS>5</STARS>
+	</RANK>
+</RANKDEFINITION>

@@ -21,6 +21,7 @@ package
 		public static var startingMinMonsterVel : Number = 150;
 		public static var maxMinMonsterVelocity : Number = 220; //this is the fastest that the monster will go when he's closer than maxMonsterDistance
 		public static var startElevation : int = CommonConstants.LEVELHEIGHT / 2; //elevation that the level begins generating at (in tiles)
+
 		
 		public var currentDifficulty : int = 1; //current difficulty of the current level
 		public var currentLevel : int = 1; //level number
@@ -70,6 +71,11 @@ package
 		public var elapsed : Number = 0;
 		
 		public var gameStarted : Boolean = false;
+		
+		public var levelTime : Number = 0;
+		public var gainedLead : Boolean = false;
+		public var totalLevelCollectibles : int = 0;
+		public var totalLevelEnemies : int = 0;
 		
 		public function World () {
 
@@ -138,6 +144,9 @@ package
 
 			var newChunk : Chunk = levGen.GenerateLevel();
 			
+			totalLevelCollectibles = levGen.totalCollectibles;
+			totalLevelEnemies = levGen.totalEnemies;
+			
 			currentDifficulty = levGen.difficulty;
 			
 			startLevelX = endX;
@@ -194,6 +203,7 @@ package
 		override public function update():void 
 		{
 			elapsed += FlxG.elapsed;
+			levelTime += FlxG.elapsed;
 			avgSpeed = (player.x - playerStartX) / elapsed;
 			
 			//basic game updating
@@ -221,16 +231,21 @@ package
 			
 			//end of level
 			if (player.state != "levelEnd" && player.x > endLevelX) {
+				//mission manager stuff
+				updateMissionVariables(false);	
+				
 				player.state = "levelEnd";
 				hud.DisplayLevelComplete();
 				GenLevel();
 				RemoveFirstChunk();
+
 			}
 			
 			if (player.state == "levelEnd") {
 				if (player.x > startLevelX - 400) {
 					currentLevel += 1;
 					player.level += 1;
+					player.score += CommonConstants.SCORELEVEL;
 					minMonsterVelocity += monsterAcceleration;
 					if (minMonsterVelocity > maxMinMonsterVelocity) {
 						minMonsterVelocity = maxMinMonsterVelocity;
@@ -238,6 +253,9 @@ package
 					player.state = "ground";
 					hud.RemoveLevelComplete();
 					RemoveFirstChunk();
+					
+					//mission manager stuff
+					resetLevelVariables();
 				}	
 			}
 			
@@ -247,6 +265,9 @@ package
 		public function updateMonster() : void {
 			if(monsterX < player.x + 500){
 				var monsterDist : Number = Math.abs(player.x - monsterX);
+				if (!gainedLead && monsterDist > levelWidth * CommonConstants.TILEWIDTH) {
+					gainedLead = true;
+				}
 				monsterVel = 300 * (monsterDist / maxMonsterDistance);
 				if (monsterVel < minMonsterVelocity) {
 					monsterVel = minMonsterVelocity;
@@ -258,7 +279,7 @@ package
 				
 				monsterX += monsterVel * FlxG.elapsed;
 				
-				if (monsterX > player.x  && player.alive) {
+				if ((monsterX > player.x  && player.alive) || FlxG.keys.justPressed("K")) {
 					player.lives = 0;
 					player.health = 0;
 					SetGameOver();
@@ -268,7 +289,7 @@ package
 					shakeTimer++;
 					if (shakeTimer >= shakeDelay) {
 						shakeTimer = 0;
-						camera.shake(.005);
+						//camera.shake(.005);
 					}
 				}
 				else {
@@ -334,6 +355,7 @@ package
 			//var bottom : FlxText = hud.DisplayCenteredText("Press R to restart");
 			//top.y -= 32;
 			//bottom.size = 10;
+			updateMissionVariables(true);
 			
 			add(new GameOverScreen(player));
 			hud.visible = false;
@@ -394,6 +416,98 @@ package
 			hud.visible = true;
 			FlxG.mouse.hide();
 			player.state = "ground";
+		}
+		
+		//called at the end of every level and on game over
+		public function updateMissionVariables(gameover : Boolean) : void {
+
+			MissionManager.AddValue("orbsGame", player.collectiblesCollectedLevel);
+			MissionManager.AddValue("orbsLevel", player.collectiblesCollectedLevel);
+			MissionManager.AddValue("enemiesGame", player.enemiesKilledLevel);
+			MissionManager.AddValue("enemiesLevel", player.enemiesKilledLevel);
+			
+			if(player.collectiblesCollectedLevel == totalLevelCollectibles && player.collectiblesCollectedLevel > 5)
+				MissionManager.SetValue("allLevelOrbs", 1);
+				
+			if (player.enemiesKilledLevel == totalLevelEnemies && player.enemiesKilledLevel > 3)
+				MissionManager.SetValue("allEnemiesStomped", 1);
+			
+			MissionManager.SetValueIfMax("deathsLevel", player.deathCountLevel);
+			
+			MissionManager.AddValue("deathsGame", player.deathCountLevel);
+			
+			if(levelTime <= 30)
+				MissionManager.AddValue("levelUnder30", 1);
+			if(levelTime <= 25)
+				MissionManager.AddValue("levelUnder25", 1);
+			if (levelTime <= 45)
+				MissionManager.AddValue("levelUnder45", 1);
+			if (gainedLead)
+				MissionManager.AddValue("gainedLead", 1);
+			
+			
+			
+			//only call this at the end of each level, not at game over
+			if (!gameover) {
+				MissionManager.AddValue("levelsCompleted", 1);
+				MissionManager.AddValue("singleLevelCompleted", 1);
+				
+				if (player.deathCountLevel == 0) {
+					MissionManager.AddValue("levelsConsecutive", 1);
+				}
+				else {
+					MissionManager.SetValue("levelsConsecutive", 0);
+				}
+				
+				if (player.collectiblesCollectedLevel == 0) {
+					MissionManager.AddValue("noOrbs", 1);
+				}
+				else {
+					MissionManager.SetValue("noOrbs", 0);
+				}
+				
+				if (player.enemiesKilledLevel == 0) {
+					MissionManager.AddValue("noEnemies", 1);
+				}
+				else {
+					MissionManager.SetValue("noEnemies", 0);
+				}
+				
+			}
+			
+			MissionManager.SetValue("springboardsGame", player.springboardCount);
+			
+			var airTime : int = player.levelAirTime;
+			MissionManager.AddValue("airTimeGame", airTime);
+			MissionManager.AddValue("airTimeLevel", airTime);
+			var slideDist : int = player.levelSlideDist;
+			MissionManager.AddValue("slideDistLevel", slideDist);
+			
+			var tilesRan : int = player.levelRunDist / CommonConstants.TILEWIDTH;
+			MissionManager.AddValue("runDist", tilesRan); 
+			
+			MissionManager.CheckIfMissionsComplete();
+			if (gameover) {
+				//MissionManager.UpdateMissionQueue();
+			}
+
+		}
+		
+		public function resetLevelVariables() : void {
+			player.collectiblesCollectedLevel = 0;
+			player.deathCountLevel = 0;
+			levelTime = 0;
+			player.enemiesKilledLevel = 0;
+			player.levelAirTime = 0;
+			player.levelRunDist = 0;
+			player.levelSlideDist = 0;
+			
+			MissionManager.SetValue("orbsLevel", 0);
+			MissionManager.SetValue("deathsLevel", 0);
+			MissionManager.SetValue("enemiesLevel", 0);
+			MissionManager.SetValue("singleLevelCompleted", 0);
+			MissionManager.SetValue("airTimeLevel", 0);
+			
 		}
 		
 	}

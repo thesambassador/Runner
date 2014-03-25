@@ -89,9 +89,6 @@ package
 				if (heightAtTarget != -1) {
 					SetTargetY(heightAtTarget * CommonConstants.TILEHEIGHT);
 				}
-				else {
-					var x = 5;
-				}
 				
 				if (forwardY == 0 ) 
 					SetTargetY(targetPoint.y, true);

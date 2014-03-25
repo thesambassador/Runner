@@ -45,7 +45,6 @@ package
 			super();
 			add(CenteredText("Game Over", 30, 20));
 			
-	
 		}
 		
 		public function StartScoreOverview(coins : int, enemies : int, levels : int) : void {

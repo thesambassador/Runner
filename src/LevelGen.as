@@ -36,6 +36,8 @@ package
 		public var difficultyIncrease : int = 2; //increase difficulty by 2 over the course of each level.
 		
 		protected var collectiblesLeft : int = 20;  //how many more collectibles can be added to the level
+		public var totalCollectibles : int = 0;
+		public var totalEnemies : int = 0;
 		protected var midBuffer : int = 5; //buffer between sections
 
 		
@@ -314,7 +316,21 @@ package
 			var col : Collectible = new Collectible();
 			currentChunk.AddEntityAtTileCoords(col, x, y);
 			collectiblesLeft --;
+			totalCollectibles += 1;
 		}
+		
+		public function addEnemy(type:int, x:int, y:int) : void {
+			totalEnemies += 1;
+			var enemy : Entity;
+			if(type == 0)
+				enemy = new EnemyWalker();
+			else if (type == 1) 
+				enemy = new EnemyJumper();
+			
+			currentChunk.AddEntityAtTileCoords(enemy, x, y);
+		}
+		
+		
 		
 		//fill all tiles under the specific tile (not including it).
 		protected function FillUnder(sx:int, sy:int, tiles:FlxTilemap, fillTile:int = 4) : void {

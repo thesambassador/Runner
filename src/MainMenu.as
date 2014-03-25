@@ -34,6 +34,11 @@ package
 		[Embed(source = '../resources/img/3.png')]private static var img3:Class;
 		
 		
+		[Embed(source = '../resources/img/missionsTab.png')]private static var missionsTab:Class;
+		
+		
+		
+		
 		[Embed(source = '../resources/img/howto.png')]private static var imgHowToFull:Class;
 		
 		
@@ -44,11 +49,15 @@ package
 		public var btnHighScores : FlxButtonPlus;
 		public var btnCredits : FlxButtonPlus;
 		public var btnBack : FlxButtonPlus;
+		public var btnMissions : FlxButtonPlus;
+		
+		public var resetButton : FlxButton;
 		
 		public var menuRoot : FlxGroup;
 		public var menuHowto : FlxGroup;
 		public var menuHighscores : FlxGroup;
 		public var menuCredits : FlxGroup;
+		public var menuMissions : MissionView;
 		
 		public var removing : Boolean = false;
 		
@@ -62,19 +71,23 @@ package
 			menuHowto = new FlxGroup();
 			menuHighscores = new FlxGroup();
 			menuCredits = new FlxGroup();
+			menuMissions = new MissionView();
 			
 			add(menuRoot);
 			add(menuHowto);
 			add(menuHighscores);
 			add(menuCredits);
+			add(menuMissions);
 			
 			menuHowto.visible = false;
 			menuHighscores.visible = false;
 			menuCredits.visible = false;
+			menuMissions.visible = false;
 			
 			menuHowto.active = false;
 			menuHighscores.active = false;
 			menuCredits.active = false;
+			menuMissions.active = false;
 			
 			logo = new FlxSprite();
 			logo.loadGraphic(imgLogo);
@@ -170,6 +183,11 @@ And special thanks to my wife Katie for all of her ideas and support
 			btnCredits.y = CommonConstants.VISIBLEHEIGHT - btnCredits.height - 15;
 			menuRoot.add(btnCredits);
 			
+			btnMissions = CreateButton(missionsTab, missionsTab, ShowMissions);
+			btnMissions.x = CommonFunctions.alignX(btnMissions.width, "left", 0);
+			btnMissions.y = CommonConstants.VISIBLEHEIGHT / 2 - btnMissions.height / 2;
+			menuRoot.add(btnMissions);
+			
 			btnBack = CreateButton(imgBack, imgBackHover, BackToRoot);
 			btnBack.x = CommonFunctions.alignX(btnBack.width, "right", 5);
 			btnBack.y = CommonConstants.VISIBLEHEIGHT - btnBack.height - 5;
@@ -186,6 +204,7 @@ And special thanks to my wife Katie for all of her ideas and support
 				btnHighScores.y += speed;
 				btnCredits.y += speed;
 				btnHowto.y += speed;
+				btnMissions.x -= speed;
 			}
 			super.update();
 		}
@@ -241,15 +260,29 @@ And special thanks to my wife Katie for all of her ideas and support
 			//btnBack._status = FlxButtonPlus.NORMAL;
 		}
 		
+		public function ShowMissions() : void {
+			menuRoot.active = false;
+			menuRoot.visible = false;
+			
+			menuMissions.active = true;
+			menuMissions.visible = true;
+			ShowResetMissionButton();
+		
+			btnBack.visible = true;
+			btnBack.active = true;
+		}
+		
 		public function BackToRoot() : void {
 			//disable and hide alternative menus
 			menuHowto.visible = false;
 			menuHighscores.visible = false;
 			menuCredits.visible = false;
+			menuMissions.visible = false;
 			
 			menuHowto.active = false;
 			menuHighscores.active = false;
 			menuCredits.active = false;
+			menuMissions.active = false;
 			
 			//reactivate root menu
 			menuRoot.active = true;
@@ -265,6 +298,23 @@ And special thanks to my wife Katie for all of her ideas and support
 		
 		public function AnimateRemoveMenu() : void {
 			removing = true;
+		}
+		
+		public function ShowResetMissionButton() : void {
+			if(resetButton == null){
+				resetButton = new FlxButton(CommonFunctions.alignX(80, "center", 0), 280 , "Reset", ResetMissions);
+				resetButton.scrollFactor.x = 0;
+				resetButton.scrollFactor.y = 0;
+			}
+			menuMissions.add(resetButton);
+		}
+		
+		public function ResetMissions() : void {
+			MissionManager.missionManagerInstance.ResetRank();
+			
+			menuMissions.SetupView();
+			ShowResetMissionButton();
+			
 		}
 		
 

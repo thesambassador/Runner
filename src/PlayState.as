@@ -1,7 +1,6 @@
 package
 {
 	import org.flixel.*;
-	import org.flixel.plugin.photonstorm.FlxDelay;
 	import org.flixel.system.FlxDebugger;
 	
 	/**
@@ -18,10 +17,15 @@ package
 		
 		public static var playImmediately : Boolean = false;
 		
+		public var missionManager : MissionManager;
+		
 		override public function create():void
 		{
 			CommonConstants.SAVE = new FlxSave();
 			CommonConstants.SAVE.bind("AlienRunner");
+
+			missionManager = new MissionManager();
+			//missionManager.ResetRank();
 			
 			//FlxG.visualDebug = true;
 			//basic initialization
@@ -56,6 +60,7 @@ package
 			//}
 			
 			//If we're paused, 
+			
 			if (FlxG.paused) {
 				pauseMenu.update();
 				return;
@@ -76,9 +81,7 @@ package
 			
 			
 			//remove the main menu after the animation of it moving off the screen is done
-			var timer : FlxDelay = new FlxDelay(2000);
-			timer.start();
-			timer.callback = RemoveMainMenu;
+			DelayManager.AddDelay(1, RemoveMainMenu);
 			
 			//set up the countdown object to show itself
 			var countdown : Countdown = new Countdown();
@@ -91,9 +94,8 @@ package
 			FlxG.volume = .25;
 			
 			//start the game after the countdown is over (3 seconds)
-			var gameStartTimer : FlxDelay = new FlxDelay(3000);
-			gameStartTimer.start();
-			gameStartTimer.callback = world.startGame;
+			
+			DelayManager.AddDelay(3, world.startGame);
 		}
 		
 		public function RemoveMainMenu() : void {

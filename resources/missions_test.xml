@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MISSIONDEFINITION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<MISSION>
+		<ID>0</ID>
+		<DESCRIPTION>Collect 5 orbs in a single run</DESCRIPTION>
+		<STARVALUE>2</STARVALUE>
+		<TRACKVAR>orbsGame</TRACKVAR>
+		<PERSIST>0</PERSIST>
+		<GOAL>5</GOAL>
+	</MISSION>
+	<MISSION>
+		<ID>1</ID>
+		<DESCRIPTION>Collect 20 orbs</DESCRIPTION>
+		<STARVALUE>2</STARVALUE>
+		<TRACKVAR>orbsGame</TRACKVAR>
+		<PERSIST>1</PERSIST>
+		<GOAL>20</GOAL>
+	</MISSION>
+	<MISSION>
+		<ID>2</ID>
+		<DESCRIPTION>Collect all orbs in a single level (at least 5)</DESCRIPTION>
+		<STARVALUE>1</STARVALUE>
+		<TRACKVAR>orbsLevel</TRACKVAR>
+		<PERSIST>0</PERSIST>
+		<GOAL>1</GOAL>
+	</MISSION>
+	<MISSION>
+		<ID>3</ID>
+		<DESCRIPTION>Die 2 times in a game</DESCRIPTION>
+		<STARVALUE>3</STARVALUE>
+		<TRACKVAR>deathsGame</TRACKVAR>
+		<PERSIST>0</PERSIST>
+		<GOAL>2</GOAL>
+	</MISSION>
+	<MISSION>
+		<ID>4</ID>
+		<DESCRIPTION>Stomp 5 enemies</DESCRIPTION>
+		<STARVALUE>2</STARVALUE>
+		<TRACKVAR>enemiesGame</TRACKVAR>
+		<PERSIST>1</PERSIST>
+		<GOAL>5</GOAL>
+	</MISSION>
+	<MISSION>
+		<ID>5</ID>
+		<DESCRIPTION>Get to level 2</DESCRIPTION>
+		<STARVALUE>1</STARVALUE>
+		<TRACKVAR>levelsCompleted</TRACKVAR>
+		<PERSIST>0</PERSIST>
+		<GOAL>2</GOAL>
+	</MISSION>
+
+</MISSIONDEFINITION>

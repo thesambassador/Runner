@@ -140,23 +140,19 @@ package
 		public function GenEnemyJumper() : void {
 			var startX : int = currentX;
 			GenFlat(5);
-			var jumper : EnemyJumper = new EnemyJumper();
-			currentChunk.AddEntityAtTileCoords(jumper, startX + 2, currentY - 1); 
+			addEnemy(1, startX + 2, currentY - 1);
 		}
 		
 		public function GenEnemyWalker(coinChange : Number = 0) : void {
 			if (lastCategory == "slide") return;
-			
-			var en : EnemyWalker = new EnemyWalker();
-
+	
 			GenFlat(2);
 
 			if (FlxG.random() < coinChange) {
 				AddCoinArch(currentX + 1, currentY - 7, 4);
 			}
 			
-			currentChunk.AddEntityAtTileCoords(en, currentX-1, currentY - 2);
-
+			addEnemy(0, currentX - 1, currentY - 2);
 		}
 
 		public function GenTripleEnemy() : void {
@@ -619,7 +615,7 @@ package
 				currentY += stepHeight * dir;
 				GenFlat(stepWidth);
 			}
-			FlxG.log("dir" + dir.toString());
+			//FlxG.log("dir" + dir.toString());
 		}
 		
 		public function GenOneWayPlatformSteps() : void {

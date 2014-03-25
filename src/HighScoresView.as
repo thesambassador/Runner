@@ -53,7 +53,7 @@ package
 			highscores = new HighScoresTable();
 			
 			var nameHeader : FlxText = new FlxText(xName, rowStartY, 100, "Name");
-			var groupHeader : FlxText = new FlxText(xGroup, rowStartY, 100, "Group");
+			//var groupHeader : FlxText = new FlxText(xGroup, rowStartY, 100, "Group");
 			var scoreHeader : FlxText = new FlxText(xScore, rowStartY, 100, "Score");
 			var levelHeader : FlxText = new FlxText(xLevel, rowStartY, 100, "Level");
 			var topDivider : FlxSprite = new FlxSprite(20, rowStartY + 15);
@@ -74,8 +74,8 @@ package
 			inputFilter.borderThickness = 1;
 			inputFilter.enterCallBack = FilterGroup;
 			
-			add(btnFilter);
-			add(inputFilter);
+			//add(btnFilter);
+			//add(inputFilter);
 			add(btnNext);
 			
 			btnRefresh = new FlxButton(0, 280, "Refresh", RefreshScores);
@@ -86,7 +86,7 @@ package
 			add(topDivider);
 			
 			add(nameHeader);
-			add(groupHeader);
+			//add(groupHeader);
 			add(scoreHeader);
 			add(levelHeader);
 
@@ -99,21 +99,21 @@ package
 			
 			var rowNumber : FlxText = new FlxText(xNum, rowY, 30, currentRow.toString());
 			var rowName : FlxText = new FlxText(xName, rowY, 100, entry.name);
-			var rowGroup: FlxText = new FlxText(xGroup, rowY, 100, entry.group);
+			//var rowGroup: FlxText = new FlxText(xGroup, rowY, 100, entry.group);
 			var rowScore : FlxText = new FlxText(xScore, rowY, 100, entry.score.toString());
 			var rowLevel : FlxText = new FlxText(xLevel, rowY, 100, entry.level.toString());
 			
 			
 			rowNumber.scrollFactor = new FlxPoint();
 			rowName.scrollFactor = new FlxPoint();
-			rowGroup.scrollFactor = new FlxPoint();
+			//rowGroup.scrollFactor = new FlxPoint();
 			rowScore.scrollFactor = new FlxPoint();
 			rowLevel.scrollFactor = new FlxPoint();
 			
 			
 			currentDisplay.add(rowNumber);
 			currentDisplay.add(rowName);
-			currentDisplay.add(rowGroup);
+			//currentDisplay.add(rowGroup);
 			currentDisplay.add(rowScore);
 			currentDisplay.add(rowLevel);
 			
@@ -161,7 +161,7 @@ package
 			loader.load(request);
 		}
 		
-		public static function SubmitScore(name : String, group : String, score : int, level : int, finishFunction : Function) : void {
+		public static function SubmitScore(name : String, group : String, score : int, level : int, rank : int, finishFunction : Function) : void {
 			var request : URLRequest = new URLRequest("http://www.thesambassador.com/files/highscore.php");
 			var loader : URLLoader = new URLLoader();
 			var requestVars : URLVariables = new URLVariables();
@@ -170,6 +170,7 @@ package
 			requestVars.score = score;
 			requestVars.group = group;
 			requestVars.level = level;
+			requestVars.rank = rank;
 				
 			request.method = URLRequestMethod.POST;
 			request.data = requestVars;
@@ -208,6 +209,15 @@ package
 		public function resetState() : void {
 			PlayState.playImmediately = true;
 			FlxG.resetGame();
+		}
+		
+		override public function update() : void {
+			super.update();
+			
+			if (FlxG.keys.justPressed("ENTER")) {
+				PlayState.playImmediately = true;
+				FlxG.resetGame();
+			}
 		}
 		
 		override public function add(object : FlxBasic) : FlxBasic{

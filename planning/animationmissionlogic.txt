@@ -1,0 +1,21 @@
+Game starts
+Game loads mission templates
+Game loads player active missions
+If no player saved missions, initializes active mission list with 3 random missions
+
+During the game, various events set variables
+At the end of each level, we check to see if missions are complete
+	We flag completed missions by setting completed = true
+	We do a short animation showing that the mission was complete during the "Level Complete" section
+	The mission is still in the active mission list at this point
+
+At the end of each game, on the game over screen:
+	Shows current active missions as "mission tiles", including completed ones
+	Does "Completion" animation:
+		Checkmark sort of animation, showing it is completed
+		Stars fly into the empty stars in the rank display
+		Mission tile slides off the screen
+	New mission is generated
+		Animation: new mission tile slides onto the screen
+	Current mission/rank status is saved.
+	

@@ -2,8 +2,12 @@ package
 {
 	import org.flixel.FlxBasic;
 	import org.flixel.FlxObject;
+	import org.flixel.FlxPoint;
 	import org.flixel.FlxSprite;
 	import org.flixel.system.FlxTile;
+	import org.flixel.FlxU;
+	import org.flixel.FlxG;
+	
 	
 	/**
 	 * ...
@@ -61,5 +65,38 @@ package
 			
 			return targetX;
 		}
+		
+		public static function moveTowards(sprite : FlxSprite, target : FlxPoint, speed : Number) : Boolean {
+			var dist : Number = FlxU.getDistance(new FlxPoint(sprite.x, sprite.y), target);
+			if (dist < speed) {
+				sprite.x = target.x;
+				sprite.y = target.y;
+				return true;
+			}
+			
+			var diffX : Number = target.x - sprite.x;
+			var diffY : Number = target.y - sprite.y;
+			
+			var move : FlxPoint = new FlxPoint();
+			
+			move.x = (diffX / dist) * speed;
+			move.y = (diffY / dist) * speed;
+
+			sprite.x += move.x;
+			sprite.y += move.y;
+			return false;
+		}
+		
+		public function getVector(angle : Number, length : Number) : FlxPoint {
+			var returned : FlxPoint = new FlxPoint();
+			
+			var radians : Number = angle * Math.PI/180
+
+			returned.x = Math.cos(radians) * length;
+			returned.y = Math.sin(radians) * length;
+			
+			return returned;
+		}
+
 	}
 }

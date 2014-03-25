@@ -26,9 +26,7 @@ package
 			scale.y = 1.5;
 			
 			FlxG.shake(.01, .1);
-			var timer : FlxDelay = new FlxDelay(1000);
-			timer.callback = tick;
-			timer.start();
+			DelayManager.AddDelay(1, tick);
 		}
 		
 		override public function update() : void{
@@ -42,21 +40,20 @@ package
 		public function tick() : void {
 			num -= 1;
 			
-			var timer : FlxDelay = new FlxDelay(1000);
-			timer.callback = tick;
+			
 			FlxG.shake(.01, .1);
 			
 			if (num == 2) {
 				loadGraphic(img2);
-				timer.start();
+				DelayManager.AddDelay(1, tick);
 			}
 			else if (num == 1) {
 				loadGraphic(img1);
-				timer.start();
+				DelayManager.AddDelay(1, tick);
 			}
 			else if (num == 0){
 				loadGraphic(imgGo);
-				timer.start();
+				DelayManager.AddDelay(1, tick);
 				this.x = CommonFunctions.alignX(width, "right", 15);
 				this.y += 15;
 		

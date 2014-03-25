@@ -11,6 +11,8 @@ package
 		[Embed(source = '../resources/sound/springboard.mp3')]private static var springboardSound:Class;
 		
 		public var bounce : int = -500;
+		public var cooldown : int = 10;
+		public var curCooldown : int = 0;
 		
 		//public var soundSpringboard : FlxSound;
 		
@@ -26,10 +28,16 @@ package
 			//soundSpringboard.loadEmbedded(springboardSound);
 		}
 		
+		override public function behavior() : void {
+			if (curCooldown > 0) curCooldown -= 1;
+		}
+		
 		override public function collidePlayer(player : Player) : void {
-			if(player.y <= this.y - 17){
+			if((player.y <= this.y - 17) && curCooldown == 0){
 				player.Bounce(bounce * .85, bounce);
 				FlxG.play(springboardSound);
+				curCooldown = cooldown;
+				player.springboardCount += 1;
 				//soundSpringboard.play();
 			}
 			else {

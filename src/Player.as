@@ -31,7 +31,9 @@ package
 		private var controlConfig : Dictionary;
 		
 		public var collectiblesCollected : int = 0;
+		public var collectiblesCollectedLevel : int = 0;
 		public var enemiesKilled : int = 0;
+		public var enemiesKilledLevel : int = 0;
 		public var score : int = 0;
 		public var level : int = 0;
 		public var invulnerable : int = 0; //how many frames to be invulnerable
@@ -50,21 +52,16 @@ package
 		
 		private var airTime: int = 0;
 		private var jumpTime:Number = 7;  //variable for how long you can hold down the jump button and get lift
-		private var jumpVel:Number = 260.00;
+		private var jumpVel:Number = 270.00;
 		private var jumpEnergy:Number = jumpTime;
 		public var canStand:Boolean = true; //hack job... too tired to figure out an elegant way, and this is quick, simple, and dirty.
 		
 		//state stuff
 		public var state:String = "menu";
 		public var lastState:String = ""; //this is the state that was active on the last frame.  
-		public var attacking:Boolean = false; //is the character currently attacking?
-		public var attackCooldown : int = 25; //cooldown before you can do another attack
-		public var attackReady : int = 0; //current readiness of the attack... gets set to attackCooldown right when you attack.
-		public var attackProjectile : MeleeAttack;
-		
-		public var totalFrames : int = 0;
 		
 		public var lastVel : FlxPoint;
+		public var lastPos : FlxPoint;
 		
 		public var currentAnimationPriority : int = 0; //currently playing animation's priority, if I play something with a higher priority it will override
 		
@@ -73,6 +70,16 @@ package
 		
 		public var invulnFlashValue : Number = 0;
 		public var invulnFlashDirection : Number = .1;
+		
+		public var deathCount : int = 0;
+		public var deathCountLevel : int = 0;
+		
+		public var springboardCount : int = 0;
+		public var levelAirTime : Number = 0;
+		public var levelRunDist : Number = 0;
+		public var levelSlideDist : Number = 0;
+		public var consecutiveEnemies : Number = 0;
+		
 
 		public function Player(xStart:int = 0, yStart:int = 0){
 			super(xStart, yStart);
@@ -92,6 +99,7 @@ package
 			this.acceleration.y = 1000;
 			this.drag.x = this.maxVelocity.x * 3;
 			this.lastVel = new FlxPoint();
+			this.lastPos = new FlxPoint();
 			
 			//graphics
 			this.loadGraphic(playerSprites, true, true, 32, 32);
@@ -118,8 +126,8 @@ package
 			
 			this.width = 15; //so we can still fall between 2 tiles with a 1 space gap
 			
-			//FlxG.watch(this.velocity, "x", "Vel X");
-			//FlxG.watch(this.velocity, "y", "Vel Y");
+			FlxG.watch(this, "levelRunDist", "RunDist");
+			FlxG.watch(this, "levelAirTime", "AirTime");
 			
 			pickupSounds = new Array();
 			pickupSounds.push(pickupSound4);
@@ -161,7 +169,7 @@ package
 				alpha = 1;
 				_colorTransform = null;
 			}
-			totalFrames ++;
+			
 			//reset acceleration and apply gravity
 			this.acceleration.x = 0;
 			this.acceleration.y = gravity;
@@ -210,6 +218,8 @@ package
 			}
 			
 			this.velocity.copyTo(lastVel);
+			this.lastPos.x = this.x;
+			this.lastPos.y = this.y;
 			
 			canStand = true;
 			
@@ -247,6 +257,9 @@ package
 			this.invulnerable = 60;
 			FlxG.play(deathSound);
 			FlxG.state.add(PlayerEffects.deathByFire(this.x, this.y, playerSprites));
+			
+			deathCount ++;
+			deathCountLevel ++;
 		}
 		
 		override public function reset(X:Number, Y:Number) : void {
@@ -274,6 +287,7 @@ package
 		//ground state can transition to air (by jumping or running off an edge) or to sliding.
 		private function updateGroundState () : Boolean {
 			airTime = 0;
+			consecutiveEnemies = 0;
 			if (!this.isTouching(FlxObject.FLOOR)) {
 				changeState("air");
 				return false;
@@ -334,6 +348,9 @@ package
 			else {
 				this.playPriority("idle", 0);
 			}
+			
+			levelRunDist +=  Math.abs(this.x - this.lastPos.x);
+			
 			
 			return true;
 			
@@ -413,15 +430,21 @@ package
 			if (this.velocity.y < 0) {
 				if(this.jumpEnergy > this.jumpTime - 2)
 					this.playPriority("jump", 6);
+				else {
+					//this.playPriority("fallinit", 4);
+				}
 			}
 			else {
 				if(this.velocity.y * this.lastVel.y < 0){ //if our velocity has changed and we're falling, play fallinit once.
 					this.playPriority("fallinit", 4);
 				}
-				else{
-					this.playPriority("fall", 1);
+				else {
+					if(this._curAnim != null && this._curAnim.name != "fallinit")
+						this.playPriority("fall", 1);
 				}
 			}
+			
+			levelAirTime += FlxG.elapsed;
 			return true;
 		}
 		
@@ -469,7 +492,9 @@ package
 			}
 			
 			this.playPriority("slide", 1);
-
+			
+			levelSlideDist +=   Math.abs(this.x - this.lastPos.x);
+			
 			return true;
 		}
 		
@@ -503,25 +528,10 @@ package
 		}
 		
 		
-		private function updateAttacking() : void {
-			if (attackReady > 0) attackReady --;
-		
-			
-			//ATTACK
-			//if(!sliding){
-				if (FlxG.keys.justPressed(controlConfig["RUN"]) && attackReady == 0) {
-					attackReady = attackCooldown;
-					attackProjectile = new MeleeAttack(this.x + 20, this.y, this);
-					attackProjectile.facing = this.facing;
-					FlxG.state.add(attackProjectile);
-				}
-			//}
-		}
-		
 		public function playPriority(name:String, priority:int) : void {
 			if (priority >= currentAnimationPriority) {
 				this.play(name); 
-				currentAnimationPriority = priority
+				currentAnimationPriority = priority;
 			}
 		}
 		
@@ -553,6 +563,15 @@ package
 				this.velocity.y = big;
 			else
 				this.velocity.y = small;
+			this.playPriority("jump", 6);
+			
+			//if we bounce on an enemy
+			if (big == -400) {
+				consecutiveEnemies += 1;
+				if (consecutiveEnemies >= 3) {
+					MissionManager.SetValue("enemyBounce", 1);
+				}
+			}
 		}
 		
 		public function collectCollectible(c : Collectible) : void {
@@ -561,6 +580,7 @@ package
 			pickupSoundDelay = 60;
 			addScore(100);
 			this.collectiblesCollected ++ ;
+			this.collectiblesCollectedLevel ++ ;
 		}
 		
 		public function collideTilemap(tilemap:FlxObject, playerObj:FlxObject) : Boolean{

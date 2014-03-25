@@ -33,7 +33,7 @@ package
 				}
 			}
 			
-			FlxG.log(validFunctions.length.toString());
+			//FlxG.log(validFunctions.length.toString());
 			return validFunctions;
 		}
 		

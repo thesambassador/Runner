@@ -1,0 +1,41 @@
+missions:
+
+Each mission is worth an amount of stars from 1-3, depending on length and difficulty
+Each "rank" takes an amount of stars to level up to the next rank
+completing a mission awards the stars and generates a new mission
+3 missions active at once
+	at least 1 of them will be a "hard" 3 star
+	other 2 can randomly be 1 or 2 stars
+missions can be repeated once the player has completed all of them
+
+Types:
+	Orbs:
+		Collect X orbs (lasts over several games)
+		Collect X orbs in a single run
+		Collect all orbs in a single level
+		
+	Deaths:
+		Die X times in a single game
+		Die X times in a single level and still complete the level
+		Die X times (over multiple games)
+
+	Speed:
+		Complete a level in under X seconds
+		Get a one level length lead on the Wall of Death
+		
+
+	Enemies:
+		Stomp X enemies (over multiple games)
+		Stomp X enemies in a single run
+		Stomp all enemies in a single level (at least 3 in a level)
+
+	Levels:
+		Complete X levels in a row without dying
+		Get to level X
+		Complete X levels (over several games)
+
+	Other:
+		Jump on X springboards
+		Run on the ground X distance
+		Be in the air for X time
+		Be in the air for X time in a single game
