@@ -174,11 +174,12 @@ And special thanks to my wife Katie for all of her ideas and support
 			btnHowto.y = CommonConstants.VISIBLEHEIGHT - btnHowto.height - 15;
 			menuRoot.add(btnHowto);
 			
+			/* removing high scores to use Kongregate's API
 			btnHighScores = CreateButton(imgHighScores, imgHighScoresHover, ShowHighscores);
 			btnHighScores.x = CommonFunctions.alignX(btnHighScores.width, "center");
 			btnHighScores.y = CommonConstants.VISIBLEHEIGHT - btnHighScores.height - 15;
 			menuRoot.add(btnHighScores);
-			
+			*/
 			btnCredits = CreateButton(imgCredits, imgCreditsHover, ShowCredits);
 			btnCredits.x = CommonFunctions.alignX(btnCredits.width, "right", 15);
 			btnCredits.y = CommonConstants.VISIBLEHEIGHT - btnCredits.height - 15;
@@ -202,7 +203,7 @@ And special thanks to my wife Katie for all of her ideas and support
 				var speed : int = 5;
 				logo.y -= speed;
 				btnPlay.visible = false;
-				btnHighScores.y += speed;
+				//btnHighScores.y += speed;
 				btnCredits.y += speed;
 				btnHowto.y += speed;
 				btnMissions.x -= speed;

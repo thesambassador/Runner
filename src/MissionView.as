@@ -192,9 +192,10 @@ package
 			
 		}
 		
-		public function StartMissionAnimation(completedCallback : Function = null) : void {
+		public function StartMissionAnimation(callback : Function = null) : void {
 			animationsCompleted = false;
 			SwitchAnimation(AnimateSlideInMissions);
+			animationCallback = callback;
 		}
 		
 		//slide in the existing missions, included ones that have been completed
@@ -329,13 +330,18 @@ package
 		
 		//animate the completed missions sliding off to the right
 		public function AnimateCompletedSlideOff() : void {
+			var anyCompleted : Boolean = false;
 			for each(var mission : MissionDisplay in missionGroup.members) {
 				if (mission.completed) {
+					anyCompleted = true;
 					mission.x += slideSpeed;
 					if (mission.x > CommonConstants.VISIBLEWIDTH) {
 						SwitchAnimation(AnimateNewSlideOn);
 					}
 				}
+			}
+			if (!anyCompleted) {
+				SwitchAnimation(AnimateNewSlideOn);
 			}
 		}
 		

@@ -23,6 +23,8 @@ package
 		public var highScoreView : HighScoresView;
 		public var missions : MissionView;
 		
+		public var missionAnimationComplete : Boolean;
+		
 		public var gameOverGroup : FlxGroup;
 		
 		public var nameBox : FlxInputText;
@@ -56,7 +58,7 @@ package
 			//add the mission display
 			missions = new MissionView();
 			gameOverGroup.add(missions);
-			missions.StartMissionAnimation();
+			missions.StartMissionAnimation(DoneAnimatingMissions);
 			
 			//show the score, save it if it's the best one
 			CommonFunctions.saveScore(player.score);
@@ -71,7 +73,7 @@ package
 			gameOverGroup.add(scoreText);
 			gameOverGroup.add(bestScoreText);
 			
-			AddInputs();
+			//AddInputs();
 			
 			//scoreOverview = new ScoreOverview();
 			//add(scoreOverview);
@@ -83,6 +85,7 @@ package
 		}
 		
 		public function AddInputs() : void {
+			/*
 			nameBox = new FlxInputText(215, 77, CommonConstants.SAVE.data.name, 100, 0xFFFFFFFF, 0xFF000000);
 			nameBox.maxLength = 15;
 			nameBox.filterMode = FlxInputText.ONLY_ALPHANUMERIC;
@@ -90,52 +93,55 @@ package
 			
 			submitButton = new FlxButton(290, 255, "Submit", SubmitScore);
 			gameOverGroup.add(submitButton);
+			*/
 			
-			var skipShortcut : FlxText = new FlxText(30, 243, 80, "(Space)");
-			skipShortcut.alignment = "center";
-			gameOverGroup.add(skipShortcut);
+
 			
-			var submitShortcut : FlxText = new FlxText(290, 243, 80, "(Enter)");
-			submitShortcut.alignment = "center";
-			gameOverGroup.add(submitShortcut);
+			//var submitShortcut : FlxText = new FlxText(290, 243, 80, "(Enter)");
+			//submitShortcut.alignment = "center";
+			//gameOverGroup.add(submitShortcut);
 			
-			skipButton = new FlxButton(30, 255, "Skip", SkipScore);
-			gameOverGroup.add(skipButton);
+			//skipButton = new FlxButton(30, 255, "Next", SkipScore);
+			//gameOverGroup.add(skipButton);
 		}
 		
 		override public function update() : void {
 			super.update();
 			
-			if (FlxG.keys.justPressed("ENTER") && !doneSubmitting) {
-				SubmitScore();
+			//if (FlxG.keys.justPressed("ENTER") && !doneSubmitting) {
+			//	SubmitScore();
+			//}
+			
+			if (FlxG.keys.justPressed("SPACE") && missionAnimationComplete) {
+				resetState();
 			}
 			
-			if (FlxG.keys.justPressed("SPACE") && !doneSubmitting) {
-				SkipScore();
-			}
-			
-			if (doneSubmitting && showingMissions) {
+			if (missionAnimationComplete && showingMissions) {
 				showingMissions = false;
 				
-				gameOverGroup.visible = false;
-				gameOverGroup.active = false;
+				//gameOverGroup.visible = false;
+				//gameOverGroup.active = false;
 				
-				var bg : FlxSprite = new FlxSprite(0, 0, CommonConstants.MENUBG);
-				bg.scrollFactor.x = 0;
-				bg.scrollFactor.y = 0;
-				add(bg);
+				//var bg : FlxSprite = new FlxSprite(0, 0, CommonConstants.MENUBG);
+				//bg.scrollFactor.x = 0;
+				//bg.scrollFactor.y = 0;
+				//add(bg);
 				
-				var playAgainShortcut : FlxText = new FlxText(CommonConstants.VISIBLEWIDTH - 120, 8, 80, "(Enter)");
-				add(playAgainShortcut);
-				playAgainShortcut.alignment = "center";
-				playAgainShortcut.scrollFactor.x = 0;
-				playAgainShortcut.scrollFactor.y = 0;
+				var skipShortcut : FlxText = new FlxText(290, 230, 80, "(Space)");
+				skipShortcut.scrollFactor.x = 0;
+				skipShortcut.scrollFactor.y = 0;
+				skipShortcut.alignment = "center";
+				add(skipShortcut);
 				
+				var btnNext : FlxButton = new FlxButton(290, 243, "Play Again", resetState);
+				btnNext.scrollFactor.x = 0;
+				btnNext.scrollFactor.y = 0;
+				add(btnNext);
 				
-				highScoreView = new HighScoresView();
-				add(highScoreView);
-				highScoreView.RefreshScores();
-				highScoreView.ShowEntries();
+				//highScoreView = new HighScoresView();
+				//add(highScoreView);
+				//highScoreView.RefreshScores();
+				//highScoreView.ShowEntries();
 			}
 				
 			/*
@@ -150,6 +156,8 @@ package
 			*/
 		}
 		
+		//commenting out this crap for kongregate
+		/*
 		public function SubmitScore() : void {
 			if(!submitting){
 				if(nameBox.text.length > 0){ //&& groupBox.text.length > 0){
@@ -165,7 +173,16 @@ package
 			submitButton.label.text = "done";
 			doneSubmitting = true;
 		}
+		*/
 		
+		public function DoneAnimatingMissions() {
+			missionAnimationComplete = true;
+		}
+		
+		public function resetState() : void {
+			PlayState.playImmediately = true;
+			FlxG.resetGame();
+		}
 	}
 
 }
