@@ -110,7 +110,7 @@ package
 			
 			timerText.text = FlxU.formatTicks(0, newTime);
 
-			coinsText.text = "Coins \n   " + player.collectiblesCollected.toString();
+			coinsText.text = "Orbs \n   " + player.collectiblesCollected.toString();
 			scoreText.text = "Score \n " + player.score;
 			levelText.text = "Level \n" + (FlxG.state as PlayState).world.currentLevel.toString();
 			

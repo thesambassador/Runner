@@ -23,7 +23,9 @@ package
 		{
 			CommonConstants.SAVE = new FlxSave();
 			CommonConstants.SAVE.bind("AlienRunner");
-
+			//CommonConstants.SAVE.erase();
+			//CommonConstants.SAVE.bind("AlienRunner");
+			
 			missionManager = new MissionManager();
 			//missionManager.ResetRank();
 			

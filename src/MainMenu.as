@@ -99,6 +99,7 @@ package
 			
 			initButtons(startGameFunction);
 			initMenus();
+			
 		}
 		
 		public function initMenus() : void {
@@ -310,6 +311,7 @@ And special thanks to my wife Katie for all of her ideas and support
 		}
 		
 		public function ResetMissions() : void {
+			
 			MissionManager.missionManagerInstance.ResetRank();
 			
 			menuMissions.SetupView();

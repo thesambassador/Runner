@@ -20,7 +20,8 @@ package
 		public var missionManager : MissionManager;
 		
 		public var missionGroup : FlxGroup;
-		public var starGroup : FlxGroup; //group for the stars on the rank display
+		public var activeStarGroup : FlxGroup; //group for the stars on the rank display
+		public var inactiveStarGroup : FlxGroup;
 		public var starQueue : FlxGroup; //group for the stars waiting to be sent from completed missions
 		
 		public var rankText : FlxText;
@@ -114,8 +115,19 @@ package
 		}
 		
 		public function SetupStars(rank : int, filledStars : int) : void {
-			starGroup = new FlxGroup();
-			add(starGroup);
+			if (activeStarGroup != null) {
+				remove(activeStarGroup);
+				activeStarGroup.destroy();
+			}
+			if (inactiveStarGroup != null) {
+				remove(inactiveStarGroup);
+				activeStarGroup.destroy();
+			}
+
+			activeStarGroup = new FlxGroup();
+			inactiveStarGroup = new FlxGroup();
+			add(inactiveStarGroup);
+			add(activeStarGroup);
 			starPositions = new Array();
 			
 			rankText.text =  rank.toString() + ": " + missionManager.GetRankName(rank);
@@ -133,8 +145,7 @@ package
 			var placeY : int = starStartY;
 			
 			for (var i:int = 0; i < numStars; i++) {
-				var star : FlxSprite;
-				
+
 				if(numStars > 5){
 					if (i == numTopRow) {
 						placeY += starBufferY;
@@ -143,18 +154,27 @@ package
 				}
 				
 				if (i < filledStars) {
-					star = new FlxSprite(placeX, placeY, CommonConstants.STARFULL);
+					var greystar : FlxSprite = new FlxSprite(placeX, placeY, CommonConstants.STAREMPTY);
+					greystar.scrollFactor.x = 0;
+					greystar.scrollFactor.y = 0;
+					inactiveStarGroup.add(greystar);
+					
+					var filledstar : FlxSprite= new FlxSprite(placeX, placeY, CommonConstants.STARFULL);
+					filledstar.scrollFactor.x = 0;
+					filledstar.scrollFactor.y = 0;
+					activeStarGroup.add(filledstar);
 				}
 				else {
-					star = new FlxSprite(placeX, placeY, CommonConstants.STAREMPTY);
+					var greystar : FlxSprite = new FlxSprite(placeX, placeY, CommonConstants.STAREMPTY);
+					greystar.scrollFactor.x = 0;
+					greystar.scrollFactor.y = 0;
+					inactiveStarGroup.add(greystar);
 				}
-				star.scrollFactor.x = 0;
-				star.scrollFactor.y = 0;
+
 				starPositions.push(new FlxPoint(placeX, placeY));
 				
 				placeX += starWidth + starBufferX;
-				
-				starGroup.add(star);
+
 			}
 		}
 		
@@ -216,7 +236,7 @@ package
 				currentMission = missionGroup.members[index] as MissionDisplay;
 				needInit = false;
 			}
-			
+			//currentMission.completed = true;
 			if (currentMission.completed && !currentMission.animatedCompleted) {
 				currentMission.AnimateCompleted();
 			}
@@ -263,7 +283,7 @@ package
 				//move our star, and if the star has reached its destination, add it to the star group and set it to null to go to the next one
 				if (CommonFunctions.moveTowards(currentStar, currentStarTargetPoint, starSpeed)){
 					starQueue.remove(currentStar, true);
-					starGroup.add(currentStar);
+					activeStarGroup.add(currentStar);
 					currentStar = null;
 					starIndex += 1;
 					
@@ -297,7 +317,7 @@ package
 				SetupStars(displayRank, 0);
 			}
 			
-			if (delay <= 45) {
+			if (delay < 45) {
 				
 				ExplodeStars();
 			}
@@ -370,7 +390,7 @@ package
 		public function ExplodeStars() : void {
 			if (explodeStarDirs == null) {
 				explodeStarDirs = new Array();
-				for (var i:int = 0; i < starGroup.length; i++ ) {
+				for (var i:int = 0; i < activeStarGroup.length; i++ ) {
 					var x:Number;
 					var y:Number;
 					
@@ -387,8 +407,8 @@ package
 				}
 			}
 			
-			for (var j : int = 0; j < starGroup.length; j++){
-				var star : FlxSprite = starGroup.members[j] as FlxSprite;
+			for (var j : int = 0; j < activeStarGroup.length; j++){
+				var star : FlxSprite = activeStarGroup.members[j] as FlxSprite;
 				var point : FlxPoint = explodeStarDirs[j];
 				if (star && point) {
 					CommonFunctions.moveTowards(star, point, 25);

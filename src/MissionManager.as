@@ -9,6 +9,7 @@ package
 	 */
 	public class MissionManager 
 	{
+		//[Embed(source = '../resources/missions_test.xml',  mimeType="application/octet-stream")]public static var missionXML:Class;
 		[Embed(source = '../resources/missions.xml',  mimeType="application/octet-stream")]public static var missionXML:Class;
 		[Embed(source = '../resources/ranks.xml',  mimeType="application/octet-stream")]public static var rankXML:Class;
 		
@@ -133,7 +134,7 @@ package
 		public function GetMissionByID(id : int, progress : int = 0) : Mission {
 			var mission : Mission = new Mission();
 			var missionTemplate : Mission = missionList[id];
-			
+
 			mission.missionID = missionTemplate.missionID;
 			mission.persist = missionTemplate.persist;
 			mission.starValue = missionTemplate.starValue;
@@ -351,7 +352,8 @@ package
 			CommonConstants.SAVE.data.completedMissions = completedMissions;
 			CommonConstants.SAVE.data.rank = currentRank;
 			CommonConstants.SAVE.data.stars = currentStars;
-			CommonConstants.SAVE.flush();
+			var x : Boolean = CommonConstants.SAVE.close();
+			CommonConstants.SAVE.bind("AlienRunner");
 		}
 		
 		public function UpdateRank() : void{
@@ -366,7 +368,8 @@ package
 		
 		public function ResetRank() : void {
 			CommonConstants.SAVE.erase();
-			CommonConstants.SAVE.flush();
+			//CommonConstants.SAVE.
+			CommonConstants.SAVE.bind("AlienRunner");
 			currentRank = 1;
 			currentStars = 0;
 			completedMissionIDs = new Array();
