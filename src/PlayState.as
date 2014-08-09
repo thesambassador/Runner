@@ -2,6 +2,7 @@ package
 {
 	import org.flixel.*;
 	import org.flixel.system.FlxDebugger;
+	import org.flixel.plugin.photonstorm.API.FlxKongregate;
 	
 	/**
 	 * Very basic game state class, sets framerate, background color, sets up a pause menu, and instantiates the game world.
@@ -21,6 +22,17 @@ package
 		
 		override public function create():void
 		{
+			if(!FlxKongregate.hasLoaded){
+				FlxKongregate.init(InitGame);
+			}
+			
+			InitGame();
+		}
+		
+		public function InitGame() : void {
+			if(!FlxKongregate.hasLoaded)
+				FlxKongregate.connect();
+			
 			CommonConstants.SAVE = new FlxSave();
 			CommonConstants.SAVE.bind("AlienRunner");
 			//CommonConstants.SAVE.erase();

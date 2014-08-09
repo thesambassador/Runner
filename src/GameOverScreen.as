@@ -9,6 +9,7 @@ package
 	import org.flixel.FlxText;
 	import org.flixel.FlxPoint;
 	import org.flixel.FlxG;
+	import org.flixel.plugin.photonstorm.API.FlxKongregate;
 	/**
 	 * ...
 	 * @author Sam Tregillus
@@ -180,6 +181,12 @@ package
 		}
 		
 		public function resetState() : void {
+			try {
+				FlxKongregate.api.stats.submit("HighScore", score);
+			}
+			catch (error:Error) {
+				
+			}
 			PlayState.playImmediately = true;
 			FlxG.resetGame();
 		}
